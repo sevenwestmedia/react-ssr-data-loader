@@ -35,6 +35,7 @@ export interface DispatchProps {
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
 const needsData = (state: LoaderDataState) => !state || (!state.loaded && !state.failed)
+const hasDataFromServer = (state: LoaderDataState) => state && state.loaded && state.serverSideRender
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     loadData = async () => {
@@ -78,7 +79,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         if (this.props.isServerSideRender && needsData(loadedState)) {
             return await this.loadData()
         }
-        if (!this.props.isServerSideRender) {
+        if (!this.props.isServerSideRender && !hasDataFromServer(loadedState)) {
             return await this.loadData()
         }
     }

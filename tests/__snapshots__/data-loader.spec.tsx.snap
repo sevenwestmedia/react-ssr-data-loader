@@ -1,3 +1,92 @@
+exports[`Client side render client render after SSR with data should not fetch data 1`] = `
+Object {
+  "data": Object {
+    "result": "Success!",
+  },
+  "errorMessage": undefined,
+  "isLoaded": true,
+  "isLoading": false,
+  "loadFailed": false,
+  "renderCount": 3,
+}
+`;
+
+exports[`Client side render client render after SSR with data should not fetch data 2`] = `
+Object {
+  "dataLoader": Object {
+    "testDataType": Object {
+      "testKey": Object {
+        "data": Object {
+          "result": "Success!",
+        },
+        "failed": false,
+        "loaded": true,
+        "loading": false,
+        "serverSideRender": true,
+      },
+    },
+  },
+}
+`;
+
+exports[`Client side render should pass failure when data load fails 1`] = `
+Object {
+  "data": undefined,
+  "errorMessage": "Boom!",
+  "isLoaded": false,
+  "isLoading": false,
+  "loadFailed": true,
+  "renderCount": 3,
+}
+`;
+
+exports[`Client side render should pass failure when data load fails 2`] = `
+Object {
+  "dataLoader": Object {
+    "testDataType": Object {
+      "testKey": Object {
+        "error": "Boom!",
+        "failed": true,
+        "loaded": false,
+        "loading": false,
+        "serverSideRender": false,
+      },
+    },
+  },
+}
+`;
+
+exports[`Client side render should pass loaded data once promise resolves 1`] = `
+Object {
+  "data": Object {
+    "result": "Success!",
+  },
+  "errorMessage": undefined,
+  "isLoaded": true,
+  "isLoading": false,
+  "loadFailed": false,
+  "renderCount": 3,
+}
+`;
+
+exports[`Client side render should pass loaded data once promise resolves 2`] = `
+Object {
+  "dataLoader": Object {
+    "testDataType": Object {
+      "testKey": Object {
+        "data": Object {
+          "result": "Success!",
+        },
+        "failed": false,
+        "loaded": true,
+        "loading": false,
+        "serverSideRender": false,
+      },
+    },
+  },
+}
+`;
+
 exports[`Client side render should start loading data if not loaded 1`] = `
 Object {
   "data": undefined,

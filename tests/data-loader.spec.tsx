@@ -120,4 +120,42 @@ describe('Client side render', () => {
         expect(store.getState()).toMatchSnapshot()
         expect(loadDataCount).toBe(1)
     })
+
+    it('should pass loaded data once promise resolves', async() => {
+        const sut = mountComponent(false)
+
+        const verifier = sut.find(Verifier)
+
+        await testDataPromise.resolve({
+            result: 'Success!'
+        })
+
+        expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+        expect(loadDataCount).toBe(1)
+    })
+
+    it('should pass failure when data load fails', async() => {
+        const sut = mountComponent(false)
+
+        const verifier = sut.find(Verifier)
+
+        await testDataPromise.reject(new Error('Boom!'))
+
+        expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+        expect(loadDataCount).toBe(1)
+    })
+
+    it('client render after SSR with data should not fetch data', async() => {
+        let sut = mountComponent(true)
+        const verifier = sut.find(Verifier)
+        await testDataPromise.resolve({ result: 'Success!' })
+
+        sut = mountComponent(false, false)
+
+        expect(loadDataCount).toBe(1)
+        expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+    })
 })
