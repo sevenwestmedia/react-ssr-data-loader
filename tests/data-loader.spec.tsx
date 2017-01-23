@@ -24,36 +24,47 @@ beforeEach(() => {
 })
 
 describe('server side render', () => {
-    let sut: ReactWrapper<OwnProps<Data>, any>
+    let loadDataCount: number
     let testDataPromise: PromiseCompletionSource<Data>
-    
-    beforeEach(() => {
+
+    const mountComponent = (isServerSideRender: boolean, resetCounters = true) => {
         testDataPromise = new PromiseCompletionSource<Data>()
         let renderCount = 0
-
+        if (resetCounters) {
+            loadDataCount = 0
+        }
         const testComponent = (
             <Provider store={store}>
                 <TestDataLoader
                     dataType="testDataType"
                     dataKey="testKey"
                     isServerSideRender={true}
-                    loadData={() => testDataPromise.promise}
+                    loadData={() => {
+                        loadDataCount++
+                        return testDataPromise.promise
+                    }}
                     renderData={(props) => (
                         <Verifier {...props} renderCount={++renderCount} />
                     )}
                 />
             </Provider>
         )
-        sut = mount(testComponent).find(TestDataLoader)
-    })
+
+        return mount(testComponent).find(TestDataLoader)
+    }
 
     it('should start load data if not loaded', () => {
+        const sut = mountComponent(true)
+
         const verifier = sut.find(Verifier)
 
         expect(verifier.props()).toMatchSnapshot()
+        expect(loadDataCount).toBe(1)
     })
 
     it('should pass loaded data once promise resolves', async() => {
+        const sut = mountComponent(true)
+
         const verifier = sut.find(Verifier)
 
         await testDataPromise.resolve({
@@ -61,5 +72,37 @@ describe('server side render', () => {
         })
 
         expect(verifier.props()).toMatchSnapshot()
+        expect(loadDataCount).toBe(1)
+    })
+
+    it('should pass failure when data load fails', async() => {
+        const sut = mountComponent(true)
+
+        const verifier = sut.find(Verifier)
+
+        await testDataPromise.reject(new Error('Boom!'))
+
+        expect(verifier.props()).toMatchSnapshot()
+        expect(loadDataCount).toBe(1)
+    })
+
+    it('second SSR when data loaded should not reload data', async() => {
+        let sut = mountComponent(true)
+        const verifier = sut.find(Verifier)
+        await testDataPromise.resolve({ result: 'Success!' })
+
+        sut = mountComponent(true, false)
+
+        expect(loadDataCount).toBe(1)
+    })
+
+    it('second SSR when data load failed should not reload data', async() => {
+        let sut = mountComponent(true)
+        const verifier = sut.find(Verifier)
+        await testDataPromise.reject(new Error('Boom'))
+
+        sut = mountComponent(true, false)
+
+        expect(loadDataCount).toBe(1)
     })
 })

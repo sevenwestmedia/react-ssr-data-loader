@@ -1,8 +1,20 @@
+exports[`server side render should pass failure when data load fails 1`] = `
+Object {
+  "data": undefined,
+  "errorMessage": "Boom!",
+  "isLoaded": false,
+  "isLoading": false,
+  "loadFailed": true,
+  "renderCount": 3,
+}
+`;
+
 exports[`server side render should pass loaded data once promise resolves 1`] = `
 Object {
   "data": Object {
     "result": "Success!",
   },
+  "errorMessage": undefined,
   "isLoaded": true,
   "isLoading": false,
   "loadFailed": false,
@@ -13,6 +25,7 @@ Object {
 exports[`server side render should start load data if not loaded 1`] = `
 Object {
   "data": undefined,
+  "errorMessage": undefined,
   "isLoaded": false,
   "isLoading": true,
   "loadFailed": false,

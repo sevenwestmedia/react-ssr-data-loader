@@ -10,6 +10,7 @@ export interface LoadedState<T> {
     isLoaded: boolean
     isLoading: boolean
     loadFailed: boolean
+    errorMessage?: string
     data?: T
 }
 
@@ -90,6 +91,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
             isLoaded: loadedState.loaded,
             isLoading: loadedState.loading,
             loadFailed: loadedState.failed,
+            errorMessage: loadedState.error,
             data: loadedState.data
         }
     }
