@@ -1,0 +1,11 @@
+exports[`server side render should pass loaded data once promise resolves 1`] = `
+Object {
+  "isLoaded": false,
+}
+`;
+
+exports[`server side render should start load data if not loaded 1`] = `
+Object {
+  "isLoaded": false,
+}
+`;

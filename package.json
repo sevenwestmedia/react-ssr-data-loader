@@ -1,0 +1,40 @@
+{
+  "name": "redux-data-loader",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {},
+  "license": "MIT",
+  "dependencies": {
+    "@types/jest": "^16.0.4",
+    "@types/react": "^15.0.1",
+    "@types/react-dom": "^0.14.20",
+    "@types/react-redux": "^4.4.35",
+    "@types/redux": "^3.6.0",
+    "enzyme": "^2.7.1",
+    "jest": "^18.1.0",
+    "react": "^15.4.2",
+    "react-addons-test-utils": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-redux": "^5.0.2",
+    "redux": "^3.6.0",
+    "ts-jest": "^18.0.1",
+    "typescript": "^2.1.5"
+  },
+  "scripts": {
+    "build": "tsc -p . -d",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:update-snapshots": "jest -u"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
+  }
+}
