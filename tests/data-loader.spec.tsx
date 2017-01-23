@@ -37,7 +37,7 @@ const mountComponent = (isServerSideRender: boolean, resetCounters = true) => {
             <TestDataLoader
                 dataType="testDataType"
                 dataKey="testKey"
-                isServerSideRender={true}
+                isServerSideRender={isServerSideRender}
                 loadData={() => {
                     loadDataCount++
                     return testDataPromise.promise

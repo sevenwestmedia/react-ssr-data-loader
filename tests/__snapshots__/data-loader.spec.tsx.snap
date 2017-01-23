@@ -17,7 +17,7 @@ Object {
         "failed": false,
         "loaded": false,
         "loading": true,
-        "serverSideRender": true,
+        "serverSideRender": false,
       },
     },
   },

@@ -34,42 +34,52 @@ export interface DispatchProps {
 }
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
+const needsData = (state: LoaderDataState) => !state || (!state.loaded && !state.failed)
+
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
-    async componentWillMount() {
-        const loadedState = this.getLoadedState()
+    loadData = async () => {
         const actionMeta = {
             dataType: this.props.dataType,
             dataKey: this.props.dataKey,
             isServerSideRender: this.props.isServerSideRender
         }
 
-        if (this.props.isServerSideRender && (!loadedState || (!loadedState.loaded && !loadedState.failed))) {
-            this.props.dispatch<LOAD_DATA>({
-                type: LOAD_DATA,
-                meta: actionMeta
+        this.props.dispatch<LOAD_DATA>({
+            type: LOAD_DATA,
+            meta: actionMeta
+        })
+
+        try {
+            const data = await this.props.loadData()
+            this.props.dispatch<LOAD_DATA_COMPLETED>({
+                type: LOAD_DATA_COMPLETED,
+                meta: actionMeta,
+                payload: data
             })
-
-            try {
-                const data = await this.props.loadData()
-                this.props.dispatch<LOAD_DATA_COMPLETED>({
-                    type: LOAD_DATA_COMPLETED,
-                    meta: actionMeta,
-                    payload: data
-                })
-            } catch (err) {
-                let payload: string
-                if (err instanceof Error) {
-                    payload = err.message
-                } else {
-                    payload = err ? err.toString() : ''
-                }
-
-                this.props.dispatch<LOAD_DATA_FAILED>({
-                    type: LOAD_DATA_FAILED,
-                    meta: actionMeta,
-                    payload: payload
-                })
+        } catch (err) {
+            let payload: string
+            if (err instanceof Error) {
+                payload = err.message
+            } else {
+                payload = err ? err.toString() : ''
             }
+
+            this.props.dispatch<LOAD_DATA_FAILED>({
+                type: LOAD_DATA_FAILED,
+                meta: actionMeta,
+                payload: payload
+            })
+        }
+    }
+
+    async componentWillMount() {
+        const loadedState = this.getLoadedState()
+
+        if (this.props.isServerSideRender && needsData(loadedState)) {
+            return await this.loadData()
+        }
+        if (!this.props.isServerSideRender) {
+            return await this.loadData()
         }
     }
 
