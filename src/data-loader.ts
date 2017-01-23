@@ -33,7 +33,7 @@ export interface DispatchProps {
 }
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
-export class DataLoader<T> extends React.Component<Props<T>, {}> {
+export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     async componentWillMount() {
         const loadedState = this.getLoadedState()
         const actionMeta = {
@@ -42,7 +42,7 @@ export class DataLoader<T> extends React.Component<Props<T>, {}> {
             isServerSideRender: this.props.isServerSideRender
         }
 
-        if (this.props.isServerSideRender && !loadedState.loaded && !loadedState.failed) {
+        if (this.props.isServerSideRender && (!loadedState || (!loadedState.loaded && !loadedState.failed))) {
             this.props.dispatch<LOAD_DATA>({
                 type: LOAD_DATA,
                 meta: actionMeta
@@ -72,15 +72,19 @@ export class DataLoader<T> extends React.Component<Props<T>, {}> {
         }
     }
 
-    getLoadedState = (): LoaderDataState => (this.props.store[this.props.dataType] && this.props.store[this.props.dataType][this.props.dataKey]) || {
-        loaded: false,
-        loading: false,
-        failed: false,
-        serverSideRender: this.props.isServerSideRender
+    getLoadedState = (): LoaderDataState => {
+        const dataLookup = this.props.store[this.props.dataType]
+        if (!dataLookup) {
+            return undefined
+        }
+        return dataLookup[this.props.dataKey]
     }
 
     getLoadedProps = (): LoadedState<T> => {
         const loadedState = this.getLoadedState()
+        if (!loadedState) {
+            return undefined
+        }
 
         return {
             isLoaded: loadedState.loaded,
@@ -91,7 +95,12 @@ export class DataLoader<T> extends React.Component<Props<T>, {}> {
     }
 
     render() {
-        return this.props.renderData(this.getLoadedProps())
+        const loadedProps = this.getLoadedProps() || {
+            isLoaded: false,
+            isLoading: false,
+            loadFailed: false
+        }
+        return this.props.renderData(loadedProps)
     }
 }
 

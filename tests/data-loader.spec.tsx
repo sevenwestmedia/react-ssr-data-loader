@@ -12,7 +12,9 @@ interface Data {
 
 const TestDataLoader = createTypedDataLoader<Data>()
 
-const Verifier: React.SFC<LoadedState<Data>> = (loadedState) => (<noscript />)
+const Verifier: React.SFC<LoadedState<Data> & {
+    renderCount: number
+}> = (loadedState) => (<noscript />)
 
 let store: Store<ReduxStoreState>
 
@@ -27,6 +29,7 @@ describe('server side render', () => {
     
     beforeEach(() => {
         testDataPromise = new PromiseCompletionSource<Data>()
+        let renderCount = 0
 
         const testComponent = (
             <Provider store={store}>
@@ -36,7 +39,7 @@ describe('server side render', () => {
                     isServerSideRender={true}
                     loadData={() => testDataPromise.promise}
                     renderData={(props) => (
-                        <Verifier {...props} />
+                        <Verifier {...props} renderCount={++renderCount} />
                     )}
                 />
             </Provider>

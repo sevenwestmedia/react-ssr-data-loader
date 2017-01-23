@@ -6,6 +6,7 @@ Object {
   "isLoaded": true,
   "isLoading": false,
   "loadFailed": false,
+  "renderCount": 3,
 }
 `;
 
@@ -15,5 +16,6 @@ Object {
   "isLoaded": false,
   "isLoading": true,
   "loadFailed": false,
+  "renderCount": 2,
 }
 `;
