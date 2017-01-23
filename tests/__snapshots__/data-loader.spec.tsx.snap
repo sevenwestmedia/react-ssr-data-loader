@@ -1,3 +1,29 @@
+exports[`Client side render should start loading data if not loaded 1`] = `
+Object {
+  "data": undefined,
+  "errorMessage": undefined,
+  "isLoaded": false,
+  "isLoading": true,
+  "loadFailed": false,
+  "renderCount": 2,
+}
+`;
+
+exports[`Client side render should start loading data if not loaded 2`] = `
+Object {
+  "dataLoader": Object {
+    "testDataType": Object {
+      "testKey": Object {
+        "failed": false,
+        "loaded": false,
+        "loading": true,
+        "serverSideRender": true,
+      },
+    },
+  },
+}
+`;
+
 exports[`server side render should pass failure when data load fails 1`] = `
 Object {
   "data": undefined,
@@ -56,7 +82,7 @@ Object {
 }
 `;
 
-exports[`server side render should start load data if not loaded 1`] = `
+exports[`server side render should start loading data if not loaded 1`] = `
 Object {
   "data": undefined,
   "errorMessage": undefined,
@@ -67,7 +93,7 @@ Object {
 }
 `;
 
-exports[`server side render should start load data if not loaded 2`] = `
+exports[`server side render should start loading data if not loaded 2`] = `
 Object {
   "dataLoader": Object {
     "testDataType": Object {

@@ -23,37 +23,37 @@ beforeEach(() => {
     store = createStore(combineReducers<ReduxStoreState>({ dataLoader: reducer }))
 })
 
-describe('server side render', () => {
-    let loadDataCount: number
-    let testDataPromise: PromiseCompletionSource<Data>
+let loadDataCount: number
+let testDataPromise: PromiseCompletionSource<Data>
 
-    const mountComponent = (isServerSideRender: boolean, resetCounters = true) => {
-        testDataPromise = new PromiseCompletionSource<Data>()
-        let renderCount = 0
-        if (resetCounters) {
-            loadDataCount = 0
-        }
-        const testComponent = (
-            <Provider store={store}>
-                <TestDataLoader
-                    dataType="testDataType"
-                    dataKey="testKey"
-                    isServerSideRender={true}
-                    loadData={() => {
-                        loadDataCount++
-                        return testDataPromise.promise
-                    }}
-                    renderData={(props) => (
-                        <Verifier {...props} renderCount={++renderCount} />
-                    )}
-                />
-            </Provider>
-        )
-
-        return mount(testComponent).find(TestDataLoader)
+const mountComponent = (isServerSideRender: boolean, resetCounters = true) => {
+    testDataPromise = new PromiseCompletionSource<Data>()
+    let renderCount = 0
+    if (resetCounters) {
+        loadDataCount = 0
     }
+    const testComponent = (
+        <Provider store={store}>
+            <TestDataLoader
+                dataType="testDataType"
+                dataKey="testKey"
+                isServerSideRender={true}
+                loadData={() => {
+                    loadDataCount++
+                    return testDataPromise.promise
+                }}
+                renderData={(props) => (
+                    <Verifier {...props} renderCount={++renderCount} />
+                )}
+            />
+        </Provider>
+    )
 
-    it('should start load data if not loaded', () => {
+    return mount(testComponent).find(TestDataLoader)
+}
+
+describe('server side render', () => {
+    it('should start loading data if not loaded', () => {
         const sut = mountComponent(true)
 
         const verifier = sut.find(Verifier)
@@ -106,6 +106,18 @@ describe('server side render', () => {
 
         sut = mountComponent(true, false)
 
+        expect(loadDataCount).toBe(1)
+    })
+})
+
+describe('Client side render', () => {
+    it('should start loading data if not loaded', () => {
+        const sut = mountComponent(false)
+
+        const verifier = sut.find(Verifier)
+
+        expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
         expect(loadDataCount).toBe(1)
     })
 })
