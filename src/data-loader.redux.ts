@@ -51,14 +51,10 @@ type Actions = LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED
 export const reducer = (state: DataTypeMap = {}, action: Actions) => {
     switch (action.type) {
         case LOAD_DATA: {
-            const dataLookup = {
-                ...state,
-                [action.meta.dataType]: state[action.meta.dataType] || {}
-            }
             return {
                 ...state,
                 [action.meta.dataType]: <DataKeyMap>{
-                    ...dataLookup,
+                    ...state[action.meta.dataType],
                     [action.meta.dataKey]: {
                         serverSideRender: action.meta.isServerSideRender,
                         loaded: false,
@@ -69,14 +65,10 @@ export const reducer = (state: DataTypeMap = {}, action: Actions) => {
             }
         }
         case LOAD_DATA_COMPLETED: {
-            const dataLookup = {
-                ...state,
-                [action.meta.dataType]: state[action.meta.dataType] || {}
-            }
             return {
                 ...state,
                 [action.meta.dataType]: <DataKeyMap>{
-                    ...dataLookup,
+                    ...state[action.meta.dataType],
                     [action.meta.dataKey]: {
                         serverSideRender: action.meta.isServerSideRender,
                         loaded: true,
@@ -88,14 +80,10 @@ export const reducer = (state: DataTypeMap = {}, action: Actions) => {
             }
         }
         case LOAD_DATA_FAILED: {
-            const dataLookup = {
-                ...state,
-                [action.meta.dataType]: state[action.meta.dataType] || {}
-            }
             return {
                 ...state,
                 [action.meta.dataType]: <DataKeyMap>{
-                    ...dataLookup,
+                    ...state[action.meta.dataType],
                     [action.meta.dataKey]: {
                         serverSideRender: action.meta.isServerSideRender,
                         loaded: false,

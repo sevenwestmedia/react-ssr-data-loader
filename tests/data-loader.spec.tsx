@@ -59,6 +59,7 @@ describe('server side render', () => {
         const verifier = sut.find(Verifier)
 
         expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
         expect(loadDataCount).toBe(1)
     })
 
@@ -72,6 +73,7 @@ describe('server side render', () => {
         })
 
         expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
         expect(loadDataCount).toBe(1)
     })
 
@@ -83,6 +85,7 @@ describe('server side render', () => {
         await testDataPromise.reject(new Error('Boom!'))
 
         expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
         expect(loadDataCount).toBe(1)
     })
 
