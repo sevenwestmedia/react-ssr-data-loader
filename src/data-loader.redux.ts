@@ -9,12 +9,17 @@ export interface LoaderDataState {
     data?: any
 }
 
-export interface LoaderReduxState {
-    [key: string]: LoaderDataState
+
+export interface DataKeyMap {
+    [dataKey: string]: LoaderDataState
+}
+
+export interface DataTypeMap {
+    [dataType: string]: DataKeyMap
 }
 
 export interface ReduxStoreState {
-    dataLoader: LoaderReduxState
+    dataLoader: DataTypeMap
 }
 
 export interface Meta {
@@ -43,43 +48,64 @@ export interface LOAD_DATA_FAILED extends Action {
 
 type Actions = LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED
 
-export const reducer = (state: LoaderReduxState = {}, action: Actions) => {
+export const reducer = (state: DataTypeMap = {}, action: Actions) => {
     switch (action.type) {
-        case LOAD_DATA:
+        case LOAD_DATA: {
+            const dataLookup = {
+                ...state,
+                [action.meta.dataType]: state[action.meta.dataType] || {}
+            }
             return {
                 ...state,
-                [action.meta.dataType]: <LoaderDataState>{
-                    key: action.meta,
-                    serverSideRender: action.meta.isServerSideRender,
-                    loaded: false,
-                    loading: true,
-                    failed: false,
+                [action.meta.dataType]: <DataKeyMap>{
+                    ...dataLookup,
+                    [action.meta.dataKey]: {
+                        serverSideRender: action.meta.isServerSideRender,
+                        loaded: false,
+                        loading: true,
+                        failed: false,
+                    }
                 },
             }
-        case LOAD_DATA_COMPLETED:
+        }
+        case LOAD_DATA_COMPLETED: {
+            const dataLookup = {
+                ...state,
+                [action.meta.dataType]: state[action.meta.dataType] || {}
+            }
             return {
                 ...state,
-                [action.meta.dataType]: <LoaderDataState>{
-                    key: action.meta,
-                    serverSideRender: action.meta.isServerSideRender,
-                    loaded: true,
-                    loading: false,
-                    failed: false,
-                    data: action.payload
+                [action.meta.dataType]: <DataKeyMap>{
+                    ...dataLookup,
+                    [action.meta.dataKey]: {
+                        serverSideRender: action.meta.isServerSideRender,
+                        loaded: true,
+                        loading: false,
+                        failed: false,
+                        data: action.payload
+                    }
                 },
             }
-        case LOAD_DATA_FAILED:
+        }
+        case LOAD_DATA_FAILED: {
+            const dataLookup = {
+                ...state,
+                [action.meta.dataType]: state[action.meta.dataType] || {}
+            }
             return {
                 ...state,
-                [action.meta.dataType]: <LoaderDataState>{
-                    key: action.meta,
-                    serverSideRender: action.meta.isServerSideRender,
-                    loaded: false,
-                    loading: false,
-                    failed: true,
-                    error: action.payload,
+                [action.meta.dataType]: <DataKeyMap>{
+                    ...dataLookup,
+                    [action.meta.dataKey]: {
+                        serverSideRender: action.meta.isServerSideRender,
+                        loaded: false,
+                        loading: false,
+                        failed: true,
+                        error: action.payload,
+                    }
                 }
             }
+        }
     }
 
     return state

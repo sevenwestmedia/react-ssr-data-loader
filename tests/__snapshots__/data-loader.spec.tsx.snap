@@ -1,11 +1,19 @@
 exports[`server side render should pass loaded data once promise resolves 1`] = `
 Object {
-  "isLoaded": false,
+  "data": Object {
+    "result": "Success!",
+  },
+  "isLoaded": true,
+  "isLoading": false,
+  "loadFailed": false,
 }
 `;
 
 exports[`server side render should start load data if not loaded 1`] = `
 Object {
+  "data": undefined,
   "isLoaded": false,
+  "isLoading": true,
+  "loadFailed": false,
 }
 `;

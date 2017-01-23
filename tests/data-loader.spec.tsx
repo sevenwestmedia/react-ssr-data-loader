@@ -50,8 +50,12 @@ describe('server side render', () => {
         expect(verifier.props()).toMatchSnapshot()
     })
 
-    it('should pass loaded data once promise resolves', function() {
+    it('should pass loaded data once promise resolves', async() => {
         const verifier = sut.find(Verifier)
+
+        await testDataPromise.resolve({
+            result: 'Success!'
+        })
 
         expect(verifier.props()).toMatchSnapshot()
     })
