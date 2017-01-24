@@ -46,7 +46,13 @@ export interface LOAD_DATA_FAILED extends Action {
     payload: string
 }
 
-type Actions = LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED
+export const UNLOAD_DATA = 'redux-data-loader/UNLOAD_DATA'
+export interface UNLOAD_DATA extends Action {
+    type: 'redux-data-loader/UNLOAD_DATA'
+    meta: Meta
+}
+
+type Actions = LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED | UNLOAD_DATA
 
 export const reducer = (state: DataTypeMap = {}, action: Actions) => {
     switch (action.type) {
@@ -93,6 +99,19 @@ export const reducer = (state: DataTypeMap = {}, action: Actions) => {
                     }
                 }
             }
+        }
+        case UNLOAD_DATA: {
+            const newState = { ...state }
+            const dataType = newState[action.meta.dataType]
+            delete dataType[action.meta.dataKey]
+
+            if (Object.keys(dataType).length === 0) {
+                delete newState[action.meta.dataType]
+            } else {
+                newState[action.meta.dataType] = dataType
+            }
+
+            return newState
         }
     }
 

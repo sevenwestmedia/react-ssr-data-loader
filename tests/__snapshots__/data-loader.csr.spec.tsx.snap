@@ -29,6 +29,12 @@ Object {
 }
 `;
 
+exports[`Client side render should ignore completion once component is unmounted 1`] = `
+Object {
+  "dataLoader": Object {},
+}
+`;
+
 exports[`Client side render should pass failure when data load fails 1`] = `
 Object {
   "data": undefined,
@@ -84,6 +90,12 @@ Object {
       },
     },
   },
+}
+`;
+
+exports[`Client side render should remove data from redux when unmounted 1`] = `
+Object {
+  "dataLoader": Object {},
 }
 `;
 

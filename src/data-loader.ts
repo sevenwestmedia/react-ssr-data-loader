@@ -3,7 +3,8 @@ import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap, LoaderDataState,
-    LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED
+    LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
+    UNLOAD_DATA
 } from './data-loader.redux'
 
 export interface LoadedState<T> {
@@ -38,26 +39,36 @@ const needsData = (state: LoaderDataState) => !state || (!state.loaded && !state
 const hasDataFromServer = (state: LoaderDataState) => state && state.loaded && state.serverSideRender
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
-    loadData = async () => {
-        const actionMeta = {
-            dataType: this.props.dataType,
-            dataKey: this.props.dataKey,
-            isServerSideRender: this.props.isServerSideRender
-        }
+    private _isMounted: boolean
 
+    actionMeta = () => ({
+        dataType: this.props.dataType,
+        dataKey: this.props.dataKey,
+        isServerSideRender: this.props.isServerSideRender
+    })
+
+    loadData = async () => {
         this.props.dispatch<LOAD_DATA>({
             type: LOAD_DATA,
-            meta: actionMeta
+            meta: this.actionMeta(),
         })
 
         try {
             const data = await this.props.loadData()
+            if (!this._isMounted) {
+                return
+            }
+
             this.props.dispatch<LOAD_DATA_COMPLETED>({
                 type: LOAD_DATA_COMPLETED,
-                meta: actionMeta,
+                meta: this.actionMeta(),
                 payload: data
             })
         } catch (err) {
+            if (!this._isMounted) {
+                return
+            }
+
             let payload: string
             if (err instanceof Error) {
                 payload = err.message
@@ -67,13 +78,14 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
 
             this.props.dispatch<LOAD_DATA_FAILED>({
                 type: LOAD_DATA_FAILED,
-                meta: actionMeta,
+                meta: this.actionMeta(),
                 payload: payload
             })
         }
     }
 
     async componentWillMount() {
+        this._isMounted = true
         const loadedState = this.getLoadedState()
 
         if (this.props.isServerSideRender && needsData(loadedState)) {
@@ -82,6 +94,14 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         if (!this.props.isServerSideRender && !hasDataFromServer(loadedState)) {
             return await this.loadData()
         }
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false
+        this.props.dispatch<UNLOAD_DATA>({
+            type: UNLOAD_DATA,
+            meta: this.actionMeta(),
+        })
     }
 
     getLoadedState = (): LoaderDataState => {
