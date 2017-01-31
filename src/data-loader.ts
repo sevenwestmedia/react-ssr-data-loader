@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap, LoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
-    UNLOAD_DATA
+    UNLOAD_DATA, LOAD_NEXT_DATA
 } from './data-loader.redux'
 
 export interface LoadedState<T> {
@@ -41,10 +41,10 @@ const hasDataFromServer = (state: LoaderDataState) => state && state.loaded && s
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     private _isMounted: boolean
 
-    actionMeta = () => ({
-        dataType: this.props.dataType,
-        dataKey: this.props.dataKey,
-        isServerSideRender: this.props.isServerSideRender
+    actionMeta = (props = this.props) => ({
+        dataType: props.dataType,
+        dataKey: props.dataKey,
+        isServerSideRender: props.isServerSideRender
     })
 
     loadData = async () => {
@@ -53,6 +53,10 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
             meta: this.actionMeta(),
         })
 
+        await this.performLoadData()
+    }
+
+    performLoadData = async () => {
         try {
             const data = await this.props.loadData()
             if (!this._isMounted) {
@@ -93,6 +97,24 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         }
         if (!this.props.isServerSideRender && !hasDataFromServer(loadedState)) {
             return await this.loadData()
+        }
+    }
+
+    async componentWillReceiveProps(nextProps: Props<T>) {
+        if (
+            this.props.dataType !== nextProps.dataType ||
+            this.props.dataKey !== nextProps.dataKey ||
+            this.props.isServerSideRender !== nextProps.isServerSideRender
+        ) {
+            this.props.dispatch<LOAD_NEXT_DATA>({
+                type: LOAD_NEXT_DATA,
+                meta: {
+                    current: this.actionMeta(),
+                    next: this.actionMeta(nextProps)
+                }
+            })
+
+            await this.performLoadData()
         }
     }
 

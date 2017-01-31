@@ -39,6 +39,20 @@ describe('Client side render', () => {
         expect(sut.loadDataCount).toBe(1)
     })
 
+    it('loads data when props change', async() => {
+        const sut = new ComponentFixture(store, false)
+
+        const verifier = sut.component.find(Verifier)
+        await sut.testDataPromise.resolve({ result: 'Success!' })
+        sut.resetPromise()
+        sut.root.setProps({ dataKey: "newData" })
+        await sut.testDataPromise.resolve({ result: 'Success2!' })
+
+        expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(2)
+    })
+
     it('should pass failure when data load fails', async() => {
         const sut = new ComponentFixture(store, false)
 

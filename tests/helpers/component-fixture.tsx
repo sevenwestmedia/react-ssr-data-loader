@@ -20,16 +20,16 @@ export default class ComponentFixture {
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<any, any>
+    root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<OwnProps<Data>, any>
 
     constructor(store: Store<ReduxStoreState>, isServerSideRender: boolean) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
-        const testComponent = (
+        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <Provider store={store}>
                 <TestDataLoader
                     dataType="testDataType"
-                    dataKey="testKey"
+                    dataKey={dataKey}
                     isServerSideRender={isServerSideRender}
                     loadData={() => {
                         this.loadDataCount++
@@ -42,9 +42,13 @@ export default class ComponentFixture {
             </Provider>
         )
 
-        this.root = mount(testComponent)
+        this.root = mount(<TestComponent dataKey="testKey" />)
 
         this.component = this.root.find(TestDataLoader)
+    }
+
+    resetPromise() {
+        this.testDataPromise = new PromiseCompletionSource<Data>()
     }
 
     unmount = async() => {

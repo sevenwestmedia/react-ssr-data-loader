@@ -52,10 +52,30 @@ export interface UNLOAD_DATA extends Action {
     meta: Meta
 }
 
-type Actions = LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED | UNLOAD_DATA
+export const LOAD_NEXT_DATA = 'redux-data-loader/LOAD_NEXT_DATA'
+export interface LOAD_NEXT_DATA extends Action {
+    type: 'redux-data-loader/LOAD_NEXT_DATA'
+    meta: {
+        current: Meta
+        next: Meta
+    }
+}
+
+type Actions = LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED | UNLOAD_DATA | LOAD_NEXT_DATA
 
 export const reducer = (state: DataTypeMap = {}, action: Actions) => {
     switch (action.type) {
+        case LOAD_NEXT_DATA: {
+            const stateWithCurrentRemoved = reducer(state, {
+                type: UNLOAD_DATA,
+                meta: action.meta.current
+            })
+            const newState = reducer(stateWithCurrentRemoved, {
+                type: LOAD_DATA,
+                meta: action.meta.next
+            })
+            return newState
+        }
         case LOAD_DATA: {
             return {
                 ...state,

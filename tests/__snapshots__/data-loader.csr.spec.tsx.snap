@@ -29,6 +29,37 @@ Object {
 }
 `;
 
+exports[`Client side render loads data when props change 1`] = `
+Object {
+  "data": Object {
+    "result": "Success2!",
+  },
+  "errorMessage": undefined,
+  "isLoaded": true,
+  "isLoading": false,
+  "loadFailed": false,
+  "renderCount": 6,
+}
+`;
+
+exports[`Client side render loads data when props change 2`] = `
+Object {
+  "dataLoader": Object {
+    "testDataType": Object {
+      "newData": Object {
+        "data": Object {
+          "result": "Success2!",
+        },
+        "failed": false,
+        "loaded": true,
+        "loading": false,
+        "serverSideRender": false,
+      },
+    },
+  },
+}
+`;
+
 exports[`Client side render should ignore completion once component is unmounted 1`] = `
 Object {
   "dataLoader": Object {},
