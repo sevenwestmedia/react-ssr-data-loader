@@ -8,7 +8,7 @@ import {
 } from './data-loader.redux'
 
 export interface LoadedState<T> {
-    isLoaded: boolean
+    isCompleted: boolean
     isLoading: boolean
     loadFailed: boolean
     errorMessage?: string
@@ -141,7 +141,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         }
 
         return {
-            isLoaded: loadedState.loaded,
+            isCompleted: loadedState.loaded,
             isLoading: loadedState.loading,
             loadFailed: loadedState.failed,
             errorMessage: loadedState.error,
@@ -151,7 +151,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
 
     render() {
         const loadedProps = this.getLoadedProps() || {
-            isLoaded: false,
+            isCompleted: false,
             isLoading: false,
             loadFailed: false
         }

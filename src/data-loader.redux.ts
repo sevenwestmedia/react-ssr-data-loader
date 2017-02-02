@@ -1,7 +1,7 @@
 import { Action } from 'redux'
 
 export interface LoaderDataState {
-    loaded: boolean
+    completed: boolean
     loading: boolean
     failed: boolean
     error?: string
@@ -9,13 +9,13 @@ export interface LoaderDataState {
     data?: any
 }
 
-
 export interface DataKeyMap {
     [dataKey: string]: LoaderDataState
 }
 
 export interface DataTypeMap {
-    [dataType: string]: DataKeyMap
+    loadingCount: number
+    data: { [dataType: string]: DataKeyMap }
 }
 
 export interface ReduxStoreState {
@@ -63,7 +63,10 @@ export interface LOAD_NEXT_DATA extends Action {
 
 type Actions = LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED | UNLOAD_DATA | LOAD_NEXT_DATA
 
-export const reducer = (state: DataTypeMap = {}, action: Actions) => {
+export const reducer = (state: DataTypeMap = {
+    data: {},
+    loadingCount: 0,
+}, action: Actions) => {
     switch (action.type) {
         case LOAD_NEXT_DATA: {
             const stateWithCurrentRemoved = reducer(state, {
@@ -83,7 +86,7 @@ export const reducer = (state: DataTypeMap = {}, action: Actions) => {
                     ...state[action.meta.dataType],
                     [action.meta.dataKey]: {
                         serverSideRender: action.meta.isServerSideRender,
-                        loaded: false,
+                        completed: false,
                         loading: true,
                         failed: false,
                     }
@@ -97,7 +100,7 @@ export const reducer = (state: DataTypeMap = {}, action: Actions) => {
                     ...state[action.meta.dataType],
                     [action.meta.dataKey]: {
                         serverSideRender: action.meta.isServerSideRender,
-                        loaded: true,
+                        completed: true,
                         loading: false,
                         failed: false,
                         data: action.payload
@@ -112,7 +115,7 @@ export const reducer = (state: DataTypeMap = {}, action: Actions) => {
                     ...state[action.meta.dataType],
                     [action.meta.dataKey]: {
                         serverSideRender: action.meta.isServerSideRender,
-                        loaded: false,
+                        completed: false,
                         loading: false,
                         failed: true,
                         error: action.payload,
