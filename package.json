@@ -1,7 +1,8 @@
 {
   "name": "redux-data-loader",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "repository": {},
   "license": "MIT",
   "dependencies": {
