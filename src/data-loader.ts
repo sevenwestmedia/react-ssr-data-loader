@@ -35,8 +35,10 @@ export interface DispatchProps {
 }
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
-const needsData = (state: LoaderDataState) => !state || (!state.loaded && !state.failed)
-const hasDataFromServer = (state: LoaderDataState) => state && state.loaded && state.serverSideRender
+const needsData = (state: LoaderDataState) => !state || (!state.completed && !state.failed)
+const hasDataFromServer = (state: LoaderDataState) => state && state.completed && state.serverSideRender
+
+declare var process: any
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     private _isMounted: boolean
@@ -127,7 +129,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     }
 
     getLoadedState = (): LoaderDataState => {
-        const dataLookup = this.props.store[this.props.dataType]
+        const dataLookup = this.props.store.data[this.props.dataType]
         if (!dataLookup) {
             return undefined
         }
@@ -141,7 +143,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         }
 
         return {
-            isCompleted: loadedState.loaded,
+            isCompleted: loadedState.completed,
             isLoading: loadedState.loading,
             loadFailed: loadedState.failed,
             errorMessage: loadedState.error,

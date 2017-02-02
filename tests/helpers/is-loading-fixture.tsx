@@ -2,7 +2,7 @@ import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
 import { createStore, combineReducers, Store } from 'redux'
 import { Provider } from 'react-redux'
-import { OwnProps, LoadedState, createTypedDataLoader } from '../../src/data-loader'
+import { LoadedState, default as IsLoading } from '../../src/is-loading'
 import { ReduxStoreState, reducer } from '../../src/data-loader.redux'
 import PromiseCompletionSource from './promise-completion-source'
 
@@ -10,31 +10,21 @@ export interface Data {
     result: string
 }
 
-export const TestDataLoader = createTypedDataLoader<Data>()
-
-export const Verifier: React.SFC<LoadedState<Data> & {
+export const Verifier: React.SFC<LoadedState & {
     renderCount: number
 }> = (loadedState) => (<noscript />)
 
 export default class ComponentFixture {
-    loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ dataKey: string }, any>
-    component: ReactWrapper<OwnProps<Data>, any>
+    root: ReactWrapper<any, any>
+    component: ReactWrapper<any, any>
 
-    constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean) {
+    constructor(store: Store<ReduxStoreState>) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
-        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+        const TestComponent: React.SFC<any> = ({ }) => (
             <Provider store={store}>
-                <TestDataLoader
-                    dataType="testDataType"
-                    dataKey={dataKey}
-                    isServerSideRender={isServerSideRender}
-                    loadData={() => {
-                        this.loadDataCount++
-                        return this.testDataPromise.promise
-                    }}
+                <IsLoading
                     renderData={(props) => (
                         <Verifier {...props} renderCount={++this.renderCount} />
                     )}
@@ -42,9 +32,9 @@ export default class ComponentFixture {
             </Provider>
         )
 
-        this.root = mount(<TestComponent dataKey={dataKey} />)
+        this.root = mount(<TestComponent />)
 
-        this.component = this.root.find(TestDataLoader)
+        this.component = this.root.find(IsLoading)
     }
 
     resetPromise() {

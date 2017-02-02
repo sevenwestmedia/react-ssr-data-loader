@@ -16,7 +16,7 @@ beforeEach(() => {
 
 describe('server side render', () => {
     it('should start loading data if not loaded', () => {
-        const sut = new ComponentFixture(store, true)
+        const sut = new ComponentFixture(store, "testKey", true)
 
         const verifier = sut.component.find(Verifier)
 
@@ -26,7 +26,7 @@ describe('server side render', () => {
     })
 
     it('should pass loaded data once promise resolves', async() => {
-        const sut = new ComponentFixture(store, true)
+        const sut = new ComponentFixture(store, "testKey", true)
 
         const verifier = sut.component.find(Verifier)
 
@@ -40,7 +40,7 @@ describe('server side render', () => {
     })
 
     it('should pass failure when data load fails', async() => {
-        const sut = new ComponentFixture(store, true)
+        const sut = new ComponentFixture(store, "testKey", true)
 
         const verifier = sut.component.find(Verifier)
 
@@ -52,21 +52,21 @@ describe('server side render', () => {
     })
 
     it('second SSR when data loaded should not reload data', async() => {
-        let sut = new ComponentFixture(store, true)
+        let sut = new ComponentFixture(store, "testKey", true)
         const verifier = sut.component.find(Verifier)
         await sut.testDataPromise.resolve({ result: 'Success!' })
 
-        sut = new ComponentFixture(store, true)
+        sut = new ComponentFixture(store, "testKey", true)
 
         expect(sut.loadDataCount).toBe(0)
     })
 
     it('second SSR when data load failed should not reload data', async() => {
-        let sut = new ComponentFixture(store, true)
+        let sut = new ComponentFixture(store, "testKey", true)
         const verifier = sut.component.find(Verifier)
         await sut.testDataPromise.reject(new Error('Boom'))
 
-        sut = new ComponentFixture(store, true)
+        sut = new ComponentFixture(store, "testKey", true)
 
         expect(sut.loadDataCount).toBe(0)
     })

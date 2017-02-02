@@ -81,57 +81,66 @@ export const reducer = (state: DataTypeMap = {
         }
         case LOAD_DATA: {
             return {
-                ...state,
-                [action.meta.dataType]: <DataKeyMap>{
-                    ...state[action.meta.dataType],
-                    [action.meta.dataKey]: {
-                        serverSideRender: action.meta.isServerSideRender,
-                        completed: false,
-                        loading: true,
-                        failed: false,
+                loadingCount: state.loadingCount + 1,
+                data: {
+                    ...state.data,
+                    [action.meta.dataType]: <DataKeyMap>{
+                        ...state[action.meta.dataType],
+                        [action.meta.dataKey]: {
+                            serverSideRender: action.meta.isServerSideRender,
+                            completed: false,
+                            loading: true,
+                            failed: false,
+                        }
                     }
-                },
+                }
             }
         }
         case LOAD_DATA_COMPLETED: {
             return {
-                ...state,
-                [action.meta.dataType]: <DataKeyMap>{
-                    ...state[action.meta.dataType],
-                    [action.meta.dataKey]: {
-                        serverSideRender: action.meta.isServerSideRender,
-                        completed: true,
-                        loading: false,
-                        failed: false,
-                        data: action.payload
+                loadingCount: state.loadingCount - 1,
+                data: {
+                    ...state.data,
+                    [action.meta.dataType]: <DataKeyMap>{
+                        ...state.data[action.meta.dataType],
+                        [action.meta.dataKey]: {
+                            serverSideRender: action.meta.isServerSideRender,
+                            completed: true,
+                            loading: false,
+                            failed: false,
+                            data: action.payload
+                        }
                     }
-                },
+                }
             }
         }
         case LOAD_DATA_FAILED: {
             return {
-                ...state,
-                [action.meta.dataType]: <DataKeyMap>{
-                    ...state[action.meta.dataType],
-                    [action.meta.dataKey]: {
-                        serverSideRender: action.meta.isServerSideRender,
-                        completed: false,
-                        loading: false,
-                        failed: true,
-                        error: action.payload,
+                loadingCount: state.loadingCount - 1,
+                data: {
+                    ...state.data,
+                    [action.meta.dataType]: <DataKeyMap>{
+                        ...state.data[action.meta.dataType],
+                        [action.meta.dataKey]: {
+                            serverSideRender: action.meta.isServerSideRender,
+                            completed: false,
+                            loading: false,
+                            failed: true,
+                            error: action.payload,
+                        }
                     }
                 }
             }
         }
         case UNLOAD_DATA: {
-            const newState = { ...state }
-            const dataType = newState[action.meta.dataType]
+            const newState = { loadingCount: state.loadingCount, data: { ...state.data } }
+            const dataType = newState.data[action.meta.dataType]
             delete dataType[action.meta.dataKey]
 
             if (Object.keys(dataType).length === 0) {
-                delete newState[action.meta.dataType]
+                delete newState.data[action.meta.dataType]
             } else {
-                newState[action.meta.dataType] = dataType
+                newState.data[action.meta.dataType] = dataType
             }
 
             return newState

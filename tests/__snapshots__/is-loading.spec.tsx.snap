@@ -1,0 +1,95 @@
+exports[`Is loading component should be loading if any data loaders are loading 1`] = `
+Object {
+  "isLoading": true,
+  "renderCount": 1,
+}
+`;
+
+exports[`Is loading component should be loading if any data loaders are loading 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": false,
+          "failed": false,
+          "loading": true,
+          "serverSideRender": false,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
+exports[`Is loading component should be loading if one of two have finished loading 1`] = `
+Object {
+  "isLoading": true,
+  "renderCount": 2,
+}
+`;
+
+exports[`Is loading component should be loading if one of two have finished loading 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Foo!",
+          },
+          "failed": false,
+          "loading": false,
+          "serverSideRender": false,
+        },
+        "testKey2": Object {
+          "completed": false,
+          "failed": false,
+          "loading": true,
+          "serverSideRender": false,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
+exports[`Is loading component should not be loading once all data loaders have completed 1`] = `
+Object {
+  "isLoading": false,
+  "renderCount": 3,
+}
+`;
+
+exports[`Is loading component should not be loading once all data loaders have completed 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Foo!",
+          },
+          "failed": false,
+          "loading": false,
+          "serverSideRender": false,
+        },
+        "testKey2": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Foo2!",
+          },
+          "failed": false,
+          "loading": false,
+          "serverSideRender": false,
+        },
+      },
+    },
+    "loadingCount": 0,
+  },
+}
+`;

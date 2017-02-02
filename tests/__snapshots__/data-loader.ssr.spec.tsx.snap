@@ -2,7 +2,7 @@ exports[`server side render should pass failure when data load fails 1`] = `
 Object {
   "data": undefined,
   "errorMessage": "Boom!",
-  "isLoaded": false,
+  "isCompleted": false,
   "isLoading": false,
   "loadFailed": true,
   "renderCount": 3,
@@ -12,15 +12,18 @@ Object {
 exports[`server side render should pass failure when data load fails 2`] = `
 Object {
   "dataLoader": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "error": "Boom!",
-        "failed": true,
-        "loaded": false,
-        "loading": false,
-        "serverSideRender": true,
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": false,
+          "error": "Boom!",
+          "failed": true,
+          "loading": false,
+          "serverSideRender": true,
+        },
       },
     },
+    "loadingCount": 0,
   },
 }
 `;
@@ -31,7 +34,7 @@ Object {
     "result": "Success!",
   },
   "errorMessage": undefined,
-  "isLoaded": true,
+  "isCompleted": true,
   "isLoading": false,
   "loadFailed": false,
   "renderCount": 3,
@@ -41,17 +44,20 @@ Object {
 exports[`server side render should pass loaded data once promise resolves 2`] = `
 Object {
   "dataLoader": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "data": Object {
-          "result": "Success!",
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Success!",
+          },
+          "failed": false,
+          "loading": false,
+          "serverSideRender": true,
         },
-        "failed": false,
-        "loaded": true,
-        "loading": false,
-        "serverSideRender": true,
       },
     },
+    "loadingCount": 0,
   },
 }
 `;
@@ -60,7 +66,7 @@ exports[`server side render should start loading data if not loaded 1`] = `
 Object {
   "data": undefined,
   "errorMessage": undefined,
-  "isLoaded": false,
+  "isCompleted": false,
   "isLoading": true,
   "loadFailed": false,
   "renderCount": 2,
@@ -70,14 +76,17 @@ Object {
 exports[`server side render should start loading data if not loaded 2`] = `
 Object {
   "dataLoader": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "failed": false,
-        "loaded": false,
-        "loading": true,
-        "serverSideRender": true,
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": false,
+          "failed": false,
+          "loading": true,
+          "serverSideRender": true,
+        },
       },
     },
+    "loadingCount": 1,
   },
 }
 `;
