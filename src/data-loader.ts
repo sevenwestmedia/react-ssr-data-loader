@@ -7,13 +7,25 @@ import {
     UNLOAD_DATA, LOAD_NEXT_DATA
 } from './data-loader.redux'
 
-export interface LoadedState<T> {
-    isCompleted: boolean
-    isLoading: boolean
-    loadFailed: boolean
-    errorMessage?: string
-    data?: T
+export interface SuccessLoadedState<T> {
+    isCompleted: true
+    isLoading: false
+    loadFailed: false
+    data: T
 }
+export interface FailedLoadedState {
+    isCompleted: true
+    isLoading: false
+    loadFailed: true
+    errorMessage: string
+}
+export interface LoadingState {
+    isCompleted: false
+    isLoading: true
+    loadFailed: false
+}
+
+export type LoadedState<T> = SuccessLoadedState<T> | FailedLoadedState | LoadingState
 
 export interface RenderData<T> {
     (loaderProps: LoadedState<T>): React.ReactElement<any>
@@ -36,9 +48,7 @@ export interface DispatchProps {
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
 const needsData = (state: LoaderDataState) => !state || (!state.completed && !state.failed)
-const hasDataFromServer = (state: LoaderDataState) => state && state.completed && state.serverSideRender
-
-declare var process: any
+const hasDataFromServer = (state: LoaderDataState) => state && state.completed && state.dataFromServerSideRender
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     private _isMounted: boolean
@@ -46,10 +56,10 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     actionMeta = (props = this.props) => ({
         dataType: props.dataType,
         dataKey: props.dataKey,
-        isServerSideRender: props.isServerSideRender
+        dataFromServerSideRender: props.isServerSideRender
     })
 
-    loadData = async () => {
+    private loadData = async () => {
         this.props.dispatch<LOAD_DATA>({
             type: LOAD_DATA,
             meta: this.actionMeta(),
@@ -58,7 +68,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         await this.performLoadData()
     }
 
-    performLoadData = async () => {
+    private performLoadData = async () => {
         try {
             const data = await this.props.loadData()
             if (!this._isMounted) {
@@ -128,7 +138,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         })
     }
 
-    getLoadedState = (): LoaderDataState => {
+    private getLoadedState = (): LoaderDataState => {
         const dataLookup = this.props.store.data[this.props.dataType]
         if (!dataLookup) {
             return undefined
@@ -136,26 +146,39 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         return dataLookup[this.props.dataKey]
     }
 
-    getLoadedProps = (): LoadedState<T> => {
+    private getLoadedProps = (): LoadedState<T> => {
         const loadedState = this.getLoadedState()
         if (!loadedState) {
             return undefined
         }
 
+        if (loadedState.completed && loadedState.failed) {
+            return {
+                isCompleted: true,
+                isLoading: false,
+                loadFailed: true,
+                errorMessage: loadedState.error,
+            }
+        } 
+        if (loadedState.completed && loadedState.failed === false) {
+            return {
+                isCompleted: true,
+                isLoading: false,
+                loadFailed: false,
+                data: loadedState.data
+            }
+        }
         return {
-            isCompleted: loadedState.completed,
-            isLoading: loadedState.loading,
-            loadFailed: loadedState.failed,
-            errorMessage: loadedState.error,
-            data: loadedState.data
+            isCompleted: false,
+            isLoading: true,
+            loadFailed: false,
         }
     }
 
     render() {
-        const loadedProps = this.getLoadedProps() || {
-            isCompleted: false,
-            isLoading: false,
-            loadFailed: false
+        const loadedProps = this.getLoadedProps()
+        if (!loadedProps) {
+            return null
         }
         return this.props.renderData(loadedProps)
     }

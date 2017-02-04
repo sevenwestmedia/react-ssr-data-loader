@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import {
-    ReduxStoreState, DataTypeMap, LoaderDataState,
+    ReduxStoreState, DataTypeMap,
 } from './data-loader.redux'
 
 export interface LoadedState {

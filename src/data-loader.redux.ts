@@ -1,13 +1,33 @@
 import { Action } from 'redux'
 
-export interface LoaderDataState {
-    completed: boolean
-    loading: boolean
-    failed: boolean
-    error?: string
-    serverSideRender: boolean
-    data?: any
+export interface CompletedSuccessfullyLoaderDataState {
+    completed: true
+    loading: false
+    failed: false
+    dataFromServerSideRender: boolean
+    data: any
 }
+
+export interface FailedLoaderDataState {
+    completed: true
+    loading: false
+    failed: true
+    error: string
+    dataFromServerSideRender: boolean
+}
+
+export interface LoadingLoaderDataState {
+    completed: false
+    loading: true
+    failed: false
+    dataFromServerSideRender: boolean
+}
+
+export type LoaderDataState = (
+    CompletedSuccessfullyLoaderDataState |
+    FailedLoaderDataState |
+    LoadingLoaderDataState
+)
 
 export interface DataKeyMap {
     [dataKey: string]: LoaderDataState
@@ -25,7 +45,7 @@ export interface ReduxStoreState {
 export interface Meta {
     dataType: string
     dataKey: string
-    isServerSideRender: boolean
+    dataFromServerSideRender: boolean
 }
 
 export const LOAD_DATA = 'redux-data-loader/LOAD_DATA'
@@ -80,54 +100,57 @@ export const reducer = (state: DataTypeMap = {
             return newState
         }
         case LOAD_DATA: {
+            const loading: LoadingLoaderDataState = {
+                dataFromServerSideRender: action.meta.dataFromServerSideRender,
+                completed: false,
+                loading: true,
+                failed: false,
+            }
             return {
                 loadingCount: state.loadingCount + 1,
                 data: {
                     ...state.data,
                     [action.meta.dataType]: <DataKeyMap>{
                         ...state[action.meta.dataType],
-                        [action.meta.dataKey]: {
-                            serverSideRender: action.meta.isServerSideRender,
-                            completed: false,
-                            loading: true,
-                            failed: false,
-                        }
+                        [action.meta.dataKey]: loading
                     }
                 }
             }
         }
         case LOAD_DATA_COMPLETED: {
+            const completed: CompletedSuccessfullyLoaderDataState = {
+                dataFromServerSideRender: action.meta.dataFromServerSideRender,
+                completed: true,
+                loading: false,
+                failed: false,
+                data: action.payload
+            }
             return {
                 loadingCount: state.loadingCount - 1,
                 data: {
                     ...state.data,
                     [action.meta.dataType]: <DataKeyMap>{
                         ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: {
-                            serverSideRender: action.meta.isServerSideRender,
-                            completed: true,
-                            loading: false,
-                            failed: false,
-                            data: action.payload
-                        }
+                        [action.meta.dataKey]: completed
                     }
                 }
             }
         }
         case LOAD_DATA_FAILED: {
+            const failed: FailedLoaderDataState = {
+                dataFromServerSideRender: action.meta.dataFromServerSideRender,
+                completed: true,
+                loading: false,
+                failed: true,
+                error: action.payload,
+            }
             return {
                 loadingCount: state.loadingCount - 1,
                 data: {
                     ...state.data,
                     [action.meta.dataType]: <DataKeyMap>{
                         ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: {
-                            serverSideRender: action.meta.isServerSideRender,
-                            completed: false,
-                            loading: false,
-                            failed: true,
-                            error: action.payload,
-                        }
+                        [action.meta.dataKey]: failed
                     }
                 }
             }
