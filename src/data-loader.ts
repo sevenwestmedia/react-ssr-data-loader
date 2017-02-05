@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap, LoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
-    UNLOAD_DATA, LOAD_NEXT_DATA
+    UNLOAD_DATA, LOAD_NEXT_DATA, ATTACH_TO_DATA,
+    DETACH_FROM_DATA
 } from './data-loader.redux'
 
 export interface SuccessLoadedState<T> {
@@ -47,13 +48,70 @@ export interface DispatchProps {
 }
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
-const needsData = (state: LoaderDataState) => !state || !state.completed
-const hasDataFromServer = (state: LoaderDataState) => state && state.completed && !state.failed && state.dataFromServerSideRender
+const ssrNeedsData = (state: LoaderDataState) => !state || (!state.completed && !state.loading)
+const hasValidData = (state: LoaderDataState) => (
+    state && state.completed && !state.failed && (
+        state.dataFromServerSideRender || state.attachedComponents > 0
+    )
+)
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     private _isMounted: boolean
 
-    actionMeta = (props = this.props) => ({
+    async componentWillMount(): Promise<void> {
+        this._isMounted = true
+        const loadedState = this.getLoadedState()
+
+        if (this.props.isServerSideRender && ssrNeedsData(loadedState)) {
+            return await this.loadData()
+        }
+        if (!this.props.isServerSideRender) {
+            if (hasValidData(loadedState)) {
+                this.props.dispatch<ATTACH_TO_DATA>({
+                    type: ATTACH_TO_DATA,
+                    meta: this.actionMeta(),
+                })
+            } else {
+                return await this.loadData()
+            }
+        }
+    }
+
+    async componentWillReceiveProps(nextProps: Props<T>) {
+        if (
+            this.props.dataType !== nextProps.dataType ||
+            this.props.dataKey !== nextProps.dataKey ||
+            this.props.isServerSideRender !== nextProps.isServerSideRender
+        ) {
+            this.props.dispatch<LOAD_NEXT_DATA>({
+                type: LOAD_NEXT_DATA,
+                meta: {
+                    current: this.actionMeta(),
+                    next: this.actionMeta(nextProps)
+                }
+            })
+
+            await this.performLoadData()
+        }
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false
+        const loadedState = this.getLoadedState()
+        if (loadedState.attachedComponents > 1) {
+            this.props.dispatch<DETACH_FROM_DATA>({
+                type: DETACH_FROM_DATA,
+                meta: this.actionMeta(),
+            })
+        } else {
+            this.props.dispatch<UNLOAD_DATA>({
+                type: UNLOAD_DATA,
+                meta: this.actionMeta(),
+            })
+        }
+    }
+
+    private actionMeta = (props = this.props) => ({
         dataType: props.dataType,
         dataKey: props.dataKey,
         dataFromServerSideRender: props.isServerSideRender
@@ -98,44 +156,6 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
                 payload: payload
             })
         }
-    }
-
-    async componentWillMount() {
-        this._isMounted = true
-        const loadedState = this.getLoadedState()
-
-        if (this.props.isServerSideRender && needsData(loadedState)) {
-            return await this.loadData()
-        }
-        if (!this.props.isServerSideRender && !hasDataFromServer(loadedState)) {
-            return await this.loadData()
-        }
-    }
-
-    async componentWillReceiveProps(nextProps: Props<T>) {
-        if (
-            this.props.dataType !== nextProps.dataType ||
-            this.props.dataKey !== nextProps.dataKey ||
-            this.props.isServerSideRender !== nextProps.isServerSideRender
-        ) {
-            this.props.dispatch<LOAD_NEXT_DATA>({
-                type: LOAD_NEXT_DATA,
-                meta: {
-                    current: this.actionMeta(),
-                    next: this.actionMeta(nextProps)
-                }
-            })
-
-            await this.performLoadData()
-        }
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false
-        this.props.dispatch<UNLOAD_DATA>({
-            type: UNLOAD_DATA,
-            meta: this.actionMeta(),
-        })
     }
 
     private getLoadedState = (): LoaderDataState => {

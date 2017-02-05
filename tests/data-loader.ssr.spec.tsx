@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { createStore, combineReducers, Store } from 'redux'
+import { createStore, combineReducers, applyMiddleware, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { OwnProps, LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
@@ -10,8 +10,23 @@ import ComponentFixture, { Verifier } from './helpers/component-fixture'
 let store: Store<ReduxStoreState>
 
 beforeEach(() => {
+    const logger = store => next => action => {
+        // console.log('dispatching', action)
+        try {
+            let result = next(action)
+            // console.log('next state', store.getState())
+            return result
+        } catch (err) {
+            console.error('REDUX ERROR', err)
+            throw err
+        }
+    }
+
     // TODO Investigate keys of syntax for combineReducers
-    store = createStore(combineReducers<ReduxStoreState>({ dataLoader: reducer }))
+    store = createStore(
+        combineReducers<ReduxStoreState>({ dataLoader: reducer }),
+        applyMiddleware(logger)
+    )
 })
 
 describe('server side render', () => {
