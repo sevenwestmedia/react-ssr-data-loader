@@ -12,9 +12,9 @@ Object {
       "testDataType": Object {
         "testKey": Object {
           "completed": false,
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": true,
-          "serverSideRender": false,
         },
       },
     },
@@ -40,15 +40,15 @@ Object {
           "data": Object {
             "result": "Foo!",
           },
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": false,
-          "serverSideRender": false,
         },
         "testKey2": Object {
           "completed": false,
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": true,
-          "serverSideRender": false,
         },
       },
     },
@@ -74,18 +74,18 @@ Object {
           "data": Object {
             "result": "Foo!",
           },
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": false,
-          "serverSideRender": false,
         },
         "testKey2": Object {
           "completed": true,
           "data": Object {
             "result": "Foo2!",
           },
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": false,
-          "serverSideRender": false,
         },
       },
     },

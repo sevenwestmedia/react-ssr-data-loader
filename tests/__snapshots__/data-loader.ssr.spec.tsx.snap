@@ -1,8 +1,7 @@
 exports[`server side render should pass failure when data load fails 1`] = `
 Object {
-  "data": undefined,
   "errorMessage": "Boom!",
-  "isCompleted": false,
+  "isCompleted": true,
   "isLoading": false,
   "loadFailed": true,
   "renderCount": 3,
@@ -15,11 +14,11 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "completed": false,
+          "completed": true,
+          "dataFromServerSideRender": true,
           "error": "Boom!",
           "failed": true,
           "loading": false,
-          "serverSideRender": true,
         },
       },
     },
@@ -33,7 +32,6 @@ Object {
   "data": Object {
     "result": "Success!",
   },
-  "errorMessage": undefined,
   "isCompleted": true,
   "isLoading": false,
   "loadFailed": false,
@@ -51,9 +49,9 @@ Object {
           "data": Object {
             "result": "Success!",
           },
+          "dataFromServerSideRender": true,
           "failed": false,
           "loading": false,
-          "serverSideRender": true,
         },
       },
     },
@@ -64,8 +62,6 @@ Object {
 
 exports[`server side render should start loading data if not loaded 1`] = `
 Object {
-  "data": undefined,
-  "errorMessage": undefined,
   "isCompleted": false,
   "isLoading": true,
   "loadFailed": false,
@@ -80,9 +76,9 @@ Object {
       "testDataType": Object {
         "testKey": Object {
           "completed": false,
+          "dataFromServerSideRender": true,
           "failed": false,
           "loading": true,
-          "serverSideRender": true,
         },
       },
     },

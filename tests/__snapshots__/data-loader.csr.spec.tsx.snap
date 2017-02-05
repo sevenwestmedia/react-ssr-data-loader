@@ -3,7 +3,6 @@ Object {
   "data": Object {
     "result": "Success!",
   },
-  "errorMessage": undefined,
   "isCompleted": true,
   "isLoading": false,
   "loadFailed": false,
@@ -21,9 +20,9 @@ Object {
           "data": Object {
             "result": "Success!",
           },
+          "dataFromServerSideRender": true,
           "failed": false,
           "loading": false,
-          "serverSideRender": true,
         },
       },
     },
@@ -37,7 +36,6 @@ Object {
   "data": Object {
     "result": "Success2!",
   },
-  "errorMessage": undefined,
   "isCompleted": true,
   "isLoading": false,
   "loadFailed": false,
@@ -55,9 +53,9 @@ Object {
           "data": Object {
             "result": "Success2!",
           },
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": false,
-          "serverSideRender": false,
         },
       },
     },
@@ -77,9 +75,8 @@ Object {
 
 exports[`Client side render should pass failure when data load fails 1`] = `
 Object {
-  "data": undefined,
   "errorMessage": "Boom!",
-  "isCompleted": false,
+  "isCompleted": true,
   "isLoading": false,
   "loadFailed": true,
   "renderCount": 3,
@@ -92,11 +89,11 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "completed": false,
+          "completed": true,
+          "dataFromServerSideRender": false,
           "error": "Boom!",
           "failed": true,
           "loading": false,
-          "serverSideRender": false,
         },
       },
     },
@@ -110,7 +107,6 @@ Object {
   "data": Object {
     "result": "Success!",
   },
-  "errorMessage": undefined,
   "isCompleted": true,
   "isLoading": false,
   "loadFailed": false,
@@ -128,9 +124,9 @@ Object {
           "data": Object {
             "result": "Success!",
           },
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": false,
-          "serverSideRender": false,
         },
       },
     },
@@ -150,8 +146,6 @@ Object {
 
 exports[`Client side render should start loading data if not loaded 1`] = `
 Object {
-  "data": undefined,
-  "errorMessage": undefined,
   "isCompleted": false,
   "isLoading": true,
   "loadFailed": false,
@@ -166,9 +160,9 @@ Object {
       "testDataType": Object {
         "testKey": Object {
           "completed": false,
+          "dataFromServerSideRender": false,
           "failed": false,
           "loading": true,
-          "serverSideRender": false,
         },
       },
     },

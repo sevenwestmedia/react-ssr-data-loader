@@ -47,8 +47,8 @@ export interface DispatchProps {
 }
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
-const needsData = (state: LoaderDataState) => !state || (!state.completed && !state.failed)
-const hasDataFromServer = (state: LoaderDataState) => state && state.completed && state.dataFromServerSideRender
+const needsData = (state: LoaderDataState) => !state || !state.completed
+const hasDataFromServer = (state: LoaderDataState) => state && state.completed && !state.failed && state.dataFromServerSideRender
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     private _isMounted: boolean
@@ -176,19 +176,21 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     }
 
     render() {
-        const loadedProps = this.getLoadedProps()
-        if (!loadedProps) {
-            return null
+        const loadedProps = this.getLoadedProps() || {
+            isCompleted: false,
+            isLoading: true,
+            loadFailed: false
         }
+
         return this.props.renderData(loadedProps)
     }
 }
 
-
 export function createTypedDataLoader<T>() {
-    return connect<MappedProps, {}, OwnProps<T>>(
+    const ConnectedDataLoader = connect<MappedProps, {}, OwnProps<T>>(
         (state: ReduxStoreState) => ({ store: state.dataLoader })
     )(DataLoader)
+    return ConnectedDataLoader
 }
 
 export default createTypedDataLoader<any>()

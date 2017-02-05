@@ -39,7 +39,7 @@ describe('Client side render', () => {
         expect(sut.loadDataCount).toBe(1)
     })
 
-    it('loads data when props change', async() => {
+    it('loads data when props change', async () => {
         const sut = new ComponentFixture(store, "testKey", false)
 
         const verifier = sut.component.find(Verifier)
