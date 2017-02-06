@@ -85,4 +85,12 @@ describe('server side render', () => {
 
         expect(sut.loadDataCount).toBe(0)
     })
+
+    it('does not render on the server if clientLoadOnlySet', async () => {
+        let sut = new ComponentFixture(store, "testKey", true, true)
+
+        expect(sut.component.find(Verifier).exists()).toBe(false)
+        expect(sut.loadDataCount).toBe(0)
+        expect(store.getState()).toMatchSnapshot()
+    })
 })

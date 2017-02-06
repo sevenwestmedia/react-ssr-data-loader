@@ -1,3 +1,12 @@
+exports[`server side render does not render on the server if clientLoadOnlySet 1`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {},
+    "loadingCount": 0,
+  },
+}
+`;
+
 exports[`server side render should pass failure when data load fails 1`] = `
 Object {
   "errorMessage": "Boom!",

@@ -71,7 +71,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         this._isMounted = true
         const loadedState = this.getLoadedState()
 
-        if (this.props.isServerSideRender && ssrNeedsData(loadedState)) {
+        if (this.props.isServerSideRender && !this.props.clientLoadOnly && ssrNeedsData(loadedState)) {
             return await this.loadData()
         }
         if (!this.props.isServerSideRender) {
@@ -208,6 +208,10 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     }
 
     render() {
+        if (this.props.isServerSideRender && this.props.clientLoadOnly) {
+            return null
+        }
+
         const loadedProps = this.getLoadedProps() || {
             isCompleted: false,
             isLoading: false,
