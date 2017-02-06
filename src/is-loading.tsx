@@ -8,7 +8,7 @@ export interface LoadedState {
     isLoading: boolean
 }
 export interface RenderLoading {
-    (loaderProps: LoadedState): React.ReactElement<any>
+    (loaderProps: LoadedState): React.ReactElement<any> | null
 }
 export interface OwnProps {
     renderData: RenderLoading

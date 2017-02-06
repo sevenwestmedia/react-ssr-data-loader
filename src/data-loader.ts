@@ -10,26 +10,35 @@ import {
 
 export interface SuccessLoadedState<T> {
     isCompleted: true
+    isLoaded: true
     isLoading: false
-    loadFailed: false
+    isError: false
     data: T
 }
-export interface FailedLoadedState {
+export interface ErrorLoadedState {
     isCompleted: true
+    isLoaded: false
     isLoading: false
-    loadFailed: true
+    isError: true
     errorMessage: string
+}
+export interface BeforeLoadingState {
+    isCompleted: false
+    isLoaded: false
+    isLoading: false
+    isError: false
 }
 export interface LoadingState {
     isCompleted: false
+    isLoaded: false
     isLoading: true
-    loadFailed: false
+    isError: false
 }
 
-export type LoadedState<T> = SuccessLoadedState<T> | FailedLoadedState | LoadingState
+export type LoadedState<T> = SuccessLoadedState<T> | BeforeLoadingState| ErrorLoadedState | LoadingState
 
 export interface RenderData<T> {
-    (loaderProps: LoadedState<T>): React.ReactElement<any>
+    (loaderProps: LoadedState<T>): React.ReactElement<any> | null
 }
 export interface OwnProps<T> {
     dataType: string
@@ -175,31 +184,35 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         if (loadedState.completed && loadedState.failed) {
             return {
                 isCompleted: true,
+                isLoaded: false,
                 isLoading: false,
-                loadFailed: true,
+                isError: true,
                 errorMessage: loadedState.error,
             }
         } 
         if (loadedState.completed && loadedState.failed === false) {
             return {
                 isCompleted: true,
+                isLoaded: true,
                 isLoading: false,
-                loadFailed: false,
+                isError: false,
                 data: loadedState.data
             }
         }
         return {
             isCompleted: false,
+            isLoaded: false,
             isLoading: true,
-            loadFailed: false,
+            isError: false,
         }
     }
 
     render() {
         const loadedProps = this.getLoadedProps() || {
             isCompleted: false,
-            isLoading: true,
-            loadFailed: false
+            isLoading: false,
+            isLoaded: false,
+            isError: false
         }
 
         return this.props.renderData(loadedProps)

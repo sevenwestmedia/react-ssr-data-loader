@@ -4,8 +4,9 @@ Object {
     "result": "Success!",
   },
   "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
   "isLoading": false,
-  "loadFailed": false,
   "renderCount": 4,
 }
 `;
@@ -38,8 +39,9 @@ Object {
     "result": "Success2!",
   },
   "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
   "isLoading": false,
-  "loadFailed": false,
   "renderCount": 6,
 }
 `;
@@ -79,8 +81,9 @@ exports[`Client side render should pass failure when data load fails 1`] = `
 Object {
   "errorMessage": "Boom!",
   "isCompleted": true,
+  "isError": true,
+  "isLoaded": false,
   "isLoading": false,
-  "loadFailed": true,
   "renderCount": 3,
 }
 `;
@@ -111,8 +114,9 @@ Object {
     "result": "Success!",
   },
   "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
   "isLoading": false,
-  "loadFailed": false,
   "renderCount": 3,
 }
 `;
@@ -151,8 +155,9 @@ Object {
 exports[`Client side render should start loading data if not loaded 1`] = `
 Object {
   "isCompleted": false,
+  "isError": false,
+  "isLoaded": false,
   "isLoading": true,
-  "loadFailed": false,
   "renderCount": 2,
 }
 `;

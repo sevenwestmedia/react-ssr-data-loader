@@ -13,8 +13,9 @@ Object {
     "result": "Test",
   },
   "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
   "isLoading": false,
-  "loadFailed": false,
   "renderCount": 3,
 }
 `;
@@ -44,8 +45,9 @@ Object {
 exports[`data-loader supports multiple loaders using the same key when data loading 1`] = `
 Object {
   "isCompleted": false,
+  "isError": false,
+  "isLoaded": false,
   "isLoading": true,
-  "loadFailed": false,
   "renderCount": 3,
 }
 `;
