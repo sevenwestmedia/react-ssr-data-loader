@@ -7,6 +7,35 @@ Object {
 }
 `;
 
+exports[`server side render multiple data loaders with same key should not load data multiple times 1`] = `
+Object {
+  "isCompleted": false,
+  "isError": false,
+  "isLoaded": false,
+  "isLoading": true,
+  "renderCount": 2,
+}
+`;
+
+exports[`server side render multiple data loaders with same key should not load data multiple times 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "attachedComponents": 0,
+          "completed": false,
+          "dataFromServerSideRender": true,
+          "failed": false,
+          "loading": true,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
 exports[`server side render should pass failure when data load fails 1`] = `
 Object {
   "errorMessage": "Boom!",

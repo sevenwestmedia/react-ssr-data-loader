@@ -40,6 +40,17 @@ describe('server side render', () => {
         expect(sut.loadDataCount).toBe(1)
     })
 
+    it('multiple data loaders with same key should not load data multiple times', () => {
+        const sut = new ComponentFixture(store, "testKey", true)
+        const sut2 = new ComponentFixture(store, "testKey", true)
+
+        const verifier = sut.component.find(Verifier)
+
+        expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(1)
+    })
+
     it('should pass loaded data once promise resolves', async() => {
         const sut = new ComponentFixture(store, "testKey", true)
 
