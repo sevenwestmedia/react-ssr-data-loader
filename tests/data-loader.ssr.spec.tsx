@@ -6,6 +6,7 @@ import { OwnProps, LoadedState, createTypedDataLoader } from '../src/data-loader
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
+import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import Verifier from './helpers/verifier'
 
 let store: Store<ReduxStoreState>
@@ -100,6 +101,14 @@ describe('server side render', () => {
 
     it('does not render on the server if clientLoadOnlySet', async () => {
         let sut = new ComponentFixture(store, "testKey", true, true)
+
+        expect(sut.component.find(Verifier).exists()).toBe(false)
+        expect(sut.loadDataCount).toBe(0)
+        expect(store.getState()).toMatchSnapshot()
+    })
+
+    it('can have two components in the same render tree', async () => {
+        let sut = new SharedDataComponentFixture(store, "testKey", true)
 
         expect(sut.component.find(Verifier).exists()).toBe(false)
         expect(sut.loadDataCount).toBe(0)
