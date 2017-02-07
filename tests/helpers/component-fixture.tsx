@@ -5,16 +5,8 @@ import { Provider } from 'react-redux'
 import { OwnProps, LoadedState, createTypedDataLoader } from '../../src/data-loader'
 import { ReduxStoreState, reducer } from '../../src/data-loader.redux'
 import PromiseCompletionSource from './promise-completion-source'
-
-export interface Data {
-    result: string
-}
-
-export const TestDataLoader = createTypedDataLoader<Data>()
-
-export const Verifier: React.SFC<LoadedState<Data> & {
-    renderCount: number
-}> = (loadedState) => (<noscript />)
+import { Data, TestDataLoader } from './test-data'
+import Verifier from './verifier'
 
 export default class ComponentFixture {
     loadDataCount = 0

@@ -5,7 +5,8 @@ import { Provider } from 'react-redux'
 import { OwnProps, LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
-import ComponentFixture, { Verifier } from './helpers/component-fixture'
+import ComponentFixture from './helpers/component-fixture'
+import Verifier from './helpers/verifier'
 
 let store: Store<ReduxStoreState>
 
