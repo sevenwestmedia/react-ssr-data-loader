@@ -1,12 +1,6 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-import {
-    ReduxStoreState, DataTypeMap, LoaderDataState,
-    LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
-    UNLOAD_DATA, LOAD_NEXT_DATA, ATTACH_TO_DATA,
-    DETACH_FROM_DATA
-} from './data-loader.redux'
+import { DataLoaderContext } from './data-provider'
+import { LoaderDataState } from './data-loader.redux'
 
 export interface SuccessLoadedState<T> {
     isCompleted: true
@@ -40,7 +34,7 @@ export type LoadedState<T> = SuccessLoadedState<T> | BeforeLoadingState| ErrorLo
 export interface RenderData<T> {
     (loaderProps: LoadedState<T>): React.ReactElement<any> | null
 }
-export interface OwnProps<T> {
+export interface Props<T> {
     dataType: string
     dataKey: string
     loadData: () => Promise<T>
@@ -48,14 +42,6 @@ export interface OwnProps<T> {
     isServerSideRender: boolean
     renderData: RenderData<T>
 }
-
-export interface MappedProps {
-    store: DataTypeMap
-}
-export interface DispatchProps {
-    dispatch: Dispatch<ReduxStoreState>
-}
-export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
 const ssrNeedsData = (state: LoaderDataState) => !state || (!state.completed && !state.loading)
 const hasValidData = (state: LoaderDataState) => (
@@ -65,6 +51,11 @@ const hasValidData = (state: LoaderDataState) => (
 )
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
+    contextTypes = {
+        dataLoader: React.PropTypes.object
+    }
+
+    context: DataLoaderContext
     private _isMounted: boolean
 
     async componentWillMount(): Promise<void> {
@@ -76,10 +67,7 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         }
         if (!this.props.isServerSideRender) {
             if (hasValidData(loadedState)) {
-                this.props.dispatch<ATTACH_TO_DATA>({
-                    type: ATTACH_TO_DATA,
-                    meta: this.actionMeta(),
-                })
+                this.context.attachToData(this.actionMeta())
             } else {
                 return await this.loadData()
             }
@@ -223,11 +211,4 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     }
 }
 
-export function createTypedDataLoader<T>() {
-    const ConnectedDataLoader = connect<MappedProps, {}, OwnProps<T>>(
-        (state: ReduxStoreState) => ({ store: state.dataLoader })
-    )(DataLoader)
-    return ConnectedDataLoader
-}
-
-export default createTypedDataLoader<any>()
+export default DataLoader
