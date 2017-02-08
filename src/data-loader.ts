@@ -48,7 +48,8 @@ export function createTypedDataLoader<T>(dataType: string) : React.ComponentClas
             dataLoader: React.PropTypes.object
         }
 
-        context: DataLoaderContext
+        context: { dataLoader: DataLoaderContext }
+
         state: LoadedState<T> = {
             isCompleted: false,
             isLoading: false,
@@ -59,18 +60,18 @@ export function createTypedDataLoader<T>(dataType: string) : React.ComponentClas
         async componentWillMount(): Promise<void> {
             this._isMounted = true
 
-            if (this.context.isServerSideRender && this.props.clientLoadOnly) {
+            if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
                 return
             }
 
-            this.context.loadData(this.actionMeta(), this.handleStateUpdate)
+            this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
         async componentWillReceiveProps(nextProps: Props<T>) {
             if (
                 this.props.dataKey !== nextProps.dataKey
             ) {
-                this.context.loadNextData(
+                this.context.dataLoader.loadNextData(
                     this.actionMeta(),
                     this.actionMeta(nextProps),
                     this.handleStateUpdate
@@ -80,7 +81,7 @@ export function createTypedDataLoader<T>(dataType: string) : React.ComponentClas
 
         componentWillUnmount() {
             this._isMounted = false
-            this.context.unloadData(this.actionMeta(), this.handleStateUpdate)
+            this.context.dataLoader.unloadData(this.actionMeta(), this.handleStateUpdate)
         }
 
         private actionMeta = (props = this.props) => ({
@@ -123,7 +124,7 @@ export function createTypedDataLoader<T>(dataType: string) : React.ComponentClas
         }
 
         render() {
-            if (this.context.isServerSideRender && this.props.clientLoadOnly) {
+            if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
                 return null
             }
 

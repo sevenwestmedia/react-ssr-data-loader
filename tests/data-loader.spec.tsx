@@ -6,6 +6,7 @@ import { LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
+import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import Verifier from './helpers/verifier'
 
 let store: Store<ReduxStoreState>
@@ -32,13 +33,11 @@ beforeEach(() => {
 
 describe('data-loader', () => {
     it('supports multiple loaders using the same key when data loading', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
-        const sut2 = new ComponentFixture(store, "testKey", false)
-        await sut.unmount()
+        const sut = new SharedDataComponentFixture(store, "testKey", false)
 
-        const verifier = sut2.component.find(Verifier)
+        const verifier = sut.component.find(Verifier)
 
-        expect(verifier.props()).toMatchSnapshot()
+        expect(verifier.at(1).props()).toMatchSnapshot()
         expect(store.getState()).toMatchSnapshot()
     })
 

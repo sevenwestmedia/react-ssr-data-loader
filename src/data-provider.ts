@@ -38,9 +38,7 @@ export interface MetaData {
 
 const ssrNeedsData = (state: LoaderDataState) => !state || (!state.completed && !state.loading)
 const hasValidData = (state: LoaderDataState) => (
-    state && state.completed && !state.failed && (
-        state.dataFromServerSideRender || state.attachedComponents > 0
-    )
+    state && state.completed && !state.failed && state.dataFromServerSideRender
 )
 
 export type DataUpdateCallback = (newState: LoaderDataState) => void
@@ -76,13 +74,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
             return await this._loadData(metadata)
         }
 
-        if (!this.isServerSideRender) {
-            if (hasValidData(loadedState)) {
-                this.dispatch<ATTACH_TO_DATA>({
-                    type: ATTACH_TO_DATA,
-                    meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
-                })
-            } else {
+        if (!this.isServerSideRender && firstAttached) {
+            if (!hasValidData(loadedState)) {
                 return await this._loadData(metadata)
             }
         }
@@ -125,7 +118,9 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 const subscribers = this._subscriptions[subscribedDataType][subscriberKey]
 
                 for (const subscriber of subscribers) {
-                    subscriber(store[subscribedDataType][subscriberKey])
+                    if (store[subscribedDataType] && store[subscribedDataType][subscriberKey]) {
+                        subscriber(store[subscribedDataType][subscriberKey])
+                    }
                 }
             }
         }
@@ -235,7 +230,7 @@ class DataProvider extends React.Component<Props, State> {
         return dataLoader(metadata.dataKey)
     }
 
-    getChildContext = () => this.context
+    getChildContext = () => ({ dataLoader: this.dataLoader })
 
     render() {
         return React.Children.only(this.props.children)

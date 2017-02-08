@@ -31,20 +31,22 @@ export default class ComponentFixture {
                         },
                     }}
                 >
-                    <TestDataLoader
-                        dataKey={dataKey}
-                        clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
-                    />
-                    <TestDataLoader
-                        dataKey={dataKey}
-                        clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
-                    />
+                    <div>
+                        <TestDataLoader
+                            dataKey={dataKey}
+                            clientLoadOnly={clientLoadOnly}
+                            renderData={(props) => (
+                                <Verifier {...props} renderCount={++this.renderCount} />
+                            )}
+                        />
+                        <TestDataLoader
+                            dataKey={dataKey}
+                            clientLoadOnly={clientLoadOnly}
+                            renderData={(props) => (
+                                <Verifier {...props} renderCount={++this.renderCount} />
+                            )}
+                        />
+                    </div>
                 </DataProvider>
             </Provider>
         )
