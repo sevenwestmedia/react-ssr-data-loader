@@ -58,4 +58,12 @@ describe('data-loader', () => {
 
         expect(store.getState()).toMatchSnapshot()
     })
+
+    it.only('notifies when all work is completed', async () => {
+        const sut = new ComponentFixture(store, "testKey", false)
+
+        expect(sut.loadAllCompletedCalled).toBe(0)
+        await sut.testDataPromise.resolve({ result: 'Test' })
+        expect(sut.loadAllCompletedCalled).toBe(1)
+    })
 })

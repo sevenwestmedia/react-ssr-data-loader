@@ -10,6 +10,7 @@ import { Data, TestDataLoader, dataType } from './test-data'
 import Verifier from './verifier'
 
 export default class ComponentFixture {
+    loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
@@ -28,6 +29,7 @@ export default class ComponentFixture {
                             return this.testDataPromise.promise
                         }
                     }}
+                    loadAllCompleted={() => this.loadAllCompletedCalled++}
                 >
                     <TestDataLoader
                         dataKey={dataKey}

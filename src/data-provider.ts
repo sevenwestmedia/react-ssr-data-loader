@@ -17,6 +17,7 @@ export interface DispatchProps {
 }
 
 export interface OwnProps {
+    loadAllCompleted?: () => void
     isServerSideRender: boolean
     loadData: {
         [dataType: string]: (dataKey: string) => Promise<any>
@@ -62,6 +63,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         private dispatch: Dispatch<ReduxStoreState>,
         private getStoreState: () => DataTypeMap,
         private performLoad: (metadata: MetaData) => Promise<any>,
+        private loadAllCompleted: () => void,
         public isServerSideRender: boolean
     ) { }
 
@@ -218,6 +220,12 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
                 payload: payload
             })
+        } finally {
+            console.log('!!!', this.getStoreState())
+            // @TODO This may be too simplistic
+            if (this.getStoreState().loadingCount === 0) {
+                this.loadAllCompleted()
+            }
         }
     }
 }
@@ -236,6 +244,7 @@ class DataProvider extends React.Component<Props, State> {
             this.props.dispatch,
             () => this.props.store,
             this.loadData,
+            this.props.loadAllCompleted,
             this.props.isServerSideRender
         )
     }
