@@ -4,8 +4,7 @@ import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap, LoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
-    UNLOAD_DATA, LOAD_NEXT_DATA, ATTACH_TO_DATA,
-    DETACH_FROM_DATA
+    UNLOAD_DATA, LOAD_NEXT_DATA
 } from './data-loader.redux'
 
 export { LoaderDataState }
@@ -61,13 +60,13 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
     constructor(
         private dispatch: Dispatch<ReduxStoreState>,
-        private getLoadedState: (metadata: MetaData) => LoaderDataState | undefined,
+        private getStoreState: () => DataTypeMap,
         private performLoad: (metadata: MetaData) => Promise<any>,
         public isServerSideRender: boolean
     ) { }
 
     async loadData(metadata: MetaData, update: DataUpdateCallback) {
-        const firstAttached = this._attach(metadata, update)
+        const firstAttached = this.attach(metadata, update)
         const loadedState = this.getLoadedState(metadata)
 
         if (this.isServerSideRender && ssrNeedsData(loadedState) && firstAttached) {
@@ -79,9 +78,14 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 return await this._loadData(metadata)
             }
         }
+
+        this.updateDataLoaders(this.getStoreState())
     }
 
     async loadNextData(currentMetadata: MetaData, nextMetadata: MetaData, update: DataUpdateCallback) {
+        this.detach(currentMetadata, update)
+        this.attach(nextMetadata, update)
+
         this.dispatch<LOAD_NEXT_DATA>({
             type: LOAD_NEXT_DATA,
             meta: {
@@ -94,18 +98,31 @@ class DataLoaderContextInternal implements DataLoaderContext {
     }
 
     unloadData(metadata: MetaData, update: DataUpdateCallback) {
-        const loadedState = this.getLoadedState(metadata)
-        if (loadedState.attachedComponents > 1) {
-            this.dispatch<DETACH_FROM_DATA>({
-                type: DETACH_FROM_DATA,
-                meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
-            })
-        } else {
+        if (this.detach(metadata, update)) {
             this.dispatch<UNLOAD_DATA>({
                 type: UNLOAD_DATA,
                 meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
             })
         }
+    }
+
+    // Returns true when data needs to be unloaded from redux
+    private detach(metadata: MetaData, update: DataUpdateCallback) {
+        const subscriptions = this.getSubscription(metadata)
+
+        if (subscriptions.length === 1) {
+            delete this._subscriptions[metadata.dataType][metadata.dataKey]
+            if (Object.keys(this._subscriptions[metadata.dataType]).length === 0) {
+                delete this._subscriptions[metadata.dataType]
+            }
+
+            return true
+        }
+
+        const subscriptionIndex = subscriptions.indexOf(update)
+        const without = subscriptions.splice(subscriptionIndex, 1)
+        this._subscriptions[metadata.dataType][metadata.dataType] = without
+        return false
     }
 
     updateDataLoaders(store: DataTypeMap) {
@@ -118,8 +135,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 const subscribers = this._subscriptions[subscribedDataType][subscriberKey]
 
                 for (const subscriber of subscribers) {
-                    if (store[subscribedDataType] && store[subscribedDataType][subscriberKey]) {
-                        subscriber(store[subscribedDataType][subscriberKey])
+                    if (store.data[subscribedDataType] && store.data[subscribedDataType][subscriberKey]) {
+                        subscriber(store.data[subscribedDataType][subscriberKey])
                     }
                 }
             }
@@ -135,7 +152,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         await this.performLoadData(metadata)
     }
 
-    private _attach(metadata: MetaData, update: DataUpdateCallback) {
+    private getSubscription(metadata: MetaData) {
         if (!this._subscriptions[metadata.dataType]) {
             this._subscriptions[metadata.dataType] = {}
         }
@@ -144,8 +161,14 @@ class DataLoaderContextInternal implements DataLoaderContext {
             this._subscriptions[metadata.dataType][metadata.dataKey] = []
         }
 
-        this._subscriptions[metadata.dataType][metadata.dataKey].push(update)
-        const firstAttached = this._subscriptions[metadata.dataType][metadata.dataKey].length === 1
+        return this._subscriptions[metadata.dataType][metadata.dataKey]
+    }
+
+    private attach(metadata: MetaData, update: DataUpdateCallback) {
+        const subscriptions = this.getSubscription(metadata)
+
+        subscriptions.push(update)
+        const firstAttached = subscriptions.length === 1
         return firstAttached
     }
 
@@ -155,6 +178,15 @@ class DataLoaderContextInternal implements DataLoaderContext {
             this._subscriptions[metadata.dataType][metadata.dataKey] &&
             this._subscriptions[metadata.dataType][metadata.dataKey].length > 0
         )
+    }
+
+    private getLoadedState = (metadata: MetaData): LoaderDataState => {
+        const dataLookup = this.getStoreState().data[metadata.dataType]
+        if (!dataLookup) {
+            return undefined
+        }
+
+        return dataLookup[metadata.dataKey]
     }
 
     private performLoadData = async (metadata: MetaData) => {
@@ -202,7 +234,7 @@ class DataProvider extends React.Component<Props, State> {
 
         this.dataLoader = new DataLoaderContextInternal(
             this.props.dispatch,
-            this.getLoadedState,
+            () => this.props.store,
             this.loadData,
             this.props.isServerSideRender
         )
@@ -210,15 +242,6 @@ class DataProvider extends React.Component<Props, State> {
 
     componentWillReceiveProps(nextProps: Props) {
         this.dataLoader.updateDataLoaders(nextProps.store)
-    }
-
-    private getLoadedState = (metadata: MetaData): LoaderDataState => {
-        const dataLookup = this.props.store.data[metadata.dataType]
-        if (!dataLookup) {
-            return undefined
-        }
-
-        return dataLookup[metadata.dataKey]
     }
 
     private loadData = (metadata: MetaData): Promise<any> => {

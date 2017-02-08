@@ -7,7 +7,7 @@ Object {
   "isError": false,
   "isLoaded": true,
   "isLoading": false,
-  "renderCount": 4,
+  "renderCount": 3,
 }
 `;
 
@@ -51,7 +51,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "newData": Object {
-          "attachedComponents": 1,
           "completed": true,
           "data": Object {
             "result": "Success2!",

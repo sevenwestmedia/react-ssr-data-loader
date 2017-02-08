@@ -47,8 +47,8 @@ Object {
   "isCompleted": false,
   "isError": false,
   "isLoaded": false,
-  "isLoading": true,
-  "renderCount": 3,
+  "isLoading": false,
+  "renderCount": 2,
 }
 `;
 
@@ -58,7 +58,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": false,
           "dataFromServerSideRender": false,
           "failed": false,
@@ -66,7 +65,7 @@ Object {
         },
       },
     },
-    "loadingCount": 2,
+    "loadingCount": 1,
   },
 }
 `;
