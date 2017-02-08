@@ -19,7 +19,6 @@ export default class ComponentFixture {
 
     constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
-        this.testDataPromise2 = new PromiseCompletionSource<Data>()
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <Provider store={store}>
                 <DataProvider

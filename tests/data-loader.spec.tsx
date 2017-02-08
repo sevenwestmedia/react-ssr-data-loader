@@ -41,15 +41,13 @@ describe('data-loader', () => {
         expect(store.getState()).toMatchSnapshot()
     })
 
-    it('supports multiple loaders using the same key when data already loaded', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
+    it('can resolve data from multiple components', async () => {
+        const sut = new SharedDataComponentFixture(store, "testKey", false)
         await sut.testDataPromise.resolve({ result: 'Test' })
-        const sut2 = new ComponentFixture(store, "testKey", false)
-        await sut.unmount()
 
-        const verifier = sut2.component.find(Verifier)
+        const verifier = sut.component.find(Verifier)
 
-        expect(verifier.props()).toMatchSnapshot()
+        expect(verifier.at(0).props()).toMatchSnapshot()
         expect(store.getState()).toMatchSnapshot()
     })
 
