@@ -2,10 +2,11 @@ import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
 import { createStore, combineReducers, Store } from 'redux'
 import { Provider } from 'react-redux'
-import { OwnProps, LoadedState, createTypedDataLoader } from '../../src/data-loader'
+import { Props, LoadedState } from '../../src/data-loader'
+import DataProvider from '../../src/data-provider'
 import { ReduxStoreState, reducer } from '../../src/data-loader.redux'
 import PromiseCompletionSource from './promise-completion-source'
-import { Data, TestDataLoader } from './test-data'
+import { Data, TestDataLoader, dataType } from './test-data'
 import Verifier from './verifier'
 
 export default class ComponentFixture {
@@ -13,25 +14,29 @@ export default class ComponentFixture {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
-    component: ReactWrapper<OwnProps<Data>, any>
+    component: ReactWrapper<Props<Data>, any>
 
     constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <Provider store={store}>
-                <TestDataLoader
-                    dataType="testDataType"
-                    dataKey={dataKey}
+                <DataProvider
                     isServerSideRender={isServerSideRender}
-                    clientLoadOnly={clientLoadOnly}
-                    loadData={() => {
-                        this.loadDataCount++
-                        return this.testDataPromise.promise
+                    loadData={{
+                        [dataType]: (dataKey: string) => {
+                            this.loadDataCount++
+                            return this.testDataPromise.promise
+                        }
                     }}
-                    renderData={(props) => (
-                        <Verifier {...props} renderCount={++this.renderCount} />
-                    )}
-                />
+                >
+                    <TestDataLoader
+                        dataKey={dataKey}
+                        clientLoadOnly={clientLoadOnly}
+                        renderData={(props) => (
+                            <Verifier {...props} renderCount={++this.renderCount} />
+                        )}
+                    />
+                </DataProvider>
             </Provider>
         )
 
