@@ -90,12 +90,9 @@ export function createTypedDataLoader<T>(dataType: string) : React.ComponentClas
         })
 
         private handleStateUpdate = (loadedState: LoaderDataState): void => {
-            let newState
-            if (!loadedState) {
-                newState = undefined
-            }
+            let newState: LoadedState<T>
 
-            if (loadedState.completed && loadedState.failed) {
+            if (loadedState && loadedState.completed && loadedState.failed) {
                 newState = {
                     isCompleted: true,
                     isLoaded: false,
@@ -103,7 +100,7 @@ export function createTypedDataLoader<T>(dataType: string) : React.ComponentClas
                     isError: true,
                     errorMessage: loadedState.error,
                 }
-            } else if (loadedState.completed && loadedState.failed === false) {
+            } else if (loadedState && loadedState.completed && loadedState.failed === false) {
                 newState = {
                     isCompleted: true,
                     isLoaded: true,

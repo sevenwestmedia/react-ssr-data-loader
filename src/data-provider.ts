@@ -17,6 +17,7 @@ export interface DispatchProps {
 }
 
 export interface OwnProps {
+    loadingCountUpdated?: (loadingCount: number) => void
     loadAllCompleted?: () => void
     isServerSideRender: boolean
     loadData: {
@@ -36,8 +37,8 @@ export interface MetaData {
     dataKey: string
 }
 
-const ssrNeedsData = (state: LoaderDataState) => !state || (!state.completed && !state.loading)
-const hasValidData = (state: LoaderDataState) => (
+const ssrNeedsData = (state: LoaderDataState | undefined) => !state || (!state.completed && !state.loading)
+const hasValidData = (state: LoaderDataState | undefined) => (
     state && state.completed && !state.failed && state.dataFromServerSideRender
 )
 
@@ -53,6 +54,9 @@ export interface DataLoaderContext {
 // Keep the public methods used to notify the context of changes hidden from the data loader
 // component by using an internal class with an interface
 class DataLoaderContextInternal implements DataLoaderContext {
+    // We need to track this in two places, one with immediate effect,
+    // one tied to reacts lifecycle
+    private loadingCount = 0
     private _subscriptions: {
         [dataType: string]: {
             [dataKey: string]: DataUpdateCallback[]
@@ -64,6 +68,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         private getStoreState: () => DataTypeMap,
         private performLoad: (metadata: MetaData) => Promise<any>,
         private loadAllCompleted: () => void,
+        private loadingCountChanged: (loadingCount: number) => void,
         public isServerSideRender: boolean
     ) { }
 
@@ -182,7 +187,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         )
     }
 
-    private getLoadedState = (metadata: MetaData): LoaderDataState => {
+    private getLoadedState = (metadata: MetaData): LoaderDataState | undefined => {
         const dataLookup = this.getStoreState().data[metadata.dataType]
         if (!dataLookup) {
             return undefined
@@ -193,6 +198,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
     private performLoadData = async (metadata: MetaData) => {
         try {
+            this.loadingCount++
+            this.loadingCountChanged(this.loadingCount)
             const data = await this.performLoad(metadata)
             if (!this._hasMountedComponents(metadata)) {
                 return
@@ -221,9 +228,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 payload: payload
             })
         } finally {
-            console.log('!!!', this.getStoreState())
-            // @TODO This may be too simplistic
-            if (this.getStoreState().loadingCount === 0) {
+            if (--this.loadingCount === 0) {
+                this.loadingCountChanged(this.loadingCount)
                 this.loadAllCompleted()
             }
         }
@@ -237,14 +243,15 @@ class DataProvider extends React.Component<Props, State> {
 
     private dataLoader: DataLoaderContextInternal
 
-    constructor(props) {
-        super(props)
+    constructor(props: Props, context: any) {
+        super(props, context)
 
         this.dataLoader = new DataLoaderContextInternal(
             this.props.dispatch,
             () => this.props.store,
             this.loadData,
-            this.props.loadAllCompleted,
+            this.props.loadAllCompleted || (() => {}),
+            this.props.loadingCountUpdated || (() => {}),
             this.props.isServerSideRender
         )
     }

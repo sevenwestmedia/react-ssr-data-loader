@@ -1,3 +1,43 @@
+exports[`data-loader can load multiple dataloaders with different keys 1`] = `
+Object {
+  "data": Object {
+    "result": "Test",
+  },
+  "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
+  "isLoading": false,
+  "renderCount": 5,
+}
+`;
+
+exports[`data-loader can load multiple dataloaders with different keys 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Test",
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+        "testKey2": Object {
+          "completed": false,
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": true,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
 exports[`data-loader can resolve data from multiple components 1`] = `
 Object {
   "data": Object {

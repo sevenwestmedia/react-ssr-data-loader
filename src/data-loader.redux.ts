@@ -91,7 +91,7 @@ type Actions = (
 export const reducer = (state: DataTypeMap = {
     data: {},
     loadingCount: 0,
-}, action: Actions) => {
+}, action: Actions): DataTypeMap => {
     switch (action.type) {
         case LOAD_NEXT_DATA: {
             const stateWithCurrentRemoved = reducer(state, {

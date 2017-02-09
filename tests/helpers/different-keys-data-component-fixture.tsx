@@ -18,16 +18,23 @@ export default class ComponentFixture {
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<Props<Data>, any>
 
-    constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(store: Store<ReduxStoreState>, dataKey: string, dataKey2: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
+        this.testDataPromise2 = new PromiseCompletionSource<Data>()
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <Provider store={store}>
                 <DataProvider
                     isServerSideRender={isServerSideRender}
                     loadData={{
-                        [dataType]: () => {
+                        [dataType]: (key: string) => {
                             this.loadDataCount++
-                            return this.testDataPromise.promise
+                            if (key === dataKey) {
+                                return this.testDataPromise.promise
+                            } else if (key === dataKey2) {
+                                return this.testDataPromise2.promise
+                            }
+
+                            return Promise.reject('Key doesn\'t match?')
                         },
                     }}
                     loadAllCompleted={() => this.loadAllCompletedCalled++}
@@ -41,7 +48,7 @@ export default class ComponentFixture {
                             )}
                         />
                         <TestDataLoader
-                            dataKey={dataKey}
+                            dataKey={dataKey2}
                             clientLoadOnly={clientLoadOnly}
                             renderData={(props) => (
                                 <Verifier {...props} renderCount={++this.renderCount} />
