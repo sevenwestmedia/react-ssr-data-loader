@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://nexus.swmdigital.io/repository/js-private"
+  },
   "repository": {},
   "license": "MIT",
   "dependencies": {
@@ -25,6 +28,7 @@
   },
   "scripts": {
     "build": "tsc -p . -d",
+    "prepublish": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:update-snapshots": "jest -u"
