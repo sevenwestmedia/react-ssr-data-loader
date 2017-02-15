@@ -1,10 +1,53 @@
+exports[`server side render can have two components in the same render tree 1`] = `
+Object {
+}
+`;
+
+exports[`server side render does not render on the server if clientLoadOnlySet 1`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {},
+    "loadingCount": 0,
+  },
+}
+`;
+
+exports[`server side render multiple data loaders with same key should not load data multiple times 1`] = `
+Object {
+  "isCompleted": false,
+  "isError": false,
+  "isLoaded": false,
+  "isLoading": true,
+  "renderCount": 2,
+}
+`;
+
+exports[`server side render multiple data loaders with same key should not load data multiple times 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "attachedComponents": 0,
+          "completed": false,
+          "dataFromServerSideRender": true,
+          "failed": false,
+          "loading": true,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
 exports[`server side render should pass failure when data load fails 1`] = `
 Object {
-  "data": undefined,
   "errorMessage": "Boom!",
+  "isCompleted": true,
+  "isError": true,
   "isLoaded": false,
   "isLoading": false,
-  "loadFailed": true,
   "renderCount": 3,
 }
 `;
@@ -12,15 +55,19 @@ Object {
 exports[`server side render should pass failure when data load fails 2`] = `
 Object {
   "dataLoader": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "error": "Boom!",
-        "failed": true,
-        "loaded": false,
-        "loading": false,
-        "serverSideRender": true,
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "attachedComponents": 0,
+          "completed": true,
+          "dataFromServerSideRender": true,
+          "error": "Boom!",
+          "failed": true,
+          "loading": false,
+        },
       },
     },
+    "loadingCount": 0,
   },
 }
 `;
@@ -30,10 +77,10 @@ Object {
   "data": Object {
     "result": "Success!",
   },
-  "errorMessage": undefined,
+  "isCompleted": true,
+  "isError": false,
   "isLoaded": true,
   "isLoading": false,
-  "loadFailed": false,
   "renderCount": 3,
 }
 `;
@@ -41,28 +88,31 @@ Object {
 exports[`server side render should pass loaded data once promise resolves 2`] = `
 Object {
   "dataLoader": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "data": Object {
-          "result": "Success!",
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "attachedComponents": 0,
+          "completed": true,
+          "data": Object {
+            "result": "Success!",
+          },
+          "dataFromServerSideRender": true,
+          "failed": false,
+          "loading": false,
         },
-        "failed": false,
-        "loaded": true,
-        "loading": false,
-        "serverSideRender": true,
       },
     },
+    "loadingCount": 0,
   },
 }
 `;
 
 exports[`server side render should start loading data if not loaded 1`] = `
 Object {
-  "data": undefined,
-  "errorMessage": undefined,
+  "isCompleted": false,
+  "isError": false,
   "isLoaded": false,
   "isLoading": true,
-  "loadFailed": false,
   "renderCount": 2,
 }
 `;
@@ -70,14 +120,18 @@ Object {
 exports[`server side render should start loading data if not loaded 2`] = `
 Object {
   "dataLoader": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "failed": false,
-        "loaded": false,
-        "loading": true,
-        "serverSideRender": true,
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "attachedComponents": 0,
+          "completed": false,
+          "dataFromServerSideRender": true,
+          "failed": false,
+          "loading": true,
+        },
       },
     },
+    "loadingCount": 1,
   },
 }
 `;

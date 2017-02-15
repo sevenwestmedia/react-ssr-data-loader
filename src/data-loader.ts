@@ -4,19 +4,41 @@ import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap, LoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
-    UNLOAD_DATA
+    UNLOAD_DATA, LOAD_NEXT_DATA, ATTACH_TO_DATA,
+    DETACH_FROM_DATA
 } from './data-loader.redux'
 
-export interface LoadedState<T> {
-    isLoaded: boolean
-    isLoading: boolean
-    loadFailed: boolean
-    errorMessage?: string
-    data?: T
+export interface SuccessLoadedState<T> {
+    isCompleted: true
+    isLoaded: true
+    isLoading: false
+    isError: false
+    data: T
+}
+export interface ErrorLoadedState {
+    isCompleted: true
+    isLoaded: false
+    isLoading: false
+    isError: true
+    errorMessage: string
+}
+export interface BeforeLoadingState {
+    isCompleted: false
+    isLoaded: false
+    isLoading: false
+    isError: false
+}
+export interface LoadingState {
+    isCompleted: false
+    isLoaded: false
+    isLoading: true
+    isError: false
 }
 
+export type LoadedState<T> = SuccessLoadedState<T> | BeforeLoadingState| ErrorLoadedState | LoadingState
+
 export interface RenderData<T> {
-    (loaderProps: LoadedState<T>): React.ReactElement<any>
+    (loaderProps: LoadedState<T>): React.ReactElement<any> | null
 }
 export interface OwnProps<T> {
     dataType: string
@@ -35,24 +57,85 @@ export interface DispatchProps {
 }
 export interface Props<T> extends OwnProps<T>, MappedProps, DispatchProps { }
 
-const needsData = (state: LoaderDataState) => !state || (!state.loaded && !state.failed)
-const hasDataFromServer = (state: LoaderDataState) => state && state.loaded && state.serverSideRender
+const ssrNeedsData = (state: LoaderDataState) => !state || (!state.completed && !state.loading)
+const hasValidData = (state: LoaderDataState) => (
+    state && state.completed && !state.failed && (
+        state.dataFromServerSideRender || state.attachedComponents > 0
+    )
+)
 
 export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
     private _isMounted: boolean
 
-    actionMeta = () => ({
-        dataType: this.props.dataType,
-        dataKey: this.props.dataKey,
-        isServerSideRender: this.props.isServerSideRender
+    async componentWillMount(): Promise<void> {
+        this._isMounted = true
+        const loadedState = this.getLoadedState()
+
+        if (this.props.isServerSideRender && !this.props.clientLoadOnly && ssrNeedsData(loadedState)) {
+            return await this.loadData()
+        }
+        if (!this.props.isServerSideRender) {
+            if (hasValidData(loadedState)) {
+                this.props.dispatch<ATTACH_TO_DATA>({
+                    type: ATTACH_TO_DATA,
+                    meta: this.actionMeta(),
+                })
+            } else {
+                return await this.loadData()
+            }
+        }
+    }
+
+    async componentWillReceiveProps(nextProps: Props<T>) {
+        if (
+            this.props.dataType !== nextProps.dataType ||
+            this.props.dataKey !== nextProps.dataKey ||
+            this.props.isServerSideRender !== nextProps.isServerSideRender
+        ) {
+            this.props.dispatch<LOAD_NEXT_DATA>({
+                type: LOAD_NEXT_DATA,
+                meta: {
+                    current: this.actionMeta(),
+                    next: this.actionMeta(nextProps)
+                }
+            })
+
+            await this.performLoadData()
+        }
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false
+        const loadedState = this.getLoadedState()
+        if (loadedState.attachedComponents > 1) {
+            this.props.dispatch<DETACH_FROM_DATA>({
+                type: DETACH_FROM_DATA,
+                meta: this.actionMeta(),
+            })
+        } else {
+            this.props.dispatch<UNLOAD_DATA>({
+                type: UNLOAD_DATA,
+                meta: this.actionMeta(),
+            })
+        }
+    }
+
+    private actionMeta = (props = this.props) => ({
+        dataType: props.dataType,
+        dataKey: props.dataKey,
+        dataFromServerSideRender: props.isServerSideRender
     })
 
-    loadData = async () => {
+    private loadData = async () => {
         this.props.dispatch<LOAD_DATA>({
             type: LOAD_DATA,
             meta: this.actionMeta(),
         })
 
+        await this.performLoadData()
+    }
+
+    private performLoadData = async () => {
         try {
             const data = await this.props.loadData()
             if (!this._isMounted) {
@@ -84,64 +167,67 @@ export class DataLoader<T> extends React.PureComponent<Props<T>, {}> {
         }
     }
 
-    async componentWillMount() {
-        this._isMounted = true
-        const loadedState = this.getLoadedState()
-
-        if (this.props.isServerSideRender && needsData(loadedState)) {
-            return await this.loadData()
-        }
-        if (!this.props.isServerSideRender && !hasDataFromServer(loadedState)) {
-            return await this.loadData()
-        }
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false
-        this.props.dispatch<UNLOAD_DATA>({
-            type: UNLOAD_DATA,
-            meta: this.actionMeta(),
-        })
-    }
-
-    getLoadedState = (): LoaderDataState => {
-        const dataLookup = this.props.store[this.props.dataType]
+    private getLoadedState = (): LoaderDataState => {
+        const dataLookup = this.props.store.data[this.props.dataType]
         if (!dataLookup) {
             return undefined
         }
         return dataLookup[this.props.dataKey]
     }
 
-    getLoadedProps = (): LoadedState<T> => {
+    private getLoadedProps = (): LoadedState<T> => {
         const loadedState = this.getLoadedState()
         if (!loadedState) {
             return undefined
         }
 
+        if (loadedState.completed && loadedState.failed) {
+            return {
+                isCompleted: true,
+                isLoaded: false,
+                isLoading: false,
+                isError: true,
+                errorMessage: loadedState.error,
+            }
+        } 
+        if (loadedState.completed && loadedState.failed === false) {
+            return {
+                isCompleted: true,
+                isLoaded: true,
+                isLoading: false,
+                isError: false,
+                data: loadedState.data
+            }
+        }
         return {
-            isLoaded: loadedState.loaded,
-            isLoading: loadedState.loading,
-            loadFailed: loadedState.failed,
-            errorMessage: loadedState.error,
-            data: loadedState.data
+            isCompleted: false,
+            isLoaded: false,
+            isLoading: true,
+            isError: false,
         }
     }
 
     render() {
-        const loadedProps = this.getLoadedProps() || {
-            isLoaded: false,
-            isLoading: false,
-            loadFailed: false
+        if (this.props.isServerSideRender && this.props.clientLoadOnly) {
+            return null
         }
+
+        const loadedProps = this.getLoadedProps() || {
+            isCompleted: false,
+            isLoading: false,
+            isLoaded: false,
+            isError: false
+        }
+
         return this.props.renderData(loadedProps)
     }
 }
 
-
 export function createTypedDataLoader<T>() {
-    return connect<MappedProps, {}, OwnProps<T>>(
+    const ConnectedDataLoader = connect<MappedProps, {}, OwnProps<T>>(
         (state: ReduxStoreState) => ({ store: state.dataLoader })
     )(DataLoader)
+    return ConnectedDataLoader
 }
 
 export default createTypedDataLoader<any>()

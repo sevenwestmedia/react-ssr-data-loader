@@ -12,26 +12,43 @@ export default class ComponentFixture {
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
+    testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<OwnProps<Data>, any>
 
     constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
+        this.testDataPromise2 = new PromiseCompletionSource<Data>()
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <Provider store={store}>
-                <TestDataLoader
-                    dataType="testDataType"
-                    dataKey={dataKey}
-                    isServerSideRender={isServerSideRender}
-                    clientLoadOnly={clientLoadOnly}
-                    loadData={() => {
-                        this.loadDataCount++
-                        return this.testDataPromise.promise
-                    }}
-                    renderData={(props) => (
-                        <Verifier {...props} renderCount={++this.renderCount} />
-                    )}
-                />
+                <div>
+                    <TestDataLoader
+                        dataType="testDataType"
+                        dataKey={dataKey}
+                        isServerSideRender={isServerSideRender}
+                        clientLoadOnly={clientLoadOnly}
+                        loadData={() => {
+                            this.loadDataCount++
+                            return this.testDataPromise.promise
+                        }}
+                        renderData={(props) => (
+                            <Verifier {...props} renderCount={++this.renderCount} />
+                        )}
+                    />
+                    <TestDataLoader
+                        dataType="testDataType"
+                        dataKey={dataKey}
+                        isServerSideRender={isServerSideRender}
+                        clientLoadOnly={clientLoadOnly}
+                        loadData={() => {
+                            this.loadDataCount++
+                            return this.testDataPromise2.promise
+                        }}
+                        renderData={(props) => (
+                            <Verifier {...props} renderCount={++this.renderCount} />
+                        )}
+                    />
+                </div>
             </Provider>
         )
 

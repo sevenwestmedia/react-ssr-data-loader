@@ -1,22 +1,38 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { createStore, combineReducers, Store } from 'redux'
+import { createStore, combineReducers, applyMiddleware, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { OwnProps, LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
-import ComponentFixture, { Verifier } from './helpers/component-fixture'
+import ComponentFixture from './helpers/component-fixture'
+import Verifier from './helpers/verifier'
 
 let store: Store<ReduxStoreState>
 
 beforeEach(() => {
+    const logger = store => next => action => {
+        // console.log('dispatching', action)
+        try {
+            let result = next(action)
+            // console.log('next state', store.getState())
+            return result
+        } catch (err) {
+            console.error('REDUX ERROR', err)
+            throw err
+        }
+    }
+
     // TODO Investigate keys of syntax for combineReducers
-    store = createStore(combineReducers<ReduxStoreState>({ dataLoader: reducer }))
+    store = createStore(
+        combineReducers<ReduxStoreState>({ dataLoader: reducer }),
+        applyMiddleware(logger)
+    )
 })
 
 describe('Client side render', () => {
     it('should start loading data if not loaded', () => {
-        const sut = new ComponentFixture(store, false)
+        const sut = new ComponentFixture(store, "testKey", false)
 
         const verifier = sut.component.find(Verifier)
 
@@ -26,7 +42,7 @@ describe('Client side render', () => {
     })
 
     it('should pass loaded data once promise resolves', async() => {
-        const sut = new ComponentFixture(store, false)
+        const sut = new ComponentFixture(store, "testKey", false)
 
         const verifier = sut.component.find(Verifier)
 
@@ -39,8 +55,22 @@ describe('Client side render', () => {
         expect(sut.loadDataCount).toBe(1)
     })
 
+    it('loads data when props change', async () => {
+        const sut = new ComponentFixture(store, "testKey", false)
+
+        const verifier = sut.component.find(Verifier)
+        await sut.testDataPromise.resolve({ result: 'Success!' })
+        sut.resetPromise()
+        sut.root.setProps({ dataKey: "newData" })
+        await sut.testDataPromise.resolve({ result: 'Success2!' })
+
+        expect(verifier.props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(2)
+    })
+
     it('should pass failure when data load fails', async() => {
-        const sut = new ComponentFixture(store, false)
+        const sut = new ComponentFixture(store, "testKey", false)
 
         const verifier = sut.component.find(Verifier)
 
@@ -52,11 +82,11 @@ describe('Client side render', () => {
     })
 
     it('client render after SSR with data should not fetch data', async() => {
-        let sut = new ComponentFixture(store, true)
+        let sut = new ComponentFixture(store, "testKey", true)
         const verifier = sut.component.find(Verifier)
         await sut.testDataPromise.resolve({ result: 'Success!' })
 
-        sut = new ComponentFixture(store, false)
+        sut = new ComponentFixture(store, "testKey", false)
 
         expect(sut.loadDataCount).toBe(0)
         expect(verifier.props()).toMatchSnapshot()
@@ -64,7 +94,7 @@ describe('Client side render', () => {
     })
 
     it('should remove data from redux when unmounted', async() => {
-        let sut = new ComponentFixture(store, false)
+        let sut = new ComponentFixture(store, "testKey", false)
         await sut.testDataPromise.resolve({ result: 'Success!' })
 
         await sut.unmount()
@@ -73,7 +103,7 @@ describe('Client side render', () => {
     })
 
     it('should ignore completion once component is unmounted', async() => {
-        let sut = new ComponentFixture(store, false)
+        let sut = new ComponentFixture(store, "testKey", false)
 
         await sut.unmount()
         await sut.testDataPromise.resolve({ result: 'Success!' })
