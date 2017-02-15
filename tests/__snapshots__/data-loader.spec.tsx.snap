@@ -1,13 +1,4 @@
-exports[`data-loader ignores completion if unmounted first 1`] = `
-Object {
-  "dataLoader": Object {
-    "data": Object {},
-    "loadingCount": 1,
-  },
-}
-`;
-
-exports[`data-loader supports multiple loaders using the same key when data already loaded 1`] = `
+exports[`data-loader can load multiple dataloaders with different keys 1`] = `
 Object {
   "data": Object {
     "result": "Test",
@@ -16,17 +7,56 @@ Object {
   "isError": false,
   "isLoaded": true,
   "isLoading": false,
-  "renderCount": 3,
+  "renderCount": 5,
 }
 `;
 
-exports[`data-loader supports multiple loaders using the same key when data already loaded 2`] = `
+exports[`data-loader can load multiple dataloaders with different keys 2`] = `
 Object {
   "dataLoader": Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
+          "completed": true,
+          "data": Object {
+            "result": "Test",
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+        "testKey2": Object {
+          "completed": false,
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": true,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
+exports[`data-loader can resolve data from multiple components 1`] = `
+Object {
+  "data": Object {
+    "result": "Test",
+  },
+  "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
+  "isLoading": false,
+  "renderCount": 5,
+}
+`;
+
+exports[`data-loader can resolve data from multiple components 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
           "completed": true,
           "data": Object {
             "result": "Test",
@@ -42,13 +72,22 @@ Object {
 }
 `;
 
+exports[`data-loader ignores completion if unmounted first 1`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {},
+    "loadingCount": 1,
+  },
+}
+`;
+
 exports[`data-loader supports multiple loaders using the same key when data loading 1`] = `
 Object {
   "isCompleted": false,
   "isError": false,
   "isLoaded": false,
   "isLoading": true,
-  "renderCount": 3,
+  "renderCount": 4,
 }
 `;
 
@@ -58,7 +97,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": false,
           "dataFromServerSideRender": false,
           "failed": false,
@@ -66,7 +104,7 @@ Object {
         },
       },
     },
-    "loadingCount": 2,
+    "loadingCount": 1,
   },
 }
 `;

@@ -1,5 +1,38 @@
 exports[`server side render can have two components in the same render tree 1`] = `
 Object {
+  "isCompleted": false,
+  "isError": false,
+  "isLoaded": false,
+  "isLoading": true,
+  "renderCount": 3,
+}
+`;
+
+exports[`server side render can have two components in the same render tree 2`] = `
+Object {
+  "isCompleted": false,
+  "isError": false,
+  "isLoaded": false,
+  "isLoading": true,
+  "renderCount": 4,
+}
+`;
+
+exports[`server side render can have two components in the same render tree 3`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": false,
+          "dataFromServerSideRender": true,
+          "failed": false,
+          "loading": true,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
 }
 `;
 
@@ -28,7 +61,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 0,
           "completed": false,
           "dataFromServerSideRender": true,
           "failed": false,
@@ -37,6 +69,53 @@ Object {
       },
     },
     "loadingCount": 1,
+  },
+}
+`;
+
+exports[`server side render second SSR with two components in same tree uses data 1`] = `
+Object {
+  "data": Object {
+    "result": "Success!",
+  },
+  "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
+  "isLoading": false,
+  "renderCount": 1,
+}
+`;
+
+exports[`server side render second SSR with two components in same tree uses data 2`] = `
+Object {
+  "data": Object {
+    "result": "Success!",
+  },
+  "isCompleted": true,
+  "isError": false,
+  "isLoaded": true,
+  "isLoading": false,
+  "renderCount": 2,
+}
+`;
+
+exports[`server side render second SSR with two components in same tree uses data 3`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Success!",
+          },
+          "dataFromServerSideRender": true,
+          "failed": false,
+          "loading": false,
+        },
+      },
+    },
+    "loadingCount": 0,
   },
 }
 `;
@@ -58,7 +137,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 0,
           "completed": true,
           "dataFromServerSideRender": true,
           "error": "Boom!",
@@ -91,7 +169,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 0,
           "completed": true,
           "data": Object {
             "result": "Success!",
@@ -123,7 +200,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 0,
           "completed": false,
           "dataFromServerSideRender": true,
           "failed": false,

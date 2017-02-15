@@ -2,10 +2,12 @@ import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
 import { createStore, combineReducers, applyMiddleware, Store } from 'redux'
 import { Provider } from 'react-redux'
-import { OwnProps, LoadedState, createTypedDataLoader } from '../src/data-loader'
+import { LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
+import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
+import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
 import Verifier from './helpers/verifier'
 
 let store: Store<ReduxStoreState>
@@ -32,26 +34,35 @@ beforeEach(() => {
 
 describe('data-loader', () => {
     it('supports multiple loaders using the same key when data loading', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
-        const sut2 = new ComponentFixture(store, "testKey", false)
-        await sut.unmount()
+        const sut = new SharedDataComponentFixture(store, "testKey", false)
 
-        const verifier = sut2.component.find(Verifier)
+        const verifier = sut.component.find(Verifier)
 
-        expect(verifier.props()).toMatchSnapshot()
+        expect(verifier.at(1).props()).toMatchSnapshot()
         expect(store.getState()).toMatchSnapshot()
     })
 
-    it('supports multiple loaders using the same key when data already loaded', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
+    it('can resolve data from multiple components', async () => {
+        const sut = new SharedDataComponentFixture(store, "testKey", false)
         await sut.testDataPromise.resolve({ result: 'Test' })
-        const sut2 = new ComponentFixture(store, "testKey", false)
-        await sut.unmount()
 
-        const verifier = sut2.component.find(Verifier)
+        const verifier = sut.component.find(Verifier)
 
-        expect(verifier.props()).toMatchSnapshot()
+        expect(verifier.at(0).props()).toMatchSnapshot()
         expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(1)
+    })
+
+    it('can load multiple dataloaders with different keys', async () => {
+        const sut = new DifferentKeysDataComponentFixture(store, "testKey", "testKey2", false)
+        await sut.testDataPromise.resolve({ result: 'Test' })
+
+        expect(sut.loadAllCompletedCalled).toBe(0)
+        const verifier = sut.component.find(Verifier)
+
+        expect(verifier.at(0).props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(2)
     })
 
     it('ignores completion if unmounted first', async () => {
@@ -60,5 +71,13 @@ describe('data-loader', () => {
         await sut.testDataPromise.resolve({ result: 'Test' })
 
         expect(store.getState()).toMatchSnapshot()
+    })
+
+    it('notifies when all work is completed', async () => {
+        const sut = new ComponentFixture(store, "testKey", false)
+
+        expect(sut.loadAllCompletedCalled).toBe(0)
+        await sut.testDataPromise.resolve({ result: 'Test' })
+        expect(sut.loadAllCompletedCalled).toBe(1)
     })
 })

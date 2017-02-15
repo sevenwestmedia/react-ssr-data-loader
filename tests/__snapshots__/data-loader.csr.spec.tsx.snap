@@ -7,7 +7,7 @@ Object {
   "isError": false,
   "isLoaded": true,
   "isLoading": false,
-  "renderCount": 4,
+  "renderCount": 3,
 }
 `;
 
@@ -17,7 +17,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": true,
           "data": Object {
             "result": "Success!",
@@ -52,7 +51,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "newData": Object {
-          "attachedComponents": 1,
           "completed": true,
           "data": Object {
             "result": "Success2!",
@@ -94,7 +92,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": true,
           "dataFromServerSideRender": false,
           "error": "Boom!",
@@ -127,7 +124,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": true,
           "data": Object {
             "result": "Success!",
@@ -168,7 +164,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": false,
           "dataFromServerSideRender": false,
           "failed": false,

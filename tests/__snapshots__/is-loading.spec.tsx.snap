@@ -11,7 +11,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": false,
           "dataFromServerSideRender": false,
           "failed": false,
@@ -37,7 +36,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": true,
           "data": Object {
             "result": "Foo!",
@@ -47,7 +45,6 @@ Object {
           "loading": false,
         },
         "testKey2": Object {
-          "attachedComponents": 1,
           "completed": false,
           "dataFromServerSideRender": false,
           "failed": false,
@@ -73,7 +70,6 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
-          "attachedComponents": 1,
           "completed": true,
           "data": Object {
             "result": "Foo!",
@@ -83,7 +79,6 @@ Object {
           "loading": false,
         },
         "testKey2": Object {
-          "attachedComponents": 1,
           "completed": true,
           "data": Object {
             "result": "Foo2!",

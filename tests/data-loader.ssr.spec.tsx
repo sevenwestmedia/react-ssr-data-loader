@@ -2,7 +2,7 @@ import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
 import { createStore, combineReducers, applyMiddleware, Store } from 'redux'
 import { Provider } from 'react-redux'
-import { OwnProps, LoadedState, createTypedDataLoader } from '../src/data-loader'
+import { LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
@@ -110,8 +110,24 @@ describe('server side render', () => {
     it('can have two components in the same render tree', async () => {
         let sut = new SharedDataComponentFixture(store, "testKey", true)
 
-        expect(sut.component.find(Verifier).exists()).toBe(false)
-        expect(sut.loadDataCount).toBe(0)
+        const verifier = sut.component.find(Verifier)
+
+        expect(verifier.at(0).props()).toMatchSnapshot()
+        expect(verifier.at(1).props()).toMatchSnapshot()
         expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(1)
+    })
+
+    it('second SSR with two components in same tree uses data', async () => {
+        let sut = new SharedDataComponentFixture(store, "testKey", true)
+        await sut.testDataPromise.resolve({ result: 'Success!' })
+        let sut2 = new SharedDataComponentFixture(store, "testKey", true)
+
+        const verifier = sut2.component.find(Verifier)
+
+        expect(verifier.at(0).props()).toMatchSnapshot()
+        expect(verifier.at(1).props()).toMatchSnapshot()
+        expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(1)
     })
 })
