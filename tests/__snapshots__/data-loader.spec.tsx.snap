@@ -81,6 +81,27 @@ Object {
 }
 `;
 
+exports[`data-loader multiple components load data once when props change 1`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "newData": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Success2!",
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+      },
+    },
+    "loadingCount": 0,
+  },
+}
+`;
+
 exports[`data-loader supports multiple loaders using the same key when data loading 1`] = `
 Object {
   "isCompleted": false,

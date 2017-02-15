@@ -65,6 +65,18 @@ describe('data-loader', () => {
         expect(sut.loadDataCount).toBe(2)
     })
 
+    it('multiple components load data once when props change', async () => {
+        const sut = new SharedDataComponentFixture(store, "testKey", false)
+
+        await sut.testDataPromise.resolve({ result: 'Success!' })
+        sut.resetPromise()
+        sut.root.setProps({ dataKey: "newData" })
+        await sut.testDataPromise.resolve({ result: 'Success2!' })
+
+        expect(store.getState()).toMatchSnapshot()
+        expect(sut.loadDataCount).toBe(2)
+    })
+
     it('ignores completion if unmounted first', async () => {
         const sut = new ComponentFixture(store, "testKey", false)
         await sut.unmount()
