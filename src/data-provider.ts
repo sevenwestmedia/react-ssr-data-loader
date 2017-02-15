@@ -91,17 +91,19 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
     async loadNextData(currentMetadata: MetaData, nextMetadata: MetaData, update: DataUpdateCallback) {
         this.detach(currentMetadata, update)
-        this.attach(nextMetadata, update)
+        const firstAttached = this.attach(nextMetadata, update)
 
-        this.dispatch<LOAD_NEXT_DATA>({
-            type: LOAD_NEXT_DATA,
-            meta: {
-                current: { ...currentMetadata, dataFromServerSideRender: this.isServerSideRender },
-                next: { ...nextMetadata, dataFromServerSideRender: this.isServerSideRender }
-            }
-        })
+        if (firstAttached) {
+            this.dispatch<LOAD_NEXT_DATA>({
+                type: LOAD_NEXT_DATA,
+                meta: {
+                    current: { ...currentMetadata, dataFromServerSideRender: this.isServerSideRender },
+                    next: { ...nextMetadata, dataFromServerSideRender: this.isServerSideRender }
+                }
+            })
 
-        await this.performLoadData(nextMetadata)
+            await this.performLoadData(nextMetadata)
+        }
     }
 
     unloadData(metadata: MetaData, update: DataUpdateCallback) {
