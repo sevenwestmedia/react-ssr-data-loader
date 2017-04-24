@@ -25,7 +25,6 @@ Object {
       "testDataType": Object {
         "testKey": Object {
           "completed": false,
-          "dataFromServerSideRender": true,
           "failed": false,
           "loading": true,
         },
@@ -62,7 +61,6 @@ Object {
       "testDataType": Object {
         "testKey": Object {
           "completed": false,
-          "dataFromServerSideRender": true,
           "failed": false,
           "loading": true,
         },
@@ -111,6 +109,7 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
+          "cached": false,
           "completed": true,
           "data": Object {
             "result": "Success!",
@@ -144,7 +143,6 @@ Object {
       "testDataType": Object {
         "testKey": Object {
           "completed": true,
-          "dataFromServerSideRender": true,
           "error": "Boom!",
           "failed": true,
           "loading": false,
@@ -178,6 +176,7 @@ Object {
     "data": Object {
       "testDataType": Object {
         "testKey": Object {
+          "cached": false,
           "completed": true,
           "data": Object {
             "result": "Success!",
@@ -210,7 +209,6 @@ Object {
       "testDataType": Object {
         "testKey": Object {
           "completed": false,
-          "dataFromServerSideRender": true,
           "failed": false,
           "loading": true,
         },

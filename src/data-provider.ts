@@ -3,6 +3,7 @@ import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap, LoaderDataState,
+    CompletedSuccessfullyLoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, LOAD_NEXT_DATA, REFRESH_DATA, NEXT_PAGE,
 } from './data-loader.redux'
@@ -38,8 +39,8 @@ export interface MetaData<TArgs> {
 }
 
 const ssrNeedsData = (state: LoaderDataState | undefined) => !state || (!state.completed && !state.loading)
-const hasValidData = (state: LoaderDataState | undefined) => (
-    state && state.completed && !state.failed
+const hasValidData = (state: LoaderDataState | undefined): state is CompletedSuccessfullyLoaderDataState => (
+    !!(state && state.completed && !state.failed)
 )
 
 export type DataUpdateCallback = (newState: LoaderDataState) => void
@@ -84,7 +85,12 @@ class DataLoaderContextInternal implements DataLoaderContext {
         }
 
         if (!this.isServerSideRender && firstAttached) {
-            if (!hasValidData(loadedState)) {
+            // Data is left from a previous session
+            if (hasValidData(loadedState)) {
+                if (loadedState.dataFromServerSideRender) {
+                    // TODO Need to flag data as cached
+                }
+            } else {
                 return await this._loadData(metadata)
             }
         }

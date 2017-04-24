@@ -1,6 +1,16 @@
 import { Action } from 'redux'
 
 export interface CompletedSuccessfullyLoaderDataState {
+    cached: false
+    completed: true
+    loading: false
+    failed: false
+    dataFromServerSideRender: boolean
+    data: any
+}
+
+export interface CachedLoaderDataState {
+    cached: true
     completed: true
     loading: false
     failed: false
@@ -13,26 +23,24 @@ export interface FailedLoaderDataState {
     loading: false
     failed: true
     error: string
-    dataFromServerSideRender: boolean
 }
 
 export interface LoadingLoaderDataState {
     completed: false
     loading: true
     failed: false
-    dataFromServerSideRender: boolean
 }
 
 export interface LoadingNextPageLoaderDataState {
     completed: false
     loading: true
     failed: false
-    dataFromServerSideRender: boolean
     data: any
 }
 
 export type LoaderDataState = (
     CompletedSuccessfullyLoaderDataState |
+    CachedLoaderDataState |
     FailedLoaderDataState |
     LoadingLoaderDataState |
     LoadingNextPageLoaderDataState
@@ -128,7 +136,6 @@ export const reducer = (state: DataTypeMap = {
         }
         case LOAD_DATA: {
             const loading: LoadingLoaderDataState = {
-                dataFromServerSideRender: action.meta.dataFromServerSideRender,
                 completed: false,
                 loading: true,
                 failed: false,
@@ -146,7 +153,6 @@ export const reducer = (state: DataTypeMap = {
         }
         case NEXT_PAGE: {
             const loading: LoadingNextPageLoaderDataState = {
-                dataFromServerSideRender: action.meta.dataFromServerSideRender,
                 completed: false,
                 loading: true,
                 failed: false,
@@ -176,6 +182,7 @@ export const reducer = (state: DataTypeMap = {
         }
         case LOAD_DATA_COMPLETED: {
             const completed: CompletedSuccessfullyLoaderDataState = {
+                cached: false,
                 dataFromServerSideRender: action.meta.dataFromServerSideRender,
                 completed: true,
                 loading: false,
@@ -195,7 +202,6 @@ export const reducer = (state: DataTypeMap = {
         }
         case LOAD_DATA_FAILED: {
             const failed: FailedLoaderDataState = {
-                dataFromServerSideRender: action.meta.dataFromServerSideRender,
                 completed: true,
                 loading: false,
                 failed: true,
