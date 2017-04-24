@@ -59,6 +59,17 @@ import { TestDataLoader } from './root'
 />
 ```
 
+### Paged data
+Just register a paged resource, you will get type safety the whole way down.
+
+To load the next page just use `props.actions.nextPage()` in the renderData callback
+``` tsx
+export const TestDataLoader = this.resources.registerPagedResource(
+    'testDataType',
+    (dataKey: string, pageNumber: number) => Promise.resolve([`page${pageNumber}`]
+)
+```
+
 ### TODOS
  - Error handling hooks
  - Gracefully handle if no data loader keys are present

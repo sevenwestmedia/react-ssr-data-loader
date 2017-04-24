@@ -195,3 +195,76 @@ Object {
   },
 }
 `;
+
+exports[`data-loader supports paged data 1`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "data": Array [
+              "Test",
+            ],
+            "pageNumber": 1,
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+      },
+    },
+    "loadingCount": 0,
+  },
+}
+`;
+
+exports[`data-loader supports paged data 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": false,
+          "data": Object {
+            "data": Array [
+              "Test",
+            ],
+            "pageNumber": 1,
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": true,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
+exports[`data-loader supports paged data 3`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "data": Array [
+              "Test",
+              "Test2",
+            ],
+            "pageNumber": 1,
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+      },
+    },
+    "loadingCount": 0,
+  },
+}
+`;

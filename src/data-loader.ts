@@ -45,19 +45,21 @@ export interface BuiltInActions {
 }
 
 // @TODO This is a decent blog post or something in itself, generic react components are hard..
-export function createTypedDataLoader<T, TLoadArgs, TActions extends object>(dataType: string, actions: TActions) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
+export function createTypedDataLoader<T, TLoadArgs, TActions extends object>(
+    dataType: string,
+    actions: (
+        dataLoader: DataLoaderContext,
+        props: Props<T, TActions> & TLoadArgs,
+        handleStateUpdates: (loadedState: LoaderDataState) => void
+    ) => TActions
+) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
     class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, LoadedState<T, TActions & BuiltInActions>> {
+        context: { dataLoader: DataLoaderContext }
         private _isMounted: boolean
-        private actions: TActions & BuiltInActions = {
-            ...(actions as object),
-            refresh: () => { this.context.dataLoader.refresh(this.actionMeta()) }
-        } as TActions & BuiltInActions
 
         static contextTypes = {
             dataLoader: React.PropTypes.object
         }
-
-        context: { dataLoader: DataLoaderContext }
 
         state: LoadedState<T, TActions & BuiltInActions> = {
             isCompleted: false,
@@ -134,6 +136,11 @@ export function createTypedDataLoader<T, TLoadArgs, TActions extends object>(dat
 
             this.setState(newState)
         }
+
+        private actions: TActions & BuiltInActions = {
+            ...actions(this.context.dataLoader, this.props, this.handleStateUpdate) as object,
+            refresh: () => { this.context.dataLoader.refresh(this.actionMeta()) }
+        } as TActions & BuiltInActions
 
         render() {
             if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {

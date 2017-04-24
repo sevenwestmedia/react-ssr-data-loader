@@ -4,29 +4,28 @@ import { createStore, combineReducers, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { Props, LoadedState } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
-import DataLoaderResources from '../../src/data-loader-resources'
+import DataLoaderResources, { PageActions } from '../../src/data-loader-resources'
 import { ReduxStoreState, reducer } from '../../src/data-loader.redux'
 import PromiseCompletionSource from './promise-completion-source'
-import { Data, dataType } from './test-data'
 import Verifier from './verifier'
 
-export default class ComponentFixture<T extends object> {
+interface DataResource {}
+
+export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    testDataPromise: PromiseCompletionSource<Data>
+    lastRenderProps: LoadedState<DataResource, PageActions>
+    testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ dataKey: string }, any>
-    component: ReactWrapper<Props<Data, {}>, any>
+    component: ReactWrapper<Props<DataResource, PageActions>, any>
     resources: DataLoaderResources
-    passedParams: T
 
-    constructor(store: Store<ReduxStoreState>, dataKey: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
-        this.testDataPromise = new PromiseCompletionSource<Data>()
+    constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+        this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        
-        const TestDataLoader = this.resources.registerResourceWithParameters(dataType, (dataKey: string, params: T) => {
+        const TestDataLoader = this.resources.registerPagedResource<DataResource>('testDataType', (dataKey, page) => {
             this.loadDataCount++
-            this.passedParams = params
             return this.testDataPromise.promise
         })
 
@@ -38,12 +37,14 @@ export default class ComponentFixture<T extends object> {
                     loadAllCompleted={() => this.loadAllCompletedCalled++}
                 >
                     <TestDataLoader
-                        {...args}
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
+                        renderData={(props) => {
+                            this.lastRenderProps = props
+                            return (
+                                <Verifier {...props} renderCount={++this.renderCount} />
+                            )}
+                        }
                     />
                 </DataProvider>
             </Provider>
@@ -54,8 +55,26 @@ export default class ComponentFixture<T extends object> {
         this.component = this.root.find(TestDataLoader)
     }
 
+    refreshData() {
+        if (this.lastRenderProps.isLoaded) {
+            this.resetPromise()
+            this.lastRenderProps.actions.refresh()
+        } else {
+            throw new Error('Not in success state, can\'t refresh')
+        }
+    }
+
+    nextPage() {
+        if (this.lastRenderProps.isLoaded) {
+            this.resetPromise()
+            this.lastRenderProps.actions.nextPage()
+        } else {
+            throw new Error('Not in success state, can\'t refresh')
+        }
+    }
+
     resetPromise() {
-        this.testDataPromise = new PromiseCompletionSource<Data>()
+        this.testDataPromise = new PromiseCompletionSource<DataResource>()
     }
 
     unmount = async() => {

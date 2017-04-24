@@ -23,10 +23,19 @@ export interface LoadingLoaderDataState {
     dataFromServerSideRender: boolean
 }
 
+export interface LoadingNextPageLoaderDataState {
+    completed: false
+    loading: true
+    failed: false
+    dataFromServerSideRender: boolean
+    data: any
+}
+
 export type LoaderDataState = (
     CompletedSuccessfullyLoaderDataState |
     FailedLoaderDataState |
-    LoadingLoaderDataState
+    LoadingLoaderDataState |
+    LoadingNextPageLoaderDataState
 )
 
 export interface DataKeyMap {
@@ -53,6 +62,13 @@ export const REFRESH_DATA = 'redux-data-loader/REFRESH_DATA'
 export interface REFRESH_DATA extends Action {
     type: 'redux-data-loader/REFRESH_DATA'
     meta: Meta
+}
+
+export const NEXT_PAGE = 'redux-data-loader/NEXT_PAGE'
+export interface NEXT_PAGE extends Action {
+    type: 'redux-data-loader/NEXT_PAGE'
+    meta: Meta
+    payload: { existingData: any }
 }
 
 export const LOAD_DATA = 'redux-data-loader/LOAD_DATA'
@@ -90,10 +106,9 @@ export interface LOAD_NEXT_DATA extends Action {
     }
 }
 
-type Actions = (
-    LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED |
-    UNLOAD_DATA | LOAD_NEXT_DATA | REFRESH_DATA
-)
+type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
+    | LOAD_DATA_FAILED | UNLOAD_DATA | LOAD_NEXT_DATA
+    | REFRESH_DATA | NEXT_PAGE
 
 export const reducer = (state: DataTypeMap = {
     data: {},
@@ -117,6 +132,25 @@ export const reducer = (state: DataTypeMap = {
                 completed: false,
                 loading: true,
                 failed: false,
+            }
+            return {
+                loadingCount: state.loadingCount + 1,
+                data: {
+                    ...state.data,
+                    [action.meta.dataType]: <DataKeyMap>{
+                        ...state.data[action.meta.dataType],
+                        [action.meta.dataKey]: loading
+                    }
+                }
+            }
+        }
+        case NEXT_PAGE: {
+            const loading: LoadingNextPageLoaderDataState = {
+                dataFromServerSideRender: action.meta.dataFromServerSideRender,
+                completed: false,
+                loading: true,
+                failed: false,
+                data: action.payload.existingData
             }
             return {
                 loadingCount: state.loadingCount + 1,

@@ -6,6 +6,7 @@ import { LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
+import PagedComponentFixture from './helpers/paged-component-fixture'
 import ComponentWithArgsFixture from './helpers/component-with-args-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
@@ -112,6 +113,18 @@ describe('data-loader', () => {
 
         expect(store.getState()).toMatchSnapshot()
         await sut.testDataPromise.resolve({ result: 'Test2' })
+        expect(store.getState()).toMatchSnapshot()
+    })
+
+    it('supports paged data', async () => {
+        const sut = new PagedComponentFixture(store, "testKey", false)
+
+        await sut.testDataPromise.resolve(['Test'])
+        expect(store.getState()).toMatchSnapshot()
+        sut.nextPage()
+        expect(store.getState()).toMatchSnapshot()
+
+        await sut.testDataPromise.resolve(['Test2'])
         expect(store.getState()).toMatchSnapshot()
     })
 })
