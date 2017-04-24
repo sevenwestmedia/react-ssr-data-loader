@@ -2,7 +2,7 @@ import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
 import { createStore, combineReducers, Store } from 'redux'
 import { Provider } from 'react-redux'
-import { Props, LoadedState, createTypedDataLoader } from '../../src/data-loader'
+import { Props, LoadedState } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
 import { ReduxStoreState, reducer } from '../../src/data-loader.redux'
@@ -10,29 +10,24 @@ import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
 import Verifier from './verifier'
 
-export default class ComponentFixture {
+export default class ComponentFixture<T extends object> {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<Props<Data>, any>
     resources: DataLoaderResources
+    passedParams: T
 
-    constructor(store: Store<ReduxStoreState>, dataKey: string, dataKey2: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(store: Store<ReduxStoreState>, dataKey: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
-        this.testDataPromise2 = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(dataType, (key: string) => {
+        
+        const TestDataLoader = this.resources.registerResource(dataType, (dataKey: string, params: T) => {
             this.loadDataCount++
-            if (key === dataKey) {
-                return this.testDataPromise.promise
-            } else if (key === dataKey2) {
-                return this.testDataPromise2.promise
-            }
-
-            return Promise.reject('Key doesn\'t match?')
+            this.passedParams = params
+            return this.testDataPromise.promise
         })
 
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
@@ -42,22 +37,14 @@ export default class ComponentFixture {
                     loadData={this.resources}
                     loadAllCompleted={() => this.loadAllCompletedCalled++}
                 >
-                    <div>
-                        <TestDataLoader
-                            dataKey={dataKey}
-                            clientLoadOnly={clientLoadOnly}
-                            renderData={(props) => (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        />
-                        <TestDataLoader
-                            dataKey={dataKey2}
-                            clientLoadOnly={clientLoadOnly}
-                            renderData={(props) => (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        />
-                    </div>
+                    <TestDataLoader
+                        {...args}
+                        dataKey={dataKey}
+                        clientLoadOnly={clientLoadOnly}
+                        renderData={(props) => (
+                            <Verifier {...props} renderCount={++this.renderCount} />
+                        )}
+                    />
                 </DataProvider>
             </Provider>
         )

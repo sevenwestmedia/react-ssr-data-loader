@@ -45,6 +45,7 @@ export interface ReduxStoreState {
 export interface Meta {
     dataType: string
     dataKey: string
+    dataParams: any
     dataFromServerSideRender: boolean
 }
 

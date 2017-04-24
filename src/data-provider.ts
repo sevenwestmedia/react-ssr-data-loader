@@ -6,6 +6,7 @@ import {
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, LOAD_NEXT_DATA
 } from './data-loader.redux'
+import DataLoaderResources from './data-loader-resources'
 
 export { LoaderDataState }
 
@@ -20,9 +21,7 @@ export interface OwnProps {
     loadingCountUpdated?: (loadingCount: number) => void
     loadAllCompleted?: () => void
     isServerSideRender: boolean
-    loadData: {
-        [dataType: string]: (dataKey: string) => Promise<any>
-    }
+    loadData: DataLoaderResources
 }
 
 export interface Props extends MappedProps, DispatchProps, OwnProps {
@@ -32,9 +31,10 @@ export interface State {
 
 }
 
-export interface MetaData {
+export interface MetaData<TArgs> {
     dataType: string
     dataKey: string
+    dataParams: TArgs
 }
 
 const ssrNeedsData = (state: LoaderDataState | undefined) => !state || (!state.completed && !state.loading)
@@ -46,9 +46,9 @@ export type DataUpdateCallback = (newState: LoaderDataState) => void
 
 export interface DataLoaderContext {
     isServerSideRender: boolean
-    loadData(metadata: MetaData, update: DataUpdateCallback): Promise<any>
-    loadNextData(currentMetadata: MetaData, nextMetadata: MetaData, update: DataUpdateCallback): Promise<any>
-    unloadData(metadata: MetaData, update: DataUpdateCallback): void
+    loadData(metadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
+    loadNextData(currentMetadata: MetaData<any>, nextMetadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
+    unloadData(metadata: MetaData<any>, update: DataUpdateCallback): void
 }
 
 // Keep the public methods used to notify the context of changes hidden from the data loader
@@ -66,13 +66,13 @@ class DataLoaderContextInternal implements DataLoaderContext {
     constructor(
         private dispatch: Dispatch<ReduxStoreState>,
         private getStoreState: () => DataTypeMap,
-        private performLoad: (metadata: MetaData) => Promise<any>,
+        private performLoad: (metadata: MetaData<any>) => Promise<any>,
         private loadAllCompleted: () => void,
         private loadingCountChanged: (loadingCount: number) => void,
         public isServerSideRender: boolean
     ) { }
 
-    async loadData(metadata: MetaData, update: DataUpdateCallback) {
+    async loadData(metadata: MetaData<any>, update: DataUpdateCallback) {
         const firstAttached = this.attach(metadata, update)
         const loadedState = this.getLoadedState(metadata)
 
@@ -89,7 +89,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         this.updateDataLoaders(this.getStoreState())
     }
 
-    async loadNextData(currentMetadata: MetaData, nextMetadata: MetaData, update: DataUpdateCallback) {
+    async loadNextData(currentMetadata: MetaData<any>, nextMetadata: MetaData<any>, update: DataUpdateCallback) {
         this.detach(currentMetadata, update)
         const firstAttached = this.attach(nextMetadata, update)
 
@@ -106,7 +106,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         }
     }
 
-    unloadData(metadata: MetaData, update: DataUpdateCallback) {
+    unloadData(metadata: MetaData<any>, update: DataUpdateCallback) {
         if (this.detach(metadata, update)) {
             this.dispatch<UNLOAD_DATA>({
                 type: UNLOAD_DATA,
@@ -116,7 +116,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
     }
 
     // Returns true when data needs to be unloaded from redux
-    private detach(metadata: MetaData, update: DataUpdateCallback) {
+    private detach(metadata: MetaData<any>, update: DataUpdateCallback) {
         const subscriptions = this.getSubscription(metadata)
 
         if (subscriptions.length === 1) {
@@ -152,7 +152,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         }
     }
 
-    private _loadData = async (metadata: MetaData) => {
+    private _loadData = async (metadata: MetaData<any>) => {
         this.dispatch<LOAD_DATA>({
             type: LOAD_DATA,
             meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender }
@@ -161,7 +161,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         await this.performLoadData(metadata)
     }
 
-    private getSubscription(metadata: MetaData) {
+    private getSubscription(metadata: MetaData<any>) {
         if (!this._subscriptions[metadata.dataType]) {
             this._subscriptions[metadata.dataType] = {}
         }
@@ -173,7 +173,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         return this._subscriptions[metadata.dataType][metadata.dataKey]
     }
 
-    private attach(metadata: MetaData, update: DataUpdateCallback) {
+    private attach(metadata: MetaData<any>, update: DataUpdateCallback) {
         const subscriptions = this.getSubscription(metadata)
 
         subscriptions.push(update)
@@ -181,7 +181,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         return firstAttached
     }
 
-    private _hasMountedComponents = (metadata: MetaData) => {
+    private _hasMountedComponents = (metadata: MetaData<any>) => {
         return (
             this._subscriptions[metadata.dataType] &&
             this._subscriptions[metadata.dataType][metadata.dataKey] &&
@@ -189,7 +189,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         )
     }
 
-    private getLoadedState = (metadata: MetaData): LoaderDataState | undefined => {
+    private getLoadedState = (metadata: MetaData<any>): LoaderDataState | undefined => {
         const dataLookup = this.getStoreState().data[metadata.dataType]
         if (!dataLookup) {
             return undefined
@@ -198,7 +198,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         return dataLookup[metadata.dataKey]
     }
 
-    private performLoadData = async (metadata: MetaData) => {
+    private performLoadData = async (metadata: MetaData<any>) => {
         try {
             this.loadingCount++
             this.loadingCountChanged(this.loadingCount)
@@ -262,13 +262,13 @@ class DataProvider extends React.Component<Props, State> {
         this.dataLoader.updateDataLoaders(nextProps.store)
     }
 
-    private loadData = (metadata: MetaData): Promise<any> => {
-        const dataLoader = this.props.loadData[metadata.dataType]
+    private loadData = (metadata: MetaData<any>): Promise<any> => {
+        const dataLoader = this.props.loadData.getResourceLoader(metadata.dataType)
         if (!dataLoader) {
             return Promise.reject(`No data loader present for ${metadata.dataType}`)
         }
 
-        return dataLoader(metadata.dataKey)
+        return dataLoader(metadata.dataKey, metadata.dataParams)
     }
 
     getChildContext = () => ({ dataLoader: this.dataLoader })

@@ -6,6 +6,7 @@ import { LoadedState, createTypedDataLoader } from '../src/data-loader'
 import { ReduxStoreState, reducer } from '../src/data-loader.redux'
 import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
+import ComponentWithArgsFixture from './helpers/component-with-args-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
 import Verifier from './helpers/verifier'
@@ -91,5 +92,15 @@ describe('data-loader', () => {
         expect(sut.loadAllCompletedCalled).toBe(0)
         await sut.testDataPromise.resolve({ result: 'Test' })
         expect(sut.loadAllCompletedCalled).toBe(1)
+    })
+
+    it('can specify arguments for data loader', async () => {
+        const foo = { bar: 1 }
+        const sut = new ComponentWithArgsFixture(store, "testKey", foo, false)
+
+        await sut.testDataPromise.resolve({ result: 'Test' })
+
+        expect(store.getState()).toMatchSnapshot()
+        expect(sut.passedParams).toEqual(foo)
     })
 })

@@ -31,7 +31,7 @@ export interface LoadingState {
 export type LoadedState<T> = SuccessLoadedState<T> | BeforeLoadingState| ErrorLoadedState | LoadingState
 
 export interface RenderData<T> {
-    (loaderProps: LoadedState<T>): React.ReactElement<any> | null
+    (loaderProps: LoadedState<T>, ): React.ReactElement<any> | null
 }
 export interface Props<T> {
     dataKey: string
@@ -40,8 +40,8 @@ export interface Props<T> {
 }
 
 // @TODO This is a decent blog post or something in itself, generic react components are hard..
-export function createTypedDataLoader<T>(dataType: string) : React.ComponentClass<Props<T>> {
-    class DataLoader extends React.PureComponent<Props<T>, LoadedState<T>> {
+export function createTypedDataLoader<T, TLoadArgs>(dataType: string) : React.ComponentClass<Props<T> & TLoadArgs> {
+    class DataLoader extends React.PureComponent<Props<T> & TLoadArgs, LoadedState<T>> {
         private _isMounted: boolean
 
         static contextTypes = {
@@ -84,10 +84,15 @@ export function createTypedDataLoader<T>(dataType: string) : React.ComponentClas
             this.context.dataLoader.unloadData(this.actionMeta(), this.handleStateUpdate)
         }
 
-        private actionMeta = (props = this.props) => ({
-            dataType,
-            dataKey: props.dataKey,
-        })
+        private actionMeta = (props: { dataKey: string, clientLoadOnly?: boolean, renderData: any } = this.props) => {
+            const { dataKey, clientLoadOnly, renderData, ...dataParams } = props
+
+            return {
+                dataType,
+                dataKey,
+                dataParams,
+            }
+        }
 
         private handleStateUpdate = (loadedState: LoaderDataState): void => {
             let newState: LoadedState<T>
