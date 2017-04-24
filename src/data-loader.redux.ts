@@ -1,5 +1,3 @@
-import { Action } from 'redux'
-
 export interface CompletedSuccessfullyLoaderDataState {
     cached: false
     completed: true
@@ -66,48 +64,48 @@ export interface Meta {
     dataFromServerSideRender: boolean
 }
 
-export const REFRESH_DATA = 'redux-data-loader/REFRESH_DATA'
-export interface REFRESH_DATA extends Action {
-    type: 'redux-data-loader/REFRESH_DATA'
+export const REFRESH_DATA = 'resource-data-loader/REFRESH_DATA'
+export interface REFRESH_DATA {
+    type: 'resource-data-loader/REFRESH_DATA'
     meta: Meta
 }
 
-export const NEXT_PAGE = 'redux-data-loader/NEXT_PAGE'
-export interface NEXT_PAGE extends Action {
-    type: 'redux-data-loader/NEXT_PAGE'
+export const NEXT_PAGE = 'resource-data-loader/NEXT_PAGE'
+export interface NEXT_PAGE {
+    type: 'resource-data-loader/NEXT_PAGE'
     meta: Meta
     payload: { existingData: any }
 }
 
-export const LOAD_DATA = 'redux-data-loader/LOAD_DATA'
-export interface LOAD_DATA extends Action {
-    type: 'redux-data-loader/LOAD_DATA'
+export const LOAD_DATA = 'resource-data-loader/LOAD_DATA'
+export interface LOAD_DATA {
+    type: 'resource-data-loader/LOAD_DATA'
     meta: Meta
 }
 
-export const LOAD_DATA_COMPLETED = 'redux-data-loader/LOAD_DATA_COMPLETED'
-export interface LOAD_DATA_COMPLETED extends Action {
-    type: 'redux-data-loader/LOAD_DATA_COMPLETED'
+export const LOAD_DATA_COMPLETED = 'resource-data-loader/LOAD_DATA_COMPLETED'
+export interface LOAD_DATA_COMPLETED {
+    type: 'resource-data-loader/LOAD_DATA_COMPLETED'
     meta: Meta
     payload: any
 }
 
-export const LOAD_DATA_FAILED = 'redux-data-loader/LOAD_DATA_FAILED'
-export interface LOAD_DATA_FAILED extends Action {
-    type: 'redux-data-loader/LOAD_DATA_FAILED'
+export const LOAD_DATA_FAILED = 'resource-data-loader/LOAD_DATA_FAILED'
+export interface LOAD_DATA_FAILED {
+    type: 'resource-data-loader/LOAD_DATA_FAILED'
     meta: Meta
     payload: string
 }
 
-export const UNLOAD_DATA = 'redux-data-loader/UNLOAD_DATA'
-export interface UNLOAD_DATA extends Action {
-    type: 'redux-data-loader/UNLOAD_DATA'
+export const UNLOAD_DATA = 'resource-data-loader/UNLOAD_DATA'
+export interface UNLOAD_DATA {
+    type: 'resource-data-loader/UNLOAD_DATA'
     meta: Meta
 }
 
-export const LOAD_NEXT_DATA = 'redux-data-loader/LOAD_NEXT_DATA'
-export interface LOAD_NEXT_DATA extends Action {
-    type: 'redux-data-loader/LOAD_NEXT_DATA'
+export const LOAD_NEXT_DATA = 'resource-data-loader/LOAD_NEXT_DATA'
+export interface LOAD_NEXT_DATA {
+    type: 'resource-data-loader/LOAD_NEXT_DATA'
     meta: {
         current: Meta
         next: Meta
