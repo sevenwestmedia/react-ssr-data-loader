@@ -34,7 +34,7 @@ export default class ComponentFixture<T extends object> {
             <Provider store={store}>
                 <DataProvider
                     isServerSideRender={isServerSideRender}
-                    loadData={this.resources}
+                    resources={this.resources}
                     loadAllCompleted={() => this.loadAllCompletedCalled++}
                 >
                     <TestDataLoader

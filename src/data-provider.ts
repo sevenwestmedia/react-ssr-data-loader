@@ -21,7 +21,7 @@ export interface OwnProps {
     loadingCountUpdated?: (loadingCount: number) => void
     loadAllCompleted?: () => void
     isServerSideRender: boolean
-    loadData: DataLoaderResources
+    resources: DataLoaderResources
 }
 
 export interface Props extends MappedProps, DispatchProps, OwnProps {
@@ -273,7 +273,7 @@ class DataProvider extends React.Component<Props, State> {
     }
 
     private loadData = (metadata: MetaData<any>): Promise<any> => {
-        const dataLoader = this.props.loadData.getResourceLoader(metadata.dataType)
+        const dataLoader = this.props.resources.getResourceLoader(metadata.dataType)
         if (!dataLoader) {
             return Promise.reject(`No data loader present for ${metadata.dataType}`)
         }

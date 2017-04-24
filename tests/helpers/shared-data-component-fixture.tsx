@@ -32,7 +32,7 @@ export default class ComponentFixture {
             <Provider store={store}>
                 <DataProvider
                     isServerSideRender={isServerSideRender}
-                    loadData={this.resources}
+                    resources={this.resources}
                     loadAllCompleted={() => this.loadAllCompletedCalled++}
                 >
                     <div>
