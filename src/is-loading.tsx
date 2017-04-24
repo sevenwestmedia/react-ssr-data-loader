@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap,
-} from './data-loader.redux'
+} from './data-loader-actions'
 
 export interface LoadedState {
     isLoading: boolean

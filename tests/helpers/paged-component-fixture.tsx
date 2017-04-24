@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { Props, LoadedState } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { PageActions } from '../../src/data-loader-resources'
-import { ReduxStoreState, reducer } from '../../src/data-loader.redux'
+import { ReduxStoreState, reducer } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import Verifier from './verifier'
 

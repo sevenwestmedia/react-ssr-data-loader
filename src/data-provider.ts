@@ -6,7 +6,7 @@ import {
     CompletedSuccessfullyLoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, LOAD_NEXT_DATA, REFRESH_DATA, NEXT_PAGE,
-} from './data-loader.redux'
+} from './data-loader-actions'
 import DataLoaderResources from './data-loader-resources'
 
 export { LoaderDataState }
