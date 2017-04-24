@@ -49,6 +49,12 @@ export interface Meta {
     dataFromServerSideRender: boolean
 }
 
+export const REFRESH_DATA = 'redux-data-loader/REFRESH_DATA'
+export interface REFRESH_DATA extends Action {
+    type: 'redux-data-loader/REFRESH_DATA'
+    meta: Meta
+}
+
 export const LOAD_DATA = 'redux-data-loader/LOAD_DATA'
 export interface LOAD_DATA extends Action {
     type: 'redux-data-loader/LOAD_DATA'
@@ -86,7 +92,7 @@ export interface LOAD_NEXT_DATA extends Action {
 
 type Actions = (
     LOAD_DATA | LOAD_DATA_COMPLETED | LOAD_DATA_FAILED |
-    UNLOAD_DATA | LOAD_NEXT_DATA
+    UNLOAD_DATA | LOAD_NEXT_DATA | REFRESH_DATA
 )
 
 export const reducer = (state: DataTypeMap = {
@@ -122,6 +128,17 @@ export const reducer = (state: DataTypeMap = {
                     }
                 }
             }
+        }
+        case REFRESH_DATA: {
+            const stateWithCurrentRemoved = reducer(state, {
+                type: UNLOAD_DATA,
+                meta: action.meta
+            })
+            const newState = reducer(stateWithCurrentRemoved, {
+                type: LOAD_DATA,
+                meta: action.meta
+            })
+            return newState
         }
         case LOAD_DATA_COMPLETED: {
             const completed: CompletedSuccessfullyLoaderDataState = {

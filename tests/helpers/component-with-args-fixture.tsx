@@ -16,7 +16,7 @@ export default class ComponentFixture<T extends object> {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
-    component: ReactWrapper<Props<Data>, any>
+    component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     passedParams: T
 

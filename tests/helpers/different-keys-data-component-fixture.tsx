@@ -17,7 +17,7 @@ export default class ComponentFixture {
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
-    component: ReactWrapper<Props<Data>, any>
+    component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
 
     constructor(store: Store<ReduxStoreState>, dataKey: string, dataKey2: string, isServerSideRender: boolean, clientLoadOnly = false) {

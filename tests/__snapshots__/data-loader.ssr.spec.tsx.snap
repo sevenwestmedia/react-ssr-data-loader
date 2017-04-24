@@ -75,6 +75,9 @@ Object {
 
 exports[`server side render second SSR with two components in same tree uses data 1`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Success!",
   },
@@ -88,6 +91,9 @@ Object {
 
 exports[`server side render second SSR with two components in same tree uses data 2`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Success!",
   },
@@ -152,6 +158,9 @@ Object {
 
 exports[`server side render should pass loaded data once promise resolves 1`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Success!",
   },

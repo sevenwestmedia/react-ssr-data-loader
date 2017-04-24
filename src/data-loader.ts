@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { DataLoaderContext, LoaderDataState } from './data-provider'
 
-export interface SuccessLoadedState<T> {
+export interface SuccessLoadedState<T, TActions> {
     isCompleted: true
     isLoaded: true
     isLoading: false
     isError: false
     data: T
+    actions: TActions & BuiltInActions
 }
 export interface ErrorLoadedState {
     isCompleted: true
@@ -28,21 +29,29 @@ export interface LoadingState {
     isError: false
 }
 
-export type LoadedState<T> = SuccessLoadedState<T> | BeforeLoadingState| ErrorLoadedState | LoadingState
+export type LoadedState<T, TActions> = SuccessLoadedState<T, TActions> | BeforeLoadingState| ErrorLoadedState | LoadingState
 
-export interface RenderData<T> {
-    (loaderProps: LoadedState<T>, ): React.ReactElement<any> | null
+export interface RenderData<T, TActions> {
+    (loaderProps: LoadedState<T, TActions>, ): React.ReactElement<any> | null
 }
-export interface Props<T> {
+export interface Props<T, TActions> {
     dataKey: string
     clientLoadOnly?: boolean
-    renderData: RenderData<T>
+    renderData: RenderData<T, TActions>
+}
+
+export interface BuiltInActions {
+    refresh: () => void
 }
 
 // @TODO This is a decent blog post or something in itself, generic react components are hard..
-export function createTypedDataLoader<T, TLoadArgs>(dataType: string) : React.ComponentClass<Props<T> & TLoadArgs> {
-    class DataLoader extends React.PureComponent<Props<T> & TLoadArgs, LoadedState<T>> {
+export function createTypedDataLoader<T, TLoadArgs, TActions extends object>(dataType: string, actions: TActions) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
+    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, LoadedState<T, TActions & BuiltInActions>> {
         private _isMounted: boolean
+        private actions: TActions & BuiltInActions = {
+            ...(actions as object),
+            refresh: () => { this.context.dataLoader.refresh(this.actionMeta()) }
+        } as TActions & BuiltInActions
 
         static contextTypes = {
             dataLoader: React.PropTypes.object
@@ -50,7 +59,7 @@ export function createTypedDataLoader<T, TLoadArgs>(dataType: string) : React.Co
 
         context: { dataLoader: DataLoaderContext }
 
-        state: LoadedState<T> = {
+        state: LoadedState<T, TActions & BuiltInActions> = {
             isCompleted: false,
             isLoading: false,
             isLoaded: false,
@@ -67,7 +76,7 @@ export function createTypedDataLoader<T, TLoadArgs>(dataType: string) : React.Co
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
-        async componentWillReceiveProps(nextProps: Props<T>) {
+        async componentWillReceiveProps(nextProps: Props<T, TActions>) {
             if (
                 this.props.dataKey !== nextProps.dataKey
             ) {
@@ -95,7 +104,7 @@ export function createTypedDataLoader<T, TLoadArgs>(dataType: string) : React.Co
         }
 
         private handleStateUpdate = (loadedState: LoaderDataState): void => {
-            let newState: LoadedState<T>
+            let newState: LoadedState<T, TActions & BuiltInActions>
 
             if (loadedState && loadedState.completed && loadedState.failed) {
                 newState = {
@@ -111,7 +120,8 @@ export function createTypedDataLoader<T, TLoadArgs>(dataType: string) : React.Co
                     isLoaded: true,
                     isLoading: false,
                     isError: false,
-                    data: loadedState.data
+                    data: loadedState.data,
+                    actions: this.actions,
                 }
             } else {
                 newState = {

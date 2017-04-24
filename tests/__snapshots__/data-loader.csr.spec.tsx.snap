@@ -1,5 +1,8 @@
 exports[`Client side render client render after SSR with data should not fetch data 1`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Success!",
   },
@@ -34,6 +37,9 @@ Object {
 
 exports[`Client side render loads data when props change 1`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Success2!",
   },
@@ -107,6 +113,9 @@ Object {
 
 exports[`Client side render should pass loaded data once promise resolves 1`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Success!",
   },

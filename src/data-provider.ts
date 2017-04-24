@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import {
     ReduxStoreState, DataTypeMap, LoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
-    UNLOAD_DATA, LOAD_NEXT_DATA
+    UNLOAD_DATA, LOAD_NEXT_DATA, REFRESH_DATA,
 } from './data-loader.redux'
 import DataLoaderResources from './data-loader-resources'
 
@@ -49,6 +49,7 @@ export interface DataLoaderContext {
     loadData(metadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
     loadNextData(currentMetadata: MetaData<any>, nextMetadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
     unloadData(metadata: MetaData<any>, update: DataUpdateCallback): void
+    refresh(metadata: MetaData<any>): Promise<any>
 }
 
 // Keep the public methods used to notify the context of changes hidden from the data loader
@@ -104,6 +105,15 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
             await this.performLoadData(nextMetadata)
         }
+    }
+
+    async refresh(metadata: MetaData<any>) {
+        this.dispatch<REFRESH_DATA>({
+            type: REFRESH_DATA,
+            meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
+        })
+
+        await this.performLoadData(metadata)
     }
 
     unloadData(metadata: MetaData<any>, update: DataUpdateCallback) {

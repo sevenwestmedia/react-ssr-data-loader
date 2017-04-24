@@ -14,9 +14,10 @@ export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
+    lastRenderProps: LoadedState<Data, {}>
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
-    component: ReactWrapper<Props<Data>, any>
+    component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
 
     constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
@@ -37,9 +38,12 @@ export default class ComponentFixture {
                     <TestDataLoader
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
+                        renderData={(props) => {
+                            this.lastRenderProps = props
+                            return (
+                                <Verifier {...props} renderCount={++this.renderCount} />
+                            )}
+                        }
                     />
                 </DataProvider>
             </Provider>
@@ -48,6 +52,15 @@ export default class ComponentFixture {
         this.root = mount(<TestComponent dataKey={dataKey} />)
 
         this.component = this.root.find(TestDataLoader)
+    }
+
+    refreshData() {
+        if (this.lastRenderProps.isLoaded) {
+            this.resetPromise()
+            this.lastRenderProps.actions.refresh()
+        } else {
+            throw new Error('Not in success state, can\'t refresh')
+        }
     }
 
     resetPromise() {

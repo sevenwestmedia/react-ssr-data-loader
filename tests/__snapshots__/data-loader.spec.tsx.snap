@@ -1,5 +1,8 @@
 exports[`data-loader can load multiple dataloaders with different keys 1`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Test",
   },
@@ -38,8 +41,50 @@ Object {
 }
 `;
 
+exports[`data-loader can refresh data 1`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": false,
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": true,
+        },
+      },
+    },
+    "loadingCount": 1,
+  },
+}
+`;
+
+exports[`data-loader can refresh data 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Test2",
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+      },
+    },
+    "loadingCount": 0,
+  },
+}
+`;
+
 exports[`data-loader can resolve data from multiple components 1`] = `
 Object {
+  "actions": Object {
+    "refresh": [Function],
+  },
   "data": Object {
     "result": "Test",
   },

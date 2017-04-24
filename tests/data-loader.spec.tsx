@@ -103,4 +103,15 @@ describe('data-loader', () => {
         expect(store.getState()).toMatchSnapshot()
         expect(sut.passedParams).toEqual(foo)
     })
+
+    it('can refresh data', async () => {
+        const sut = new ComponentFixture(store, "testKey", false)
+
+        await sut.testDataPromise.resolve({ result: 'Test' })
+        sut.refreshData()
+
+        expect(store.getState()).toMatchSnapshot()
+        await sut.testDataPromise.resolve({ result: 'Test2' })
+        expect(store.getState()).toMatchSnapshot()
+    })
 })
