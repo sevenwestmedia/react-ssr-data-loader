@@ -37,6 +37,7 @@ export interface RenderData<T, TActions> {
 export interface Props<T, TActions> {
     dataKey: string
     clientLoadOnly?: boolean
+    unloadDataOnUnmount?: boolean // defaults to true
     renderData: RenderData<T, TActions>
 }
 
@@ -92,7 +93,11 @@ export function createTypedDataLoader<T, TLoadArgs, TActions extends object>(
 
         componentWillUnmount() {
             this._isMounted = false
-            this.context.dataLoader.unloadData(this.actionMeta(), this.handleStateUpdate)
+            if (this.props.unloadDataOnUnmount === false) {
+                this.context.dataLoader.detach(this.actionMeta(), this.handleStateUpdate)
+            } else {
+                this.context.dataLoader.unloadData(this.actionMeta(), this.handleStateUpdate)
+            }
         }
 
         private actionMeta = (props: { dataKey: string, clientLoadOnly?: boolean, renderData: any } = this.props) => {

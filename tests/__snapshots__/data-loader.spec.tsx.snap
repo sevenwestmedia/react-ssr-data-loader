@@ -138,6 +138,48 @@ Object {
 }
 `;
 
+exports[`data-loader can support preserving data on unmount 1`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Test",
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+      },
+    },
+    "loadingCount": 0,
+  },
+}
+`;
+
+exports[`data-loader can support preserving data on unmount 2`] = `
+Object {
+  "dataLoader": Object {
+    "data": Object {
+      "testDataType": Object {
+        "testKey": Object {
+          "completed": true,
+          "data": Object {
+            "result": "Test",
+          },
+          "dataFromServerSideRender": false,
+          "failed": false,
+          "loading": false,
+        },
+      },
+    },
+    "loadingCount": 0,
+  },
+}
+`;
+
 exports[`data-loader ignores completion if unmounted first 1`] = `
 Object {
   "dataLoader": Object {

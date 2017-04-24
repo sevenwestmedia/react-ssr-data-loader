@@ -80,7 +80,7 @@ describe('data-loader', () => {
     })
 
     it('ignores completion if unmounted first', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
+        const sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
         await sut.unmount()
         await sut.testDataPromise.resolve({ result: 'Test' })
 
@@ -88,7 +88,7 @@ describe('data-loader', () => {
     })
 
     it('notifies when all work is completed', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
+        const sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         expect(sut.loadAllCompletedCalled).toBe(0)
         await sut.testDataPromise.resolve({ result: 'Test' })
@@ -106,7 +106,7 @@ describe('data-loader', () => {
     })
 
     it('can refresh data', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
+        const sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         await sut.testDataPromise.resolve({ result: 'Test' })
         sut.refreshData()
@@ -125,6 +125,23 @@ describe('data-loader', () => {
         expect(store.getState()).toMatchSnapshot()
 
         await sut.testDataPromise.resolve(['Test2'])
+        expect(store.getState()).toMatchSnapshot()
+    })
+
+    it('can support preserving data on unmount', async () => {
+        const sut = new ComponentFixture(store, "testKey", {
+            isServerSideRender: false,
+            unloadDataOnUnmount: false
+        })
+        await sut.testDataPromise.resolve({ result: 'Test' })
+        await sut.unmount()
+
+        expect(store.getState()).toMatchSnapshot()
+        // Check we can re-mount the existing data
+        new ComponentFixture(store, "testKey", {
+            isServerSideRender: false,
+            unloadDataOnUnmount: false
+        })
         expect(store.getState()).toMatchSnapshot()
     })
 })

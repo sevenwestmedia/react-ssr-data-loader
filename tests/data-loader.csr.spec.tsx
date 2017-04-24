@@ -32,7 +32,7 @@ beforeEach(() => {
 
 describe('Client side render', () => {
     it('should start loading data if not loaded', () => {
-        const sut = new ComponentFixture(store, "testKey", false)
+        const sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         const verifier = sut.component.find(Verifier)
 
@@ -42,7 +42,7 @@ describe('Client side render', () => {
     })
 
     it('should pass loaded data once promise resolves', async() => {
-        const sut = new ComponentFixture(store, "testKey", false)
+        const sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         const verifier = sut.component.find(Verifier)
 
@@ -56,7 +56,7 @@ describe('Client side render', () => {
     })
 
     it('loads data when props change', async () => {
-        const sut = new ComponentFixture(store, "testKey", false)
+        const sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         const verifier = sut.component.find(Verifier)
         await sut.testDataPromise.resolve({ result: 'Success!' })
@@ -70,7 +70,7 @@ describe('Client side render', () => {
     })
 
     it('should pass failure when data load fails', async() => {
-        const sut = new ComponentFixture(store, "testKey", false)
+        const sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         const verifier = sut.component.find(Verifier)
 
@@ -82,11 +82,11 @@ describe('Client side render', () => {
     })
 
     it('client render after SSR with data should not fetch data', async() => {
-        let sut = new ComponentFixture(store, "testKey", true)
+        let sut = new ComponentFixture(store, "testKey", { isServerSideRender: true })
         const verifier = sut.component.find(Verifier)
         await sut.testDataPromise.resolve({ result: 'Success!' })
 
-        sut = new ComponentFixture(store, "testKey", false)
+        sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         expect(sut.loadDataCount).toBe(0)
         expect(verifier.props()).toMatchSnapshot()
@@ -94,7 +94,7 @@ describe('Client side render', () => {
     })
 
     it('should remove data from redux when unmounted', async() => {
-        let sut = new ComponentFixture(store, "testKey", false)
+        let sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
         await sut.testDataPromise.resolve({ result: 'Success!' })
 
         await sut.unmount()
@@ -103,7 +103,7 @@ describe('Client side render', () => {
     })
 
     it('should ignore completion once component is unmounted', async() => {
-        let sut = new ComponentFixture(store, "testKey", false)
+        let sut = new ComponentFixture(store, "testKey", { isServerSideRender: false })
 
         await sut.unmount()
         await sut.testDataPromise.resolve({ result: 'Success!' })

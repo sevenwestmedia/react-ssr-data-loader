@@ -39,7 +39,7 @@ export interface MetaData<TArgs> {
 
 const ssrNeedsData = (state: LoaderDataState | undefined) => !state || (!state.completed && !state.loading)
 const hasValidData = (state: LoaderDataState | undefined) => (
-    state && state.completed && !state.failed && state.dataFromServerSideRender
+    state && state.completed && !state.failed
 )
 
 export type DataUpdateCallback = (newState: LoaderDataState) => void
@@ -49,6 +49,7 @@ export interface DataLoaderContext {
     loadData(metadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
     loadNextData(currentMetadata: MetaData<any>, nextMetadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
     unloadData(metadata: MetaData<any>, update: DataUpdateCallback): void
+    detach(metadata: MetaData<any>, update: DataUpdateCallback): void
     refresh(metadata: MetaData<any>): Promise<any>
     nextPage(metadata: MetaData<any>): Promise<any>
 }
@@ -141,7 +142,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
     }
 
     // Returns true when data needs to be unloaded from redux
-    private detach(metadata: MetaData<any>, update: DataUpdateCallback) {
+    detach(metadata: MetaData<any>, update: DataUpdateCallback) {
         const subscriptions = this.getSubscription(metadata)
 
         if (subscriptions.length === 1) {

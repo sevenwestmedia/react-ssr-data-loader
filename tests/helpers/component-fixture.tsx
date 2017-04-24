@@ -10,6 +10,12 @@ import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
 import Verifier from './verifier'
 
+interface FixtureOptions {
+    isServerSideRender: boolean
+    clientLoadOnly?: boolean
+    unloadDataOnUnmount?: boolean
+}
+
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
@@ -20,7 +26,7 @@ export default class ComponentFixture {
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
 
-    constructor(store: Store<ReduxStoreState>, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(store: Store<ReduxStoreState>, dataKey: string, options: FixtureOptions) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
         const TestDataLoader = this.resources.registerResource(dataType, (dataKey: string) => {
@@ -31,13 +37,14 @@ export default class ComponentFixture {
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <Provider store={store}>
                 <DataProvider
-                    isServerSideRender={isServerSideRender}
+                    isServerSideRender={options.isServerSideRender}
                     resources={this.resources}
                     loadAllCompleted={() => this.loadAllCompletedCalled++}
                 >
                     <TestDataLoader
                         dataKey={dataKey}
-                        clientLoadOnly={clientLoadOnly}
+                        clientLoadOnly={options.clientLoadOnly}
+                        unloadDataOnUnmount={options.unloadDataOnUnmount}
                         renderData={(props) => {
                             this.lastRenderProps = props
                             return (

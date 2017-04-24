@@ -32,7 +32,7 @@ beforeEach(() => {
 
 describe('Is loading component', () => {
     it('should be loading if any data loaders are loading', () => {
-        const dataLoaderFixture = new ComponentFixture(store, "testKey", false)
+        const dataLoaderFixture = new ComponentFixture(store, "testKey", { isServerSideRender: false })
         const sut = new IsLoadingFixture(store)
 
         const verifier = sut.component.find(Verifier)
@@ -42,8 +42,8 @@ describe('Is loading component', () => {
     })
 
     it('should be loading if one of two have finished loading', async () => {
-        const dataLoaderFixture = new ComponentFixture(store, "testKey", false)
-        const dataLoaderFixture2 = new ComponentFixture(store, "testKey2", false)
+        const dataLoaderFixture = new ComponentFixture(store, "testKey", { isServerSideRender: false })
+        const dataLoaderFixture2 = new ComponentFixture(store, "testKey2", { isServerSideRender: false })
         const sut = new IsLoadingFixture(store)
         await dataLoaderFixture.testDataPromise.resolve({
             result: 'Foo!'
@@ -56,8 +56,8 @@ describe('Is loading component', () => {
     })
 
     it('should not be loading once all data loaders have completed', async () => {
-        const dataLoaderFixture = new ComponentFixture(store, "testKey", false)
-        const dataLoaderFixture2 = new ComponentFixture(store, "testKey2", false)
+        const dataLoaderFixture = new ComponentFixture(store, "testKey", { isServerSideRender: false })
+        const dataLoaderFixture2 = new ComponentFixture(store, "testKey2", { isServerSideRender: false })
         const sut = new IsLoadingFixture(store)
         await dataLoaderFixture.testDataPromise.resolve({
             result: 'Foo!'
