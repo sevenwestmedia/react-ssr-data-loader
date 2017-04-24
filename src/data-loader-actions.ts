@@ -48,13 +48,9 @@ export interface DataKeyMap {
     [dataKey: string]: LoaderDataState
 }
 
-export interface DataTypeMap {
+export interface DataLoaderState {
     loadingCount: number
     data: { [dataType: string]: DataKeyMap }
-}
-
-export interface ReduxStoreState {
-    dataLoader: DataTypeMap
 }
 
 export interface Meta {
@@ -62,6 +58,11 @@ export interface Meta {
     dataKey: string
     dataParams: any
     dataFromServerSideRender: boolean
+}
+
+export const INIT = 'resource-data-loader/INIT'
+export interface INIT {
+    type: 'resource-data-loader/INIT'
 }
 
 export const REFRESH_DATA = 'resource-data-loader/REFRESH_DATA'
@@ -112,14 +113,14 @@ export interface LOAD_NEXT_DATA {
     }
 }
 
-type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
+export type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
     | LOAD_DATA_FAILED | UNLOAD_DATA | LOAD_NEXT_DATA
-    | REFRESH_DATA | NEXT_PAGE
+    | REFRESH_DATA | NEXT_PAGE | INIT
 
-export const reducer = (state: DataTypeMap = {
+export const reducer = (state: DataLoaderState = {
     data: {},
     loadingCount: 0,
-}, action: Actions): DataTypeMap => {
+}, action: Actions): DataLoaderState => {
     switch (action.type) {
         case LOAD_NEXT_DATA: {
             const stateWithCurrentRemoved = reducer(state, {

@@ -1,11 +1,9 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { createStore, combineReducers, Store } from 'redux'
-import { Provider } from 'react-redux'
 import { Props, LoadedState, createTypedDataLoader } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { ReduxStoreState, reducer } from '../../src/data-loader-actions'
+import { DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
 import Verifier from './verifier'
@@ -19,8 +17,9 @@ export default class ComponentFixture {
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
+    currentState: DataLoaderState
 
-    constructor(store: Store<ReduxStoreState>, dataKey: string, dataKey2: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(initialState: DataLoaderState, dataKey: string, dataKey2: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.testDataPromise2 = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
@@ -36,30 +35,31 @@ export default class ComponentFixture {
         })
 
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
-            <Provider store={store}>
-                <DataProvider
-                    isServerSideRender={isServerSideRender}
-                    resources={this.resources}
-                    loadAllCompleted={() => this.loadAllCompletedCalled++}
-                >
-                    <div>
-                        <TestDataLoader
-                            dataKey={dataKey}
-                            clientLoadOnly={clientLoadOnly}
-                            renderData={(props) => (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        />
-                        <TestDataLoader
-                            dataKey={dataKey2}
-                            clientLoadOnly={clientLoadOnly}
-                            renderData={(props) => (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        />
-                    </div>
-                </DataProvider>
-            </Provider>
+            <DataProvider
+                initialState={initialState}
+                isServerSideRender={isServerSideRender}
+                resources={this.resources}
+                loadAllCompleted={() => this.loadAllCompletedCalled++}
+                stateChanged={state => this.currentState = state}
+                onError={err => console.error(err)}
+            >
+                <div>
+                    <TestDataLoader
+                        dataKey={dataKey}
+                        clientLoadOnly={clientLoadOnly}
+                        renderData={(props) => (
+                            <Verifier {...props} renderCount={++this.renderCount} />
+                        )}
+                    />
+                    <TestDataLoader
+                        dataKey={dataKey2}
+                        clientLoadOnly={clientLoadOnly}
+                        renderData={(props) => (
+                            <Verifier {...props} renderCount={++this.renderCount} />
+                        )}
+                    />
+                </div>
+            </DataProvider>
         )
 
         this.root = mount(<TestComponent dataKey={dataKey} />)

@@ -1,4 +1,3 @@
-export { reducer, ReduxStoreState } from './data-loader-actions'
 export { RenderData, LoadedState as RenderProps } from './data-loader'
 export { default as DataProvider } from './data-provider'
 export { default as DataLoaderResources } from './data-loader-resources'

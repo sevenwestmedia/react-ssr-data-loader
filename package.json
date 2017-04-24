@@ -39,7 +39,8 @@
     "prepublish": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:update-snapshots": "jest -u"
+    "test:update-snapshots": "jest -u",
+    "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand"
   },
   "jest": {
     "transform": {

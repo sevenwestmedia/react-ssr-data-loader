@@ -1,35 +1,26 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
 import {
-    ReduxStoreState, DataTypeMap, LoaderDataState,
-    CompletedSuccessfullyLoaderDataState,
+    DataLoaderState, LoaderDataState, Actions,
+    CompletedSuccessfullyLoaderDataState, reducer,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, LOAD_NEXT_DATA, REFRESH_DATA, NEXT_PAGE,
+    INIT,
 } from './data-loader-actions'
 import DataLoaderResources from './data-loader-resources'
 
 export { LoaderDataState }
 
-export interface MappedProps {
-    store: DataTypeMap
-}
-export interface DispatchProps {
-    dispatch: Dispatch<ReduxStoreState>
-}
-
-export interface OwnProps {
+export interface Props {
+    initialState: DataLoaderState
+    onError?: (err: string) => void
     loadingCountUpdated?: (loadingCount: number) => void
     loadAllCompleted?: () => void
+    stateChanged?: (state: DataLoaderState) => void
     isServerSideRender: boolean
     resources: DataLoaderResources
 }
 
-export interface Props extends MappedProps, DispatchProps, OwnProps {
-
-}
-export interface State {
-
+export interface State extends DataLoaderState {
 }
 
 export interface MetaData<TArgs> {
@@ -44,6 +35,7 @@ const hasValidData = (state: LoaderDataState | undefined): state is CompletedSuc
 )
 
 export type DataUpdateCallback = (newState: LoaderDataState) => void
+export type StateSubscription = (state: DataLoaderState) => void
 
 export interface DataLoaderContext {
     isServerSideRender: boolean
@@ -53,6 +45,10 @@ export interface DataLoaderContext {
     detach(metadata: MetaData<any>, update: DataUpdateCallback): void
     refresh(metadata: MetaData<any>): Promise<any>
     nextPage(metadata: MetaData<any>): Promise<any>
+
+    subscribe: (callback: StateSubscription) => void
+    unsubscribe: (callback: StateSubscription) => void
+    getDataLoaderState: () => DataLoaderState
 }
 
 // Keep the public methods used to notify the context of changes hidden from the data loader
@@ -66,15 +62,33 @@ class DataLoaderContextInternal implements DataLoaderContext {
             [dataKey: string]: DataUpdateCallback[]
         }
     } = {}
+    private _stateSubscriptions: StateSubscription[] = []
+    private state: DataLoaderState = reducer(undefined, { type: INIT })
 
     constructor(
-        private dispatch: Dispatch<ReduxStoreState>,
-        private getStoreState: () => DataTypeMap,
+        private onStateChanged: (state: DataLoaderState) => void,
         private performLoad: (metadata: MetaData<any>, existingData: any) => Promise<any>,
         private loadAllCompleted: () => void,
         private loadingCountChanged: (loadingCount: number) => void,
+        private onError: (err: string) => void,
         public isServerSideRender: boolean
     ) { }
+
+    dispatch = <T extends Actions>(action: T): void => {
+        this.state = reducer(this.state, action)
+        this.updateDataLoaders(this.state)
+        this.onStateChanged(this.state)
+    }
+
+    getDataLoaderState = () => this.state
+
+    subscribe(callback: StateSubscription) {
+        this._stateSubscriptions.push(callback)
+    }
+
+    unsubscribe(callback: StateSubscription) {
+        this._stateSubscriptions.splice(this._stateSubscriptions.indexOf(callback), 1)
+    }
 
     async loadData(metadata: MetaData<any>, update: DataUpdateCallback) {
         const firstAttached = this.attach(metadata, update)
@@ -94,8 +108,6 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 return await this._loadData(metadata)
             }
         }
-
-        this.updateDataLoaders(this.getStoreState())
     }
 
     async loadNextData(currentMetadata: MetaData<any>, nextMetadata: MetaData<any>, update: DataUpdateCallback) {
@@ -166,9 +178,10 @@ class DataLoaderContextInternal implements DataLoaderContext {
         return false
     }
 
-    updateDataLoaders(store: DataTypeMap) {
+    updateDataLoaders(state: DataLoaderState) {
         const subscribedDataTypes = Object.keys(this._subscriptions)
 
+        // Notify any dataloaders
         for (const subscribedDataType of subscribedDataTypes) {
             const subscribedKeys = Object.keys(this._subscriptions[subscribedDataType])
 
@@ -176,11 +189,16 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 const subscribers = this._subscriptions[subscribedDataType][subscriberKey]
 
                 for (const subscriber of subscribers) {
-                    if (store.data[subscribedDataType] && store.data[subscribedDataType][subscriberKey]) {
-                        subscriber(store.data[subscribedDataType][subscriberKey])
+                    if (state.data[subscribedDataType] && state.data[subscribedDataType][subscriberKey]) {
+                        subscriber(state.data[subscribedDataType][subscriberKey])
                     }
                 }
             }
+        }
+
+        // Notify any is-loading components
+        for (const stateSubscriber of this._stateSubscriptions) {
+            stateSubscriber(state)
         }
     }
 
@@ -226,7 +244,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
     }
 
     private getLoadedState = (metadata: MetaData<any>): LoaderDataState | undefined => {
-        const dataLookup = this.getStoreState().data[metadata.dataType]
+        const dataLookup = this.state.data[metadata.dataType]
         if (!dataLookup) {
             return undefined
         }
@@ -260,6 +278,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 payload = err ? err.toString() : ''
             }
 
+            this.onError(payload)
+
             this.dispatch<LOAD_DATA_FAILED>({
                 type: LOAD_DATA_FAILED,
                 meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
@@ -274,28 +294,30 @@ class DataLoaderContextInternal implements DataLoaderContext {
     }
 }
 
-class DataProvider extends React.Component<Props, State> {
+export default class DataProvider extends React.Component<Props, {}> {
     static childContextTypes = {
         dataLoader: React.PropTypes.object
     }
 
     private dataLoader: DataLoaderContextInternal
+    state: State = reducer(undefined, { type: INIT })
 
     constructor(props: Props, context: any) {
         super(props, context)
 
         this.dataLoader = new DataLoaderContextInternal(
-            this.props.dispatch,
-            () => this.props.store,
+            this.props.stateChanged || (() => {}),
             this.loadData,
             this.props.loadAllCompleted || (() => {}),
             this.props.loadingCountUpdated || (() => {}),
-            this.props.isServerSideRender
+            this.props.onError || (() => {}),
+            this.props.isServerSideRender,
         )
     }
 
-    componentWillReceiveProps(nextProps: Props) {
-        this.dataLoader.updateDataLoaders(nextProps.store)
+    shouldComponentUpdate(nextProps: Props) {
+        // We don't want to re-render based on state, only props
+
     }
 
     private loadData = (metadata: MetaData<any>, existingData: any): Promise<any> => {
@@ -307,13 +329,9 @@ class DataProvider extends React.Component<Props, State> {
         return dataLoader(metadata.dataKey, metadata.dataParams, existingData)
     }
 
-    getChildContext = () => ({ dataLoader: this.dataLoader })
+    getChildContext = (): { dataLoader: DataLoaderContext } => ({ dataLoader: this.dataLoader })
 
     render() {
         return React.Children.only(this.props.children)
     }
 }
-
-export default connect<MappedProps, {}, OwnProps>(
-    (state: ReduxStoreState) => ({ store: state.dataLoader })
-)(DataProvider)
