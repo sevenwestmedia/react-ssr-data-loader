@@ -96,7 +96,7 @@ describe('server side render', () => {
     it('second SSR with two components in same tree uses data', async () => {
         let sut = new SharedDataComponentFixture(undefined, "testKey", true)
         await sut.testDataPromise.resolve({ result: 'Success!' })
-        let sut2 = new SharedDataComponentFixture(undefined, "testKey", true)
+        let sut2 = new SharedDataComponentFixture(sut.currentState, "testKey", true)
 
         const verifier = sut2.component.find(Verifier)
 

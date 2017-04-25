@@ -21,7 +21,6 @@ export default class IsLoading extends React.Component<Props, DataLoaderState> {
 
     constructor(props: Props, context: { dataLoader: DataLoaderContext }) {
         super(props, context)
-        console.log('##', context.dataLoader.getDataLoaderState())
         this.state = context.dataLoader.getDataLoaderState()
     }
 
@@ -34,7 +33,6 @@ export default class IsLoading extends React.Component<Props, DataLoaderState> {
     }
 
     stateChanged = (state: DataLoaderState) => {
-        console.log('$$', state)
         this.setState(state)
     }
 

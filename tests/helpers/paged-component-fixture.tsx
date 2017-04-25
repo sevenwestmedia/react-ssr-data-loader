@@ -21,6 +21,7 @@ export default class ComponentFixture {
     currentState: DataLoaderState
 
     constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+        this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
         const TestDataLoader = this.resources.registerPagedResource<DataResource>('testDataType', (dataKey, page) => {

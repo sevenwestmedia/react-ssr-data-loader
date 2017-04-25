@@ -20,6 +20,7 @@ export default class ComponentFixture {
     currentState: DataLoaderState
 
     constructor(initialState: DataLoaderState, dataKey: string, dataKey2: string, isServerSideRender: boolean, clientLoadOnly = false) {
+        this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.testDataPromise2 = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()

@@ -63,16 +63,24 @@ class DataLoaderContextInternal implements DataLoaderContext {
         }
     } = {}
     private _stateSubscriptions: StateSubscription[] = []
-    private state: DataLoaderState = reducer(undefined, { type: INIT })
+    private state: DataLoaderState
 
     constructor(
         private onStateChanged: (state: DataLoaderState) => void,
+        initialState: DataLoaderState,
         private performLoad: (metadata: MetaData<any>, existingData: any) => Promise<any>,
         private loadAllCompleted: () => void,
         private loadingCountChanged: (loadingCount: number) => void,
         private onError: (err: string) => void,
         public isServerSideRender: boolean
-    ) { }
+    ) {
+        if (initialState) {
+            this.state = initialState
+        } else {
+            this.state = reducer(undefined, { type: INIT })
+            onStateChanged(this.state)
+        }
+    }
 
     dispatch = <T extends Actions>(action: T): void => {
         this.state = reducer(this.state, action)
@@ -96,6 +104,10 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
         if (this.isServerSideRender && ssrNeedsData(loadedState) && firstAttached) {
             return await this._loadData(metadata)
+        } else {
+            // Give the data-loader it's state
+            const loaderState = this.getLoadedState(metadata)
+            loaderState && update(loaderState)
         }
 
         if (!this.isServerSideRender && firstAttached) {
@@ -307,17 +319,13 @@ export default class DataProvider extends React.Component<Props, {}> {
 
         this.dataLoader = new DataLoaderContextInternal(
             this.props.stateChanged || (() => {}),
+            this.props.initialState,
             this.loadData,
             this.props.loadAllCompleted || (() => {}),
             this.props.loadingCountUpdated || (() => {}),
             this.props.onError || (() => {}),
             this.props.isServerSideRender,
         )
-    }
-
-    shouldComponentUpdate(nextProps: Props) {
-        // We don't want to re-render based on state, only props
-
     }
 
     private loadData = (metadata: MetaData<any>, existingData: any): Promise<any> => {
