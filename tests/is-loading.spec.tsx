@@ -28,7 +28,7 @@ describe('Is loading component', () => {
         expect(sut.currentState).toMatchSnapshot()
     })
 
-    it.only('should not be loading once all data loaders have completed', async () => {
+    it('should not be loading once all data loaders have completed', async () => {
         const sut = new IsLoadingWithMultipleLoadersFixture()
         await sut.testDataPromise.resolve({
             result: 'Foo!'

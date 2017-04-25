@@ -2,7 +2,7 @@ import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
 import { Props, LoadedState } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
-import DataLoaderResources, { PageActions } from '../../src/data-loader-resources'
+import DataLoaderResources, { PageActions, Paging } from '../../src/data-loader-resources'
 import { DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import Verifier from './verifier'
@@ -24,10 +24,17 @@ export default class ComponentFixture {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerPagedResource<DataResource>('testDataType', (dataKey, page) => {
-            this.loadDataCount++
-            return this.testDataPromise.promise
-        })
+        const paging: Paging = {
+            pageSize: 10,
+        }
+        const TestDataLoader = this.resources.registerPagedResource<DataResource>(
+            'testDataType',
+            paging,
+            (dataKey, paging, page) => {
+                this.loadDataCount++
+                return this.testDataPromise.promise
+            }
+        )
 
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <DataProvider

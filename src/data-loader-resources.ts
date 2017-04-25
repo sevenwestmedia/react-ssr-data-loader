@@ -11,6 +11,13 @@ export interface PagedData<Datum> {
     data: Datum[]
 }
 export type PageActions = { nextPage: () => void }
+export interface Paging {
+    /** Defaults to 0 */
+    initialOffset?: number
+    /** Overrides pageSize for initial page */
+    initialSize?: number
+    pageSize: number
+}
 
 export default class DataLoaderResources {
     private resources: Resources = {}
@@ -39,7 +46,7 @@ export default class DataLoaderResources {
 
     /** Page numbers start at 1 */
     registerPagedResource<TData>(
-        dataType: string, loadResource: (dataKey: string, page: number) => Promise<TData[]>
+        dataType: string, paging: Paging, loadResource: (dataKey: string, paging: Paging, page: number) => Promise<TData[]>
     ): React.ComponentClass<Props<PagedData<TData>, PageActions>> {
         type PageInfo = { page: number }
         const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageInfo, PageActions>(
@@ -48,7 +55,7 @@ export default class DataLoaderResources {
                 const metadata = {
                     dataType,
                     dataKey: props.dataKey,
-                    dataParams: { page: 1 }
+                    dataParams: { ...paging, page: 1 }
                 }
                 return {
                     // Refresh action needs to reset to 1st page
@@ -61,7 +68,7 @@ export default class DataLoaderResources {
 
         this.resources[dataType] = async (dataKey, pageInfo: PageInfo, existingData: PagedData<TData>): Promise<PagedData<TData>> => {
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
-            const data = await loadResource(dataKey, pageNumber)
+            const data = await loadResource(dataKey, paging, pageNumber)
             if (existingData && existingData.data) {
                 return {
                     pageNumber,
