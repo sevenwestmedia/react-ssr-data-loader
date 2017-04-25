@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
-    DataLoaderState, LoaderDataState, Actions,
-    CompletedSuccessfullyLoaderDataState, reducer,
+    DataLoaderState, LoaderDataState, Actions, reducer,
+    CompletedSuccessfullyLoaderDataState,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, LOAD_NEXT_DATA, REFRESH_DATA, NEXT_PAGE,
     INIT,
@@ -11,12 +11,12 @@ import DataLoaderResources from './data-loader-resources'
 export { LoaderDataState }
 
 export interface Props {
-    initialState: DataLoaderState
+    initialState?: DataLoaderState
     onError?: (err: string) => void
     loadingCountUpdated?: (loadingCount: number) => void
     loadAllCompleted?: () => void
     stateChanged?: (state: DataLoaderState) => void
-    isServerSideRender: boolean
+    isServerSideRender?: boolean
     resources: DataLoaderResources
 }
 
@@ -67,7 +67,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
     constructor(
         private onStateChanged: (state: DataLoaderState) => void,
-        initialState: DataLoaderState,
+        initialState: DataLoaderState | undefined,
         private performLoad: (metadata: MetaData<any>, existingData: any) => Promise<any>,
         private loadAllCompleted: () => void,
         private loadingCountChanged: (loadingCount: number) => void,
@@ -290,7 +290,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
                 payload = err ? err.toString() : ''
             }
 
-            this.onError(payload)
+            this.onError(`Error when loading ${JSON.stringify(metadata)}:
+    ${payload}`)
 
             this.dispatch<LOAD_DATA_FAILED>({
                 type: LOAD_DATA_FAILED,
@@ -324,7 +325,7 @@ export default class DataProvider extends React.Component<Props, {}> {
             this.props.loadAllCompleted || (() => {}),
             this.props.loadingCountUpdated || (() => {}),
             this.props.onError || (() => {}),
-            this.props.isServerSideRender,
+            this.props.isServerSideRender || false,
         )
     }
 

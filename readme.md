@@ -21,7 +21,7 @@ The samples below are for TypeScript
 First you need a data provider at the top level
 
 ``` tsx
-import { DataLoaderResources, DataProvider } from 'redux-data-loder'
+import { DataLoaderResources, DataProvider } from 'redux-data-loader'
 
 // Initialise the resources, you pass this to the DataProvider
 const resources = new DataLoaderResources()
