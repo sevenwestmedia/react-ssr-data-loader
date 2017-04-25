@@ -8,12 +8,12 @@ This component is a child as function component which takes care of correctly lo
  - Removing the data from Redux once the component is unmounted
  - Track loading states so you can focus on rendering based on the status
  - Refreshing data
+ - Paging data
 
 ## Notes
 * Data loading arguments are not taken into account when checking to see if the data is already loaded
     * This means if you use two data loaders with the same type and key but different arguments the second data loader will still use the data from the first.
     * This will change in a future version
-* Is currently tied to redux, in the future this will be pluggable
 
 ## Usage
 The samples below are for TypeScript
