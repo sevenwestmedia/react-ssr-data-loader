@@ -18,6 +18,7 @@ export interface Paging {
     initialSize?: number
     pageSize: number
 }
+export type PageProps = { page: number, paging: Paging }
 
 export default class DataLoaderResources {
     private resources: Resources = {}
@@ -26,7 +27,7 @@ export default class DataLoaderResources {
      * the second 
      */
     registerResourceWithParameters<T, TData>(
-        dataType: string, loadResource: (dataKey: string, resourceParameters?: T) => Promise<TData>
+        dataType: string, loadResource: (dataKey: string, resourceParameters: T, existingData: TData) => Promise<TData>
     ): React.ComponentClass<Props<TData, {}>> {
         const typedDataLoader = createTypedDataLoader<TData, T, {}>(dataType, () => ({}))
         this.resources[dataType] = loadResource
@@ -46,16 +47,15 @@ export default class DataLoaderResources {
 
     /** Page numbers start at 1 */
     registerPagedResource<TData>(
-        dataType: string, paging: Paging, loadResource: (dataKey: string, paging: Paging, page: number) => Promise<TData[]>
-    ): React.ComponentClass<Props<PagedData<TData>, PageActions>> {
-        type PageInfo = { page: number }
-        const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageInfo, PageActions>(
+        dataType: string, loadResource: (dataKey: string, paging: Paging, page: number) => Promise<TData[]>
+    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & { paging: Paging }> {
+        const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageProps, PageActions>(
             dataType,
             (dataLoaderContext, props, handleUpdate) => {
                 const metadata = {
                     dataType,
                     dataKey: props.dataKey,
-                    dataParams: { ...paging, page: 1 }
+                    dataParams: { paging: props.paging, page: 1 }
                 }
                 return {
                     // Refresh action needs to reset to 1st page
@@ -66,9 +66,9 @@ export default class DataLoaderResources {
             }
         )
 
-        this.resources[dataType] = async (dataKey, pageInfo: PageInfo, existingData: PagedData<TData>): Promise<PagedData<TData>> => {
+        this.resources[dataType] = async (dataKey, pageInfo: PageProps, existingData: PagedData<TData>): Promise<PagedData<TData>> => {
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
-            const data = await loadResource(dataKey, paging, pageNumber)
+            const data = await loadResource(dataKey, pageInfo.paging, pageNumber)
             if (existingData && existingData.data) {
                 return {
                     pageNumber,

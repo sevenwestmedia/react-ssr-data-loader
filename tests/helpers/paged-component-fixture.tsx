@@ -29,7 +29,6 @@ export default class ComponentFixture {
         }
         const TestDataLoader = this.resources.registerPagedResource<DataResource>(
             'testDataType',
-            paging,
             (dataKey, paging, page) => {
                 this.loadDataCount++
                 return this.testDataPromise.promise
@@ -46,6 +45,7 @@ export default class ComponentFixture {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
+                    paging={{ pageSize: 10 }}
                     dataKey={dataKey}
                     clientLoadOnly={clientLoadOnly}
                     renderData={(props) => {
