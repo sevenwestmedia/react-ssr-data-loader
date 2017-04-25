@@ -21,10 +21,7 @@ The samples below are for TypeScript
 First you need a data provider at the top level
 
 ``` tsx
-import { reducer as dataLoader, createTypedDataLoader, ReduxStoreState, DataProvider } from 'redux-data-loder'
-
-// Create redux store
-const store = createStore(combineReducers<ReduxStoreState>({ dataLoader }))
+import { DataLoaderResources, DataProvider } from 'redux-data-loder'
 
 // Initialise the resources, you pass this to the DataProvider
 const resources = new DataLoaderResources()
@@ -36,14 +33,11 @@ export const TestDataLoader = this.resources.registerResource(
 )
 
 const Root: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
-    <Provider store={store}>
-        <DataProvider resources={this.resources}>
-            <App />
-        </DataProvider>
-    </Provider>
+    <DataProvider resources={this.resources}>
+        <App />
+    </DataProvider>
 )
 ```
-
 
 ``` tsx
 import { TestDataLoader } from './root'
@@ -57,6 +51,31 @@ import { TestDataLoader } from './root'
         // It will have the data and additional actions
     }
 />
+```
+
+### Transferring data from server to client
+In server side rendering scenarios you need to transfer the loaded state to the client
+
+You can do this with a similar approach to when using Redux.
+
+``` tsx
+// On server
+let state: any
+
+const Root: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+    <DataProvider resources={this.resources} stateChanged={s => state = s}>
+        <App />
+    </DataProvider>
+)
+
+// Serialise state to global in your HTML response
+
+/// On Client
+const Root: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+    <DataProvider resources={this.resources} initialState={DATA_LOADER_INITIAL_STATE}>
+        <App />
+    </DataProvider>
+)
 ```
 
 ### Paged data
