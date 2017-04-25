@@ -46,15 +46,15 @@ export interface BuiltInActions {
 }
 
 // @TODO This is a decent blog post or something in itself, generic react components are hard..
-export function createTypedDataLoader<T, TLoadArgs, TActions extends object>(
+export function createTypedDataLoader<T, TLoadArgs extends object, TActions extends object>(
     dataType: string,
     actions: (
         dataLoader: DataLoaderContext,
-        props: Props<T, TActions> & { dataParams: TLoadArgs },
+        props: Props<T, TActions> & TLoadArgs,
         handleStateUpdates: (loadedState: LoaderDataState) => void
     ) => TActions
-) : React.ComponentClass<Props<T, TActions & BuiltInActions> & { dataParams: TLoadArgs }> {
-    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & { dataParams: TLoadArgs }, LoadedState<T, TActions & BuiltInActions>> {
+) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
+    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, LoadedState<T, TActions & BuiltInActions>> {
         context: { dataLoader: DataLoaderContext }
         private _isMounted: boolean
 

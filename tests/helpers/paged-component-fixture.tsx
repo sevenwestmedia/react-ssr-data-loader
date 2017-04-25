@@ -46,7 +46,7 @@ export default class ComponentFixture {
             >
                 <TestDataLoader
                     dataKey={dataKey}
-                    dataParams={{ paging: { pageSize: 10 } }}
+                    paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
                     renderData={(props) => {
                         this.lastRenderProps = props
