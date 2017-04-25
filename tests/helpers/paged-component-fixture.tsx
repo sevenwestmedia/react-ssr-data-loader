@@ -45,8 +45,8 @@ export default class ComponentFixture {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
-                    paging={{ pageSize: 10 }}
                     dataKey={dataKey}
+                    dataParams={{ paging: { pageSize: 10 } }}
                     clientLoadOnly={clientLoadOnly}
                     renderData={(props) => {
                         this.lastRenderProps = props

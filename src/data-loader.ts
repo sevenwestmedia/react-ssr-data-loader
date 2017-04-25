@@ -50,11 +50,11 @@ export function createTypedDataLoader<T, TLoadArgs, TActions extends object>(
     dataType: string,
     actions: (
         dataLoader: DataLoaderContext,
-        props: Props<T, TActions> & TLoadArgs,
+        props: Props<T, TActions> & { dataParams: TLoadArgs },
         handleStateUpdates: (loadedState: LoaderDataState) => void
     ) => TActions
-) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
-    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, LoadedState<T, TActions & BuiltInActions>> {
+) : React.ComponentClass<Props<T, TActions & BuiltInActions> & { dataParams: TLoadArgs }> {
+    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & { dataParams: TLoadArgs }, LoadedState<T, TActions & BuiltInActions>> {
         context: { dataLoader: DataLoaderContext }
         private _isMounted: boolean
 

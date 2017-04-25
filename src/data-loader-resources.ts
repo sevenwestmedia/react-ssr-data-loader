@@ -28,7 +28,7 @@ export default class DataLoaderResources {
      */
     registerResourceWithParameters<T, TData>(
         dataType: string, loadResource: (dataKey: string, resourceParameters: T, existingData: TData) => Promise<TData>
-    ): React.ComponentClass<Props<TData, {}>> {
+    ): React.ComponentClass<Props<TData, {}> & { dataParams: T }> {
         const typedDataLoader = createTypedDataLoader<TData, T, {}>(dataType, () => ({}))
         this.resources[dataType] = loadResource
 
@@ -48,14 +48,14 @@ export default class DataLoaderResources {
     /** Page numbers start at 1 */
     registerPagedResource<TData>(
         dataType: string, loadResource: (dataKey: string, paging: Paging, page: number) => Promise<TData[]>
-    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & { paging: Paging }> {
+    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & { dataParams: { paging: Paging } }> {
         const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageProps, PageActions>(
             dataType,
             (dataLoaderContext, props, handleUpdate) => {
                 const metadata = {
                     dataType,
                     dataKey: props.dataKey,
-                    dataParams: { paging: props.paging, page: 1 }
+                    dataParams: { paging: props.dataParams.paging, page: 1 }
                 }
                 return {
                     // Refresh action needs to reset to 1st page
