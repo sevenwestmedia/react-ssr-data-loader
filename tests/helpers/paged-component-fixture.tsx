@@ -2,42 +2,43 @@ import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
 import { Props, LoadedState } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
-import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState, reducer } from '../../src/data-loader-actions'
+import DataLoaderResources, { PageActions, Paging } from '../../src/data-loader-resources'
+import { DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
-import { Data, dataType } from './test-data'
 import Verifier from './verifier'
 
-interface FixtureOptions {
-    isServerSideRender: boolean
-    clientLoadOnly?: boolean
-    unloadDataOnUnmount?: boolean
-}
+interface DataResource {}
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps: LoadedState<Data, {}>
-    testDataPromise: PromiseCompletionSource<Data>
+    lastRenderProps: LoadedState<DataResource, PageActions>
+    testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ dataKey: string }, any>
-    component: ReactWrapper<Props<Data, {}>, any>
+    component: ReactWrapper<Props<DataResource, PageActions>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
 
-    constructor(initialState: DataLoaderState, dataKey: string, options: FixtureOptions) {
+    constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
-        this.testDataPromise = new PromiseCompletionSource<Data>()
+        this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(dataType, (dataKey: string) => {
-            this.loadDataCount++
-            return this.testDataPromise.promise
-        })
+        const paging: Paging = {
+            pageSize: 10,
+        }
+        const TestDataLoader = this.resources.registerPagedResource<DataResource>(
+            'testDataType',
+            (dataKey, paging, page) => {
+                this.loadDataCount++
+                return this.testDataPromise.promise
+            }
+        )
 
         const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
             <DataProvider
                 initialState={initialState}
-                isServerSideRender={options.isServerSideRender}
+                isServerSideRender={isServerSideRender}
                 resources={this.resources}
                 loadAllCompleted={() => this.loadAllCompletedCalled++}
                 stateChanged={state => this.currentState = state}
@@ -45,8 +46,8 @@ export default class ComponentFixture {
             >
                 <TestDataLoader
                     dataKey={dataKey}
-                    clientLoadOnly={options.clientLoadOnly}
-                    unloadDataOnUnmount={options.unloadDataOnUnmount}
+                    paging={{ pageSize: 10 }}
+                    clientLoadOnly={clientLoadOnly}
                     renderData={(props) => {
                         this.lastRenderProps = props
                         return (
@@ -71,8 +72,17 @@ export default class ComponentFixture {
         }
     }
 
+    nextPage() {
+        if (this.lastRenderProps.isLoaded) {
+            this.resetPromise()
+            this.lastRenderProps.actions.nextPage()
+        } else {
+            throw new Error('Not in success state, can\'t refresh')
+        }
+    }
+
     resetPromise() {
-        this.testDataPromise = new PromiseCompletionSource<Data>()
+        this.testDataPromise = new PromiseCompletionSource<DataResource>()
     }
 
     unmount = async() => {

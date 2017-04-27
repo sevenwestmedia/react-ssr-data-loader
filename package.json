@@ -1,6 +1,6 @@
 {
   "name": "redux-data-loader",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "publishConfig": {
@@ -8,14 +8,9 @@
   },
   "repository": {},
   "license": "MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "react": "^15.4.2",
-    "react-addons-test-utils": "^15.4.2",
-    "react-dom": "^15.4.2",
-    "redux": "^3.6.0",
-    "react-redux": "^5.0.2"
+    "react": "^15.4.2"
   },
   "devDependencies": {
     "@types/enzyme": "^2.7.2",
@@ -33,14 +28,15 @@
     "redux": "^3.6.0",
     "source-map-loader": "^0.1.6",
     "ts-jest": "^18.0.1",
-    "typescript": "^2.1.5"
+    "typescript": "^2.2.2"
   },
   "scripts": {
     "build": "tsc -p . -d",
     "prepublish": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:update-snapshots": "jest -u"
+    "test:update-snapshots": "jest -u",
+    "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand"
   },
   "jest": {
     "transform": {

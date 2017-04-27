@@ -1,30 +1,32 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState, createTypedDataLoader } from '../../src/data-loader'
+import { Props, LoadedState } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState } from '../../src/data-loader-actions'
+import { reducer, DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
 import Verifier from './verifier'
 
-export default class ComponentFixture {
+export default class ComponentFixture<T extends object> {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
+    passedParams: T
     currentState: DataLoaderState
 
-    constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(initialState: DataLoaderState, dataKey: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(dataType, (dataKey: string) => {
+        
+        const TestDataLoader = this.resources.registerResourceWithParameters(dataType, (dataKey: string, params: T) => {
             this.loadDataCount++
+            this.passedParams = params
             return this.testDataPromise.promise
         })
 
@@ -37,22 +39,14 @@ export default class ComponentFixture {
                 stateChanged={state => this.currentState = state}
                 onError={err => console.error(err)}
             >
-                <div>
-                    <TestDataLoader
-                        dataKey={dataKey}
-                        clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
-                    />
-                    <TestDataLoader
-                        dataKey={dataKey}
-                        clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
-                    />
-                </div>
+                <TestDataLoader
+                    {...args}
+                    dataKey={dataKey}
+                    clientLoadOnly={clientLoadOnly}
+                    renderData={(props) => (
+                        <Verifier {...props} renderCount={++this.renderCount} />
+                    )}
+                />
             </DataProvider>
         )
 
@@ -64,6 +58,8 @@ export default class ComponentFixture {
     resetPromise() {
         this.testDataPromise = new PromiseCompletionSource<Data>()
     }
+
+    getState = () => this.currentState
 
     unmount = async() => {
         this.root.unmount()

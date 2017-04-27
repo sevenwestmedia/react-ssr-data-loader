@@ -17,6 +17,7 @@ export const Verifier: React.SFC<LoadedState & {
 export default class ComponentFixture {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
+    testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<any, any>
     component: ReactWrapper<any, any>
     resources: DataLoaderResources
@@ -24,9 +25,13 @@ export default class ComponentFixture {
 
     constructor() {
         this.testDataPromise = new PromiseCompletionSource<Data>()
+        this.testDataPromise2 = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
         const TestDataLoader = this.resources.registerResource('dataType', (dataKey: string) => {
             return this.testDataPromise.promise
+        })
+        const TestDataLoader2 = this.resources.registerResource('dataType2', (dataKey: string) => {
+            return this.testDataPromise2.promise
         })
         const TestComponent: React.SFC<any> = ({ }) => (
             <DataProvider
@@ -38,6 +43,10 @@ export default class ComponentFixture {
             >
                 <div>
                     <TestDataLoader
+                        dataKey={'dataKey'}
+                        renderData={(props) => (<div />)}
+                    />
+                    <TestDataLoader2
                         dataKey={'dataKey'}
                         renderData={(props) => (<div />)}
                     />
