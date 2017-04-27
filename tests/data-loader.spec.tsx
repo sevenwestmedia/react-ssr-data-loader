@@ -14,33 +14,21 @@ describe('data-loader', () => {
     it('supports multiple loaders using the same key when data loading', async () => {
         const sut = new SharedDataComponentFixture(undefined, "testKey", false)
 
-        const verifier = sut.component.find(Verifier)
-
-        expect(verifier.at(1).props()).toMatchSnapshot()
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
     })
 
     it('can resolve data from multiple components', async () => {
         const sut = new SharedDataComponentFixture(undefined, "testKey", false)
         await sut.testDataPromise.resolve({ result: 'Test' })
 
-        const verifier = sut.component.find(Verifier)
-
-        expect(verifier.at(0).props()).toMatchSnapshot()
-        expect(sut.currentState).toMatchSnapshot()
-        expect(sut.loadDataCount).toBe(1)
+        sut.assertState()
     })
 
     it('can load multiple dataloaders with different keys', async () => {
         const sut = new DifferentKeysDataComponentFixture(undefined, "testKey", "testKey2", false)
         await sut.testDataPromise.resolve({ result: 'Test' })
 
-        expect(sut.loadAllCompletedCalled).toBe(0)
-        const verifier = sut.component.find(Verifier)
-
-        expect(verifier.at(0).props()).toMatchSnapshot()
-        expect(sut.currentState).toMatchSnapshot()
-        expect(sut.loadDataCount).toBe(2)
+        sut.assertState()
     })
 
     it('multiple components load data once when props change', async () => {
@@ -51,8 +39,7 @@ describe('data-loader', () => {
         sut.root.setProps({ dataKey: "newData" })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
 
-        expect(sut.currentState).toMatchSnapshot()
-        expect(sut.loadDataCount).toBe(2)
+        sut.assertState()
     })
 
     it('ignores completion if unmounted first', async () => {
@@ -60,7 +47,7 @@ describe('data-loader', () => {
         await sut.unmount()
         await sut.testDataPromise.resolve({ result: 'Test' })
 
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
     })
 
     it('notifies when all work is completed', async () => {
@@ -77,7 +64,6 @@ describe('data-loader', () => {
 
         await sut.testDataPromise.resolve({ result: 'Test' })
 
-        expect(sut.currentState).toMatchSnapshot()
         expect(sut.passedParams).toEqual(foo)
     })
 
@@ -87,37 +73,37 @@ describe('data-loader', () => {
         await sut.testDataPromise.resolve({ result: 'Test' })
         sut.refreshData()
 
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
         await sut.testDataPromise.resolve({ result: 'Test2' })
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
     })
 
     it('supports paged data', async () => {
         const sut = new PagedComponentFixture(undefined, "testKey", false)
 
         await sut.testDataPromise.resolve(['Test'])
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
         sut.nextPage()
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
 
         await sut.testDataPromise.resolve(['Test2'])
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
     })
 
     it('can support preserving data on unmount', async () => {
-        const sut = new ComponentFixture(undefined, "testKey", {
+        let sut = new ComponentFixture(undefined, "testKey", {
             isServerSideRender: false,
             unloadDataOnUnmount: false
         })
         await sut.testDataPromise.resolve({ result: 'Test' })
         await sut.unmount()
 
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
         // Check we can re-mount the existing data
-        new ComponentFixture(sut.currentState, "testKey", {
+        sut = new ComponentFixture(sut.currentState, "testKey", {
             isServerSideRender: false,
             unloadDataOnUnmount: false
         })
-        expect(sut.currentState).toMatchSnapshot()
+        sut.assertState()
     })
 })

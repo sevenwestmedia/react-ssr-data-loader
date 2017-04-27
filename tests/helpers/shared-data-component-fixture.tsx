@@ -18,6 +18,8 @@ export default class ComponentFixture {
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
+    lastRenderProps: LoadedState<Data, {}>
+    lastRenderProps2: LoadedState<Data, {}>
 
     constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
@@ -41,16 +43,22 @@ export default class ComponentFixture {
                     <TestDataLoader
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
+                        renderData={(props) => {
+                            this.lastRenderProps = props
+                            return (
+                                <Verifier {...props} renderCount={++this.renderCount} />
+                            )}
+                        }
                     />
                     <TestDataLoader
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
+                        renderData={(props) => {
+                            this.lastRenderProps2 = props
+                            return (
+                                <Verifier {...props} renderCount={++this.renderCount} />
+                            )}
+                        }
                     />
                 </div>
             </DataProvider>
@@ -59,6 +67,16 @@ export default class ComponentFixture {
         this.root = mount(<TestComponent dataKey={dataKey} />)
 
         this.component = this.root.find(TestDataLoader)
+    }
+
+    assertState() {
+        expect({
+            renderCount: this.renderCount,
+            loadAllCompletedCalled: this.loadAllCompletedCalled,
+            renderProps1: this.lastRenderProps,
+            renderProps2: this.lastRenderProps2,
+            loadDataCount: this.loadDataCount
+        }).toMatchSnapshot()
     }
 
     resetPromise() {

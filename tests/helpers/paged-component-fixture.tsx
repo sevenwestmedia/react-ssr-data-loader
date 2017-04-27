@@ -81,6 +81,15 @@ export default class ComponentFixture {
         }
     }
 
+    assertState() {
+        expect({
+            renderCount: this.renderCount,
+            loadAllCompletedCalled: this.loadAllCompletedCalled,
+            renderProps: this.lastRenderProps,
+            loadDataCount: this.loadDataCount
+        }).toMatchSnapshot()
+    }
+
     resetPromise() {
         this.testDataPromise = new PromiseCompletionSource<DataResource>()
     }

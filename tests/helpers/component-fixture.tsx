@@ -62,6 +62,15 @@ export default class ComponentFixture {
         this.component = this.root.find(TestDataLoader)
     }
 
+    assertState() {
+        expect({
+            renderCount: this.renderCount,
+            loadAllCompletedCalled: this.loadAllCompletedCalled,
+            renderProps: this.lastRenderProps,
+            loadDataCount: this.loadDataCount
+        }).toMatchSnapshot()
+    }
+
     refreshData() {
         if (this.lastRenderProps.isLoaded) {
             this.resetPromise()
