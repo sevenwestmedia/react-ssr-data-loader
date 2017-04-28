@@ -5,7 +5,6 @@ import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { PageActions, Paging } from '../../src/data-loader-resources'
 import { DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
-import Verifier from './verifier'
 
 interface DataResource {}
 
@@ -49,11 +48,10 @@ export default class ComponentFixture {
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
                     renderData={(props) => {
+                        this.renderCount++
                         this.lastRenderProps = props
-                        return (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
-                    }
+                        return null
+                    }}
                 />
             </DataProvider>
         )

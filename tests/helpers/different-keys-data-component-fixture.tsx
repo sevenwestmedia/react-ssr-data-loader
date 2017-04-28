@@ -6,7 +6,6 @@ import DataLoaderResources from '../../src/data-loader-resources'
 import { DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
-import Verifier from './verifier'
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
@@ -51,21 +50,18 @@ export default class ComponentFixture {
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
                         renderData={(props) => {
+                            this.renderCount++
                             this.lastRenderProps = props
-                            return (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        }
+                            return null
+                        }}
                     />
                     <TestDataLoader
                         dataKey={dataKey2}
                         clientLoadOnly={clientLoadOnly}
                         renderData={(props) => {
                             this.lastRenderProps2 = props
-                            return (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        }
+                            return null
+                        }}
                     />
                 </div>
             </DataProvider>

@@ -1,206 +1,125 @@
 exports[`server side render can have two components in the same render tree 1`] = `
 Object {
-  "isCompleted": false,
-  "isError": false,
-  "isLoaded": false,
-  "isLoading": true,
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
   "renderCount": 1,
-}
-`;
-
-exports[`server side render can have two components in the same render tree 2`] = `
-Object {
-  "isCompleted": false,
-  "isError": false,
-  "isLoaded": false,
-  "isLoading": true,
-  "renderCount": 2,
-}
-`;
-
-exports[`server side render can have two components in the same render tree 3`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": false,
-        "failed": false,
-        "loading": true,
-      },
-    },
+  "renderCount2": 1,
+  "renderProps1": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
   },
-  "loadingCount": 1,
+  "renderProps2": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
+  },
 }
 `;
 
 exports[`server side render does not render on the server if clientLoadOnlySet 1`] = `
 Object {
-  "data": Object {},
-  "loadingCount": 0,
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 0,
+  "renderCount": 0,
+  "renderProps": undefined,
 }
 `;
 
 exports[`server side render multiple data loaders with same key should not load data multiple times 1`] = `
 Object {
-  "isCompleted": false,
-  "isError": false,
-  "isLoaded": false,
-  "isLoading": true,
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
   "renderCount": 1,
-}
-`;
-
-exports[`server side render multiple data loaders with same key should not load data multiple times 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": false,
-        "failed": false,
-        "loading": true,
-      },
-    },
+  "renderProps": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
   },
-  "loadingCount": 1,
 }
 `;
 
 exports[`server side render second SSR with two components in same tree uses data 1`] = `
 Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Success!",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
-  "renderCount": 1,
-}
-`;
-
-exports[`server side render second SSR with two components in same tree uses data 2`] = `
-Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Success!",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
   "renderCount": 2,
-}
-`;
-
-exports[`server side render second SSR with two components in same tree uses data 3`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Success!",
-        },
-        "dataFromServerSideRender": true,
-        "failed": false,
-        "loading": false,
-      },
+  "renderCount2": 2,
+  "renderProps1": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Success!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
+  "renderProps2": Object {
+    "actions": Object {
+      "refresh": [Function],
+    },
+    "data": Object {
+      "result": "Success!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
+  },
 }
 `;
 
 exports[`server side render should pass failure when data load fails 1`] = `
 Object {
-  "errorMessage": "Boom!",
-  "isCompleted": true,
-  "isError": true,
-  "isLoaded": false,
-  "isLoading": false,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
   "renderCount": 2,
-}
-`;
-
-exports[`server side render should pass failure when data load fails 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": true,
-        "error": "Boom!",
-        "failed": true,
-        "loading": false,
-      },
-    },
+  "renderProps": Object {
+    "errorMessage": "Boom!",
+    "isCompleted": true,
+    "isError": true,
+    "isLoaded": false,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`server side render should pass loaded data once promise resolves 1`] = `
 Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Success!",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
   "renderCount": 2,
-}
-`;
-
-exports[`server side render should pass loaded data once promise resolves 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Success!",
-        },
-        "dataFromServerSideRender": true,
-        "failed": false,
-        "loading": false,
-      },
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Success!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`server side render should start loading data if not loaded 1`] = `
 Object {
-  "isCompleted": false,
-  "isError": false,
-  "isLoaded": false,
-  "isLoading": true,
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
   "renderCount": 1,
-}
-`;
-
-exports[`server side render should start loading data if not loaded 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": false,
-        "failed": false,
-        "loading": true,
-      },
-    },
+  "renderProps": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
   },
-  "loadingCount": 1,
 }
 `;

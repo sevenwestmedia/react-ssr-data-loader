@@ -6,12 +6,12 @@ import DataLoaderResources from '../../src/data-loader-resources'
 import { DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
-import Verifier from './verifier'
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
+    renderCount2 = 0
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
@@ -44,21 +44,19 @@ export default class ComponentFixture {
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
                         renderData={(props) => {
+                            this.renderCount++
                             this.lastRenderProps = props
-                            return (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        }
+                            return null
+                        }}
                     />
                     <TestDataLoader
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
                         renderData={(props) => {
+                            this.renderCount2++
                             this.lastRenderProps2 = props
-                            return (
-                                <Verifier {...props} renderCount={++this.renderCount} />
-                            )}
-                        }
+                            return null
+                        }}
                     />
                 </div>
             </DataProvider>
@@ -72,6 +70,7 @@ export default class ComponentFixture {
     assertState() {
         expect({
             renderCount: this.renderCount,
+            renderCount2: this.renderCount2,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps1: this.lastRenderProps,
             renderProps2: this.lastRenderProps2,

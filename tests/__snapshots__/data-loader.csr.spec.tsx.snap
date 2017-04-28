@@ -1,173 +1,122 @@
 exports[`Client side render client render after SSR with data should not fetch data 1`] = `
 Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Success!",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
-  "renderCount": 2,
-}
-`;
-
-exports[`Client side render client render after SSR with data should not fetch data 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Success!",
-        },
-        "dataFromServerSideRender": true,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 0,
+  "renderCount": 1,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Success!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`Client side render loads data when props change 1`] = `
 Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Success2!",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
+  "loadAllCompletedCalled": 2,
+  "loadDataCount": 2,
   "renderCount": 4,
-}
-`;
-
-exports[`Client side render loads data when props change 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "newData": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Success2!",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Success2!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`Client side render should ignore completion once component is unmounted 1`] = `
 Object {
-  "data": Object {},
-  "loadingCount": 1,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 1,
+  "renderProps": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
+  },
 }
 `;
 
 exports[`Client side render should pass failure when data load fails 1`] = `
 Object {
-  "errorMessage": "Boom!",
-  "isCompleted": true,
-  "isError": true,
-  "isLoaded": false,
-  "isLoading": false,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
   "renderCount": 2,
-}
-`;
-
-exports[`Client side render should pass failure when data load fails 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": true,
-        "error": "Boom!",
-        "failed": true,
-        "loading": false,
-      },
-    },
+  "renderProps": Object {
+    "errorMessage": "Boom!",
+    "isCompleted": true,
+    "isError": true,
+    "isLoaded": false,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`Client side render should pass loaded data once promise resolves 1`] = `
 Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Success!",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
   "renderCount": 2,
-}
-`;
-
-exports[`Client side render should pass loaded data once promise resolves 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Success!",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Success!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`Client side render should remove data from redux when unmounted 1`] = `
 Object {
-  "data": Object {},
-  "loadingCount": 0,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 2,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
+    },
+    "data": Object {
+      "result": "Success!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
+  },
 }
 `;
 
 exports[`Client side render should start loading data if not loaded 1`] = `
 Object {
-  "isCompleted": false,
-  "isError": false,
-  "isLoaded": false,
-  "isLoading": true,
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
   "renderCount": 1,
-}
-`;
-
-exports[`Client side render should start loading data if not loaded 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": false,
-        "failed": false,
-        "loading": true,
-      },
-    },
+  "renderProps": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
   },
-  "loadingCount": 1,
 }
 `;

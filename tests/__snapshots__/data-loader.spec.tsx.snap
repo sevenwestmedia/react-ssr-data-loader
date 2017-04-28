@@ -2,7 +2,7 @@ exports[`data-loader can load multiple dataloaders with different keys 1`] = `
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 2,
-  "renderCount": 3,
+  "renderCount": 2,
   "renderProps": Object {
     "actions": Object {
       "refresh": [Function],
@@ -68,7 +68,8 @@ exports[`data-loader can resolve data from multiple components 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
-  "renderCount": 4,
+  "renderCount": 2,
+  "renderCount2": 2,
   "renderProps1": Object {
     "actions": Object {
       "refresh": [Function],
@@ -82,6 +83,26 @@ Object {
     "isLoading": false,
   },
   "renderProps2": Object {
+    "actions": Object {
+      "refresh": [Function],
+    },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
+  },
+}
+`;
+
+exports[`data-loader can specify arguments for data loader 1`] = `
+Object {
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 2,
+  "renderProps": Object {
     "actions": Object {
       "refresh": [Function],
     },
@@ -154,7 +175,8 @@ exports[`data-loader multiple components load data once when props change 1`] = 
 Object {
   "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
-  "renderCount": 8,
+  "renderCount": 4,
+  "renderCount2": 4,
   "renderProps1": Object {
     "actions": Object {
       "refresh": [Function],
@@ -186,7 +208,8 @@ exports[`data-loader supports multiple loaders using the same key when data load
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 1,
-  "renderCount": 2,
+  "renderCount": 1,
+  "renderCount2": 1,
   "renderProps1": Object {
     "isCompleted": false,
     "isError": false,

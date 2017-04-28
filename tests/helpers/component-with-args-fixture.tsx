@@ -6,7 +6,6 @@ import DataLoaderResources from '../../src/data-loader-resources'
 import { reducer, DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
-import Verifier from './verifier'
 
 export default class ComponentFixture<T extends object> {
     loadAllCompletedCalled = 0
@@ -18,6 +17,7 @@ export default class ComponentFixture<T extends object> {
     resources: DataLoaderResources
     passedParams: T
     currentState: DataLoaderState
+    lastRenderProps: LoadedState<Data, {}>
 
     constructor(initialState: DataLoaderState, dataKey: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
@@ -43,9 +43,12 @@ export default class ComponentFixture<T extends object> {
                     {...args}
                     dataKey={dataKey}
                     clientLoadOnly={clientLoadOnly}
-                    renderData={(props) => (
-                        <Verifier {...props} renderCount={++this.renderCount} />
-                    )}
+                    renderData={(props) => {
+                        this.renderCount++
+                        this.lastRenderProps = props
+
+                        return null
+                    }}
                 />
             </DataProvider>
         )
@@ -53,6 +56,15 @@ export default class ComponentFixture<T extends object> {
         this.root = mount(<TestComponent dataKey={dataKey} />)
 
         this.component = this.root.find(TestDataLoader)
+    }
+
+    assertState() {
+        expect({
+            renderCount: this.renderCount,
+            loadAllCompletedCalled: this.loadAllCompletedCalled,
+            renderProps: this.lastRenderProps,
+            loadDataCount: this.loadDataCount
+        }).toMatchSnapshot()
     }
 
     resetPromise() {

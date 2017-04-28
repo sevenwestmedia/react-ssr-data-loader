@@ -10,10 +10,6 @@ export interface Data {
     result: string
 }
 
-export const Verifier: React.SFC<LoadedState & {
-    renderCount: number
-}> = (loadedState) => (<noscript />)
-
 export default class ComponentFixture {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
@@ -21,6 +17,7 @@ export default class ComponentFixture {
     component: ReactWrapper<any, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
+    lastRenderProps: LoadedState
 
     constructor() {
         this.testDataPromise = new PromiseCompletionSource<Data>()
@@ -42,9 +39,11 @@ export default class ComponentFixture {
                         renderData={(props) => (<div />)}
                     />
                     <IsLoading
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
+                        renderData={(props) => {
+                            this.lastRenderProps = props
+                            ++this.renderCount
+                            return null
+                        }}
                     />
                 </div>
             </DataProvider>
@@ -53,6 +52,13 @@ export default class ComponentFixture {
         this.root = mount(<TestComponent />)
 
         this.component = this.root.find(IsLoading)
+    }
+
+    assertState() {
+        expect({
+            renderCount: this.renderCount,
+            renderProps: this.lastRenderProps,
+        }).toMatchSnapshot()
     }
 
     resetPromise() {

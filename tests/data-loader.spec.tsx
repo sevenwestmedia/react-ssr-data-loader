@@ -8,7 +8,6 @@ import PagedComponentFixture from './helpers/paged-component-fixture'
 import ComponentWithArgsFixture from './helpers/component-with-args-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
-import Verifier from './helpers/verifier'
 
 describe('data-loader', () => {
     it('supports multiple loaders using the same key when data loading', async () => {
@@ -65,6 +64,7 @@ describe('data-loader', () => {
         await sut.testDataPromise.resolve({ result: 'Test' })
 
         expect(sut.passedParams).toEqual(foo)
+        sut.assertState()
     })
 
     it('can refresh data', async () => {
