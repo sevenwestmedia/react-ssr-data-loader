@@ -4,22 +4,28 @@ Object {
   "loadDataCount": 2,
   "renderCount": 2,
   "renderProps": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test",
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
   "renderProps2": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
 }
 `;
@@ -28,18 +34,23 @@ exports[`data-loader can refresh data 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 2,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 3,
   "renderProps": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test",
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 3,
   },
 }
 `;
@@ -48,18 +59,23 @@ exports[`data-loader can refresh data 2`] = `
 Object {
   "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 4,
   "renderProps": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test2",
+      "data": Object {
+        "result": "Test2",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "page",
+    },
+    "status": 0,
   },
 }
 `;
@@ -71,28 +87,32 @@ Object {
   "renderCount": 2,
   "renderCount2": 2,
   "renderProps1": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test",
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
   "renderProps2": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test",
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -101,18 +121,23 @@ exports[`data-loader can specify arguments for data loader 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 2,
   "renderProps": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test",
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -121,18 +146,23 @@ exports[`data-loader can support preserving data on unmount 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 2,
   "renderProps": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test",
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -141,18 +171,23 @@ exports[`data-loader can support preserving data on unmount 2`] = `
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 1,
   "renderProps": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Test",
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -161,12 +196,17 @@ exports[`data-loader ignores completion if unmounted first 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
+  "renderActions": undefined,
   "renderCount": 1,
   "renderProps": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
 }
 `;
@@ -178,28 +218,32 @@ Object {
   "renderCount": 4,
   "renderCount2": 4,
   "renderProps1": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Success2!",
+      "data": Object {
+        "result": "Success2!",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
   "renderProps2": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Success2!",
+      "data": Object {
+        "result": "Success2!",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -211,16 +255,24 @@ Object {
   "renderCount": 1,
   "renderCount2": 1,
   "renderProps1": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
   "renderProps2": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
 }
 `;
@@ -229,22 +281,27 @@ exports[`data-loader supports paged data 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
+  "renderActions": Object {
+    "nextPage": [Function],
+    "refresh": [Function],
+  },
   "renderCount": 2,
   "renderProps": Object {
-    "actions": Object {
-      "nextPage": [Function],
-      "refresh": [Function],
-    },
     "data": Object {
-      "data": Array [
-        "Test",
-      ],
-      "pageNumber": 1,
+      "data": Object {
+        "data": Array [
+          "Test",
+        ],
+        "pageNumber": 1,
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -253,22 +310,27 @@ exports[`data-loader supports paged data 2`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 2,
+  "renderActions": Object {
+    "nextPage": [Function],
+    "refresh": [Function],
+  },
   "renderCount": 3,
   "renderProps": Object {
-    "actions": Object {
-      "nextPage": [Function],
-      "refresh": [Function],
-    },
     "data": Object {
-      "data": Array [
-        "Test",
-      ],
-      "pageNumber": 1,
+      "data": Object {
+        "data": Array [
+          "Test",
+        ],
+        "pageNumber": 1,
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 3,
   },
 }
 `;
@@ -277,23 +339,28 @@ exports[`data-loader supports paged data 3`] = `
 Object {
   "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
+  "renderActions": Object {
+    "nextPage": [Function],
+    "refresh": [Function],
+  },
   "renderCount": 4,
   "renderProps": Object {
-    "actions": Object {
-      "nextPage": [Function],
-      "refresh": [Function],
-    },
     "data": Object {
-      "data": Array [
-        "Test",
-        "Test2",
-      ],
-      "pageNumber": 1,
+      "data": Object {
+        "data": Array [
+          "Test",
+          "Test2",
+        ],
+        "pageNumber": 1,
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "page",
+    },
+    "status": 0,
   },
 }
 `;

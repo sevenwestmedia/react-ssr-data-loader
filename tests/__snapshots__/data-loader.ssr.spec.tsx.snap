@@ -5,16 +5,24 @@ Object {
   "renderCount": 1,
   "renderCount2": 1,
   "renderProps1": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
   "renderProps2": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
 }
 `;
@@ -23,6 +31,7 @@ exports[`server side render does not render on the server if clientLoadOnlySet 1
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
+  "renderActions": undefined,
   "renderCount": 0,
   "renderProps": undefined,
 }
@@ -32,12 +41,17 @@ exports[`server side render multiple data loaders with same key should not load 
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 1,
+  "renderActions": undefined,
   "renderCount": 1,
   "renderProps": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
 }
 `;
@@ -49,28 +63,32 @@ Object {
   "renderCount": 2,
   "renderCount2": 2,
   "renderProps1": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Success!",
+      "data": Object {
+        "result": "Success!",
+      },
+      "dataFromServerSideRender": true,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
   "renderProps2": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Success!",
+      "data": Object {
+        "result": "Success!",
+      },
+      "dataFromServerSideRender": true,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -79,13 +97,18 @@ exports[`server side render should pass failure when data load fails 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
+  "renderActions": undefined,
   "renderCount": 2,
   "renderProps": Object {
-    "errorMessage": "Boom!",
-    "isCompleted": true,
-    "isError": true,
-    "isLoaded": false,
-    "isLoading": false,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "error": "Boom!",
+      "success": false,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -94,18 +117,23 @@ exports[`server side render should pass loaded data once promise resolves 1`] = 
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 2,
   "renderProps": Object {
-    "actions": Object {
-      "refresh": [Function],
-    },
     "data": Object {
-      "result": "Success!",
+      "data": Object {
+        "result": "Success!",
+      },
+      "dataFromServerSideRender": true,
+      "hasData": true,
     },
-    "isCompleted": true,
-    "isError": false,
-    "isLoaded": true,
-    "isLoading": false,
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
   },
 }
 `;
@@ -114,12 +142,17 @@ exports[`server side render should start loading data if not loaded 1`] = `
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 1,
+  "renderActions": undefined,
   "renderCount": 1,
   "renderProps": Object {
-    "isCompleted": false,
-    "isError": false,
-    "isLoaded": false,
-    "isLoading": true,
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
   },
 }
 `;

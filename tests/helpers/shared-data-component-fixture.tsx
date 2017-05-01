@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState, createTypedDataLoader } from '../../src/data-loader'
+import { Props, createTypedDataLoader } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
 
@@ -18,8 +18,8 @@ export default class ComponentFixture {
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
-    lastRenderProps: LoadedState<Data, {}>
-    lastRenderProps2: LoadedState<Data, {}>
+    lastRenderProps: LoaderState<Data>
+    lastRenderProps2: LoaderState<Data>
 
     constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState

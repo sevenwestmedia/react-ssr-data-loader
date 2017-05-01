@@ -11,14 +11,14 @@ export type FailedAction = {
 
 export enum LoaderStatus { // The loader is ________ (the data/resource)
     /**
-     * The loader has been instantiated and is fetching the resource for the first time
-     */
-    Fetching = 0,
-
-    /**
      * The loader is inactive -- not performing any action
      */
-    Idle = 1,
+    Idle = 0,
+
+    /**
+     * The loader has been instantiated and is fetching the resource for the first time
+     */
+    Fetching = 1,
 
     /**
      * The loader is re-fetching the resource

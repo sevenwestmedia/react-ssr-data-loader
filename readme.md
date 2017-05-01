@@ -99,3 +99,8 @@ The `DataProvider` is the component which is responsible for actually fetching t
 ### TODOS
  - Error handling hooks
  - Gracefully handle if no data loader keys are present
+
+### Things to consider/discuss
+ - Should renderProps/actions be the same object?
+    - If so, how do we ensure shallow compare works on state?
+ - Should we version the state, making it easy to shallow compare/give react hints

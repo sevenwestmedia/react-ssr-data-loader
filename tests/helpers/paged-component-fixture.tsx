@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState } from '../../src/data-loader'
+import { Props, BuiltInActions } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { PageActions, Paging } from '../../src/data-loader-resources'
-import { DataLoaderState } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderState, LoaderStatus } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 
 interface DataResource {}
@@ -12,12 +12,13 @@ export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps: LoadedState<DataResource, PageActions>
+    lastRenderProps: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<Props<DataResource, PageActions>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
+    lastRenderActions: PageActions & BuiltInActions
 
     constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
@@ -47,9 +48,10 @@ export default class ComponentFixture {
                     dataKey={dataKey}
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
-                    renderData={(props) => {
+                    renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
+                        this.lastRenderActions = actions
                         return null
                     }}
                 />
@@ -62,18 +64,18 @@ export default class ComponentFixture {
     }
 
     refreshData() {
-        if (this.lastRenderProps.isLoaded) {
+        if (this.lastRenderProps.status === LoaderStatus.Idle) {
             this.resetPromise()
-            this.lastRenderProps.actions.refresh()
+            this.lastRenderActions.refresh()
         } else {
             throw new Error('Not in success state, can\'t refresh')
         }
     }
 
     nextPage() {
-        if (this.lastRenderProps.isLoaded) {
+        if (this.lastRenderProps.status === LoaderStatus.Idle) {
             this.resetPromise()
-            this.lastRenderProps.actions.nextPage()
+            this.lastRenderActions.nextPage()
         } else {
             throw new Error('Not in success state, can\'t refresh')
         }
@@ -84,6 +86,7 @@ export default class ComponentFixture {
             renderCount: this.renderCount,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
+            renderActions: this.lastRenderActions,
             loadDataCount: this.loadDataCount
         }).toMatchSnapshot()
     }

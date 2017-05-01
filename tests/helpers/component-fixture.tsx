@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState } from '../../src/data-loader'
-import DataProvider from '../../src/data-provider'
+import { Props, BuiltInActions } from '../../src/data-loader'
+import DataProvider, { LoaderState } from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState, reducer } from '../../src/data-loader-actions'
+import { DataLoaderState, reducer, LoaderStatus } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
 
@@ -22,7 +22,8 @@ export default class ComponentFixture {
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
-    lastRenderProps: LoadedState<Data, {}>
+    lastRenderProps: LoaderState<Data>
+    lastRenderActions: BuiltInActions
 
     constructor(initialState: DataLoaderState, dataKey: string, options: FixtureOptions) {
         this.currentState = initialState
@@ -46,9 +47,10 @@ export default class ComponentFixture {
                     dataKey={dataKey}
                     clientLoadOnly={options.clientLoadOnly}
                     unloadDataOnUnmount={options.unloadDataOnUnmount}
-                    renderData={(props) => {
+                    renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
+                        this.lastRenderActions = actions
                         return null
                     }}
                 />
@@ -65,14 +67,15 @@ export default class ComponentFixture {
             renderCount: this.renderCount,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
+            renderActions: this.lastRenderActions,
             loadDataCount: this.loadDataCount
         }).toMatchSnapshot()
     }
 
     refreshData() {
-        if (this.lastRenderProps.isLoaded) {
+        if (this.lastRenderProps.status === LoaderStatus.Idle) {
             this.resetPromise()
-            this.lastRenderProps.actions.refresh()
+            this.lastRenderActions.refresh()
         } else {
             throw new Error('Not in success state, can\'t refresh')
         }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { LoadedState, createTypedDataLoader } from '../src/data-loader'
+import { createTypedDataLoader } from '../src/data-loader'
 import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'

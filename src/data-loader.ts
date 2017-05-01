@@ -1,52 +1,27 @@
 import * as React from 'react'
-import { LoaderStatus } from './data-loader-actions'
 import { DataLoaderContext, LoaderState } from './data-provider'
 
-export interface SuccessLoadedState<T, TActions> {
-    isCompleted: true
-    isLoaded: true
-    isLoading: false
-    isError: false
-    data: T
-    actions: TActions & BuiltInActions
-}
-export interface ErrorLoadedState {
-    isCompleted: true
-    isLoaded: false
-    isLoading: false
-    isError: true
-    errorMessage: string
-}
-export interface BeforeLoadingState {
-    isCompleted: false
-    isLoaded: false
-    isLoading: false
-    isError: false
-}
-export interface LoadingState {
-    isCompleted: false
-    isLoaded: false
-    isLoading: true
-    isError: false
-}
-
-export type LoadedState<T, TActions> = SuccessLoadedState<T, TActions> | BeforeLoadingState| ErrorLoadedState | LoadingState
-
 export interface RenderData<T, TActions> {
-    (loaderProps: LoadedState<T, TActions>, ): React.ReactElement<any> | null
+    (loaderProps: LoaderState<T>, actions?: TActions): React.ReactElement<any> | null
 }
 export interface Props<T, TActions> {
     dataKey: string
     clientLoadOnly?: boolean
     unloadDataOnUnmount?: boolean // defaults to true
-    renderData: RenderData<T, TActions>
+    renderData: RenderData<T, TActions & BuiltInActions>
 }
 
 export interface BuiltInActions {
     refresh: () => void
 }
 
-// @TODO This is a decent blog post or something in itself, generic react components are hard..
+type State<T> = {
+    loaderState: LoaderState<T>
+}
+
+// This function is because it's hard to consume open generic React Components and you have to
+// create a wrapping function anyway. 
+// TODO because the data loader is created when registering resources, can we remove this?
 export function createTypedDataLoader<T, TLoadArgs extends object, TActions extends object>(
     dataType: string,
     actions: (
@@ -55,19 +30,12 @@ export function createTypedDataLoader<T, TLoadArgs extends object, TActions exte
         handleStateUpdates: (loadedState: LoaderState<T>) => void
     ) => TActions
 ) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
-    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, LoadedState<T, TActions & BuiltInActions>> {
+    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, State<T>> {
         context: { dataLoader: DataLoaderContext }
         private _isMounted: boolean
 
         static contextTypes = {
             dataLoader: React.PropTypes.object
-        }
-
-        state: LoadedState<T, TActions & BuiltInActions> = {
-            isCompleted: false,
-            isLoading: false,
-            isLoaded: false,
-            isError: false
         }
 
         async componentWillMount(): Promise<void> {
@@ -112,35 +80,9 @@ export function createTypedDataLoader<T, TLoadArgs extends object, TActions exte
         }
 
         private handleStateUpdate = (loadedState: LoaderState<T>): void => {
-            let newState: LoadedState<T, TActions & BuiltInActions>
-
-            if (loadedState && loadedState.status === LoaderStatus.Idle && !loadedState.lastAction.success) {
-                newState = {
-                    isCompleted: true,
-                    isLoaded: false,
-                    isLoading: false,
-                    isError: true,
-                    errorMessage: loadedState.lastAction.error,
-                }
-            } else if (loadedState && loadedState.status === LoaderStatus.Idle && loadedState.data.hasData) {
-                newState = {
-                    isCompleted: true,
-                    isLoaded: true,
-                    isLoading: false,
-                    isError: false,
-                    data: loadedState.data.data,
-                    actions: this.actions,
-                }
-            } else {
-                newState = {
-                    isCompleted: false,
-                    isLoaded: false,
-                    isLoading: true,
-                    isError: false,
-                }
-            }
-
-            this.setState(newState)
+            this.setState({
+                loaderState: loadedState,
+            })
         }
 
         private actions: TActions & BuiltInActions = {
@@ -153,7 +95,10 @@ export function createTypedDataLoader<T, TLoadArgs extends object, TActions exte
                 return null
             }
 
-            return this.props.renderData(this.state)
+            return this.props.renderData(
+                this.state.loaderState,
+                this.state.loaderState.data.hasData ? this.actions : undefined
+            )
         }
     }
 

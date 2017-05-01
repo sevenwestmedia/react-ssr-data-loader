@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState } from '../../src/data-loader'
+import { Props, BuiltInActions } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { reducer, DataLoaderState } from '../../src/data-loader-actions'
+import { reducer, DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
 
@@ -17,7 +17,8 @@ export default class ComponentFixture<T extends object> {
     resources: DataLoaderResources
     passedParams: T
     currentState: DataLoaderState
-    lastRenderProps: LoadedState<Data, {}>
+    lastRenderProps: LoaderState<Data>
+    lastRenderActions: BuiltInActions
 
     constructor(initialState: DataLoaderState, dataKey: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
@@ -43,9 +44,10 @@ export default class ComponentFixture<T extends object> {
                     {...args}
                     dataKey={dataKey}
                     clientLoadOnly={clientLoadOnly}
-                    renderData={(props) => {
+                    renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
+                        this.lastRenderActions = actions
 
                         return null
                     }}
@@ -63,6 +65,7 @@ export default class ComponentFixture<T extends object> {
             renderCount: this.renderCount,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
+            renderActions: this.lastRenderActions,
             loadDataCount: this.loadDataCount
         }).toMatchSnapshot()
     }
