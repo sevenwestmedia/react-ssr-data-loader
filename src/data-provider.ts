@@ -30,7 +30,7 @@ export interface MetaData<TArgs> {
 
 export type DataUpdateCallback = (newState: LoaderState<any>) => void
 export type StateSubscription = (state: DataLoaderState) => void
-const ssrNeedsData = (state: LoaderState<any> | undefined) => !state || !state.data.hasData
+const ssrNeedsData = (state: LoaderState<any> | undefined) => !state || (!state.data.hasData && state.lastAction.success)
 
 export interface DataLoaderContext {
     isServerSideRender: boolean

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { DataLoaderContext, LoaderDataState } from './data-provider'
+import { LoaderStatus } from './data-loader-actions'
+import { DataLoaderContext, LoaderState } from './data-provider'
 
 export interface SuccessLoadedState<T, TActions> {
     isCompleted: true
@@ -51,7 +52,7 @@ export function createTypedDataLoader<T, TLoadArgs extends object, TActions exte
     actions: (
         dataLoader: DataLoaderContext,
         props: Props<T, TActions> & TLoadArgs,
-        handleStateUpdates: (loadedState: LoaderDataState) => void
+        handleStateUpdates: (loadedState: LoaderState<T>) => void
     ) => TActions
 ) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
     class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, LoadedState<T, TActions & BuiltInActions>> {
@@ -110,24 +111,24 @@ export function createTypedDataLoader<T, TLoadArgs extends object, TActions exte
             }
         }
 
-        private handleStateUpdate = (loadedState: LoaderDataState): void => {
+        private handleStateUpdate = (loadedState: LoaderState<T>): void => {
             let newState: LoadedState<T, TActions & BuiltInActions>
 
-            if (loadedState && loadedState.completed && loadedState.failed) {
+            if (loadedState && loadedState.status === LoaderStatus.Idle && !loadedState.lastAction.success) {
                 newState = {
                     isCompleted: true,
                     isLoaded: false,
                     isLoading: false,
                     isError: true,
-                    errorMessage: loadedState.error,
+                    errorMessage: loadedState.lastAction.error,
                 }
-            } else if (loadedState && loadedState.completed && loadedState.failed === false) {
+            } else if (loadedState && loadedState.status === LoaderStatus.Idle && loadedState.data.hasData) {
                 newState = {
                     isCompleted: true,
                     isLoaded: true,
                     isLoading: false,
                     isError: false,
-                    data: loadedState.data,
+                    data: loadedState.data.data,
                     actions: this.actions,
                 }
             } else {
