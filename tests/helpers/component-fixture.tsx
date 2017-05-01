@@ -6,7 +6,6 @@ import DataLoaderResources from '../../src/data-loader-resources'
 import { DataLoaderState, reducer } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
-import Verifier from './verifier'
 
 interface FixtureOptions {
     isServerSideRender: boolean
@@ -18,12 +17,12 @@ export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps: LoadedState<Data, {}>
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
+    lastRenderProps: LoadedState<Data, {}>
 
     constructor(initialState: DataLoaderState, dataKey: string, options: FixtureOptions) {
         this.currentState = initialState
@@ -48,11 +47,10 @@ export default class ComponentFixture {
                     clientLoadOnly={options.clientLoadOnly}
                     unloadDataOnUnmount={options.unloadDataOnUnmount}
                     renderData={(props) => {
+                        this.renderCount++
                         this.lastRenderProps = props
-                        return (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
-                    }
+                        return null
+                    }}
                 />
             </DataProvider>
         )
@@ -60,6 +58,15 @@ export default class ComponentFixture {
         this.root = mount(<TestComponent dataKey={dataKey} />)
 
         this.component = this.root.find(TestDataLoader)
+    }
+
+    assertState() {
+        expect({
+            renderCount: this.renderCount,
+            loadAllCompletedCalled: this.loadAllCompletedCalled,
+            renderProps: this.lastRenderProps,
+            loadDataCount: this.loadDataCount
+        }).toMatchSnapshot()
     }
 
     refreshData() {

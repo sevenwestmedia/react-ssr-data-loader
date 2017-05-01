@@ -6,18 +6,20 @@ import DataLoaderResources from '../../src/data-loader-resources'
 import { DataLoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, dataType } from './test-data'
-import Verifier from './verifier'
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
+    renderCount2 = 0
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ dataKey: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
+    lastRenderProps: LoadedState<Data, {}>
+    lastRenderProps2: LoadedState<Data, {}>
 
     constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
@@ -41,16 +43,20 @@ export default class ComponentFixture {
                     <TestDataLoader
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
+                        renderData={(props) => {
+                            this.renderCount++
+                            this.lastRenderProps = props
+                            return null
+                        }}
                     />
                     <TestDataLoader
                         dataKey={dataKey}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => (
-                            <Verifier {...props} renderCount={++this.renderCount} />
-                        )}
+                        renderData={(props) => {
+                            this.renderCount2++
+                            this.lastRenderProps2 = props
+                            return null
+                        }}
                     />
                 </div>
             </DataProvider>
@@ -59,6 +65,17 @@ export default class ComponentFixture {
         this.root = mount(<TestComponent dataKey={dataKey} />)
 
         this.component = this.root.find(TestDataLoader)
+    }
+
+    assertState() {
+        expect({
+            renderCount: this.renderCount,
+            renderCount2: this.renderCount2,
+            loadAllCompletedCalled: this.loadAllCompletedCalled,
+            renderProps1: this.lastRenderProps,
+            renderProps2: this.lastRenderProps2,
+            loadDataCount: this.loadDataCount
+        }).toMatchSnapshot()
     }
 
     resetPromise() {

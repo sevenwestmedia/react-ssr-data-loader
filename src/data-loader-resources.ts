@@ -51,7 +51,7 @@ export default class DataLoaderResources {
     ): React.ComponentClass<Props<PagedData<TData>, PageActions> & { paging: Paging }> {
         const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageProps, PageActions>(
             dataType,
-            (dataLoaderContext, props, handleUpdate) => {
+            (dataLoaderContext, props, _handleUpdate) => {
                 const metadata = {
                     dataType,
                     dataKey: props.dataKey,

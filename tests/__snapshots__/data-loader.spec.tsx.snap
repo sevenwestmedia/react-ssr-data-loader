@@ -1,291 +1,299 @@
 exports[`data-loader can load multiple dataloaders with different keys 1`] = `
 Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Test",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
-  "renderCount": 3,
-}
-`;
-
-exports[`data-loader can load multiple dataloaders with different keys 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Test",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
-      "testKey2": Object {
-        "completed": false,
-        "failed": false,
-        "loading": true,
-      },
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 2,
+  "renderCount": 2,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 1,
+  "renderProps2": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
+  },
 }
 `;
 
 exports[`data-loader can refresh data 1`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": false,
-        "failed": false,
-        "loading": true,
-      },
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 2,
+  "renderCount": 3,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
   },
-  "loadingCount": 1,
 }
 `;
 
 exports[`data-loader can refresh data 2`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Test2",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 2,
+  "loadDataCount": 2,
+  "renderCount": 4,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Test2",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`data-loader can resolve data from multiple components 1`] = `
 Object {
-  "actions": Object {
-    "refresh": [Function],
-  },
-  "data": Object {
-    "result": "Test",
-  },
-  "isCompleted": true,
-  "isError": false,
-  "isLoaded": true,
-  "isLoading": false,
-  "renderCount": 3,
-}
-`;
-
-exports[`data-loader can resolve data from multiple components 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Test",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 2,
+  "renderCount2": 2,
+  "renderProps1": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
+  "renderProps2": Object {
+    "actions": Object {
+      "refresh": [Function],
+    },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
+  },
 }
 `;
 
 exports[`data-loader can specify arguments for data loader 1`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Test",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 2,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`data-loader can support preserving data on unmount 1`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Test",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 2,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`data-loader can support preserving data on unmount 2`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Test",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 0,
+  "renderCount": 1,
+  "renderProps": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Test",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`data-loader ignores completion if unmounted first 1`] = `
 Object {
-  "data": Object {},
-  "loadingCount": 1,
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 1,
+  "renderProps": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
+  },
 }
 `;
 
 exports[`data-loader multiple components load data once when props change 1`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "newData": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "result": "Success2!",
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 2,
+  "loadDataCount": 2,
+  "renderCount": 4,
+  "renderCount2": 4,
+  "renderProps1": Object {
+    "actions": Object {
+      "refresh": [Function],
     },
+    "data": Object {
+      "result": "Success2!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
+  "renderProps2": Object {
+    "actions": Object {
+      "refresh": [Function],
+    },
+    "data": Object {
+      "result": "Success2!",
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
+  },
 }
 `;
 
 exports[`data-loader supports multiple loaders using the same key when data loading 1`] = `
 Object {
-  "isCompleted": false,
-  "isError": false,
-  "isLoaded": false,
-  "isLoading": true,
-  "renderCount": 2,
-}
-`;
-
-exports[`data-loader supports multiple loaders using the same key when data loading 2`] = `
-Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": false,
-        "failed": false,
-        "loading": true,
-      },
-    },
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
+  "renderCount": 1,
+  "renderCount2": 1,
+  "renderProps1": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
   },
-  "loadingCount": 1,
+  "renderProps2": Object {
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
+  },
 }
 `;
 
 exports[`data-loader supports paged data 1`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "data": Array [
-            "Test",
-          ],
-          "pageNumber": 1,
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderCount": 2,
+  "renderProps": Object {
+    "actions": Object {
+      "nextPage": [Function],
+      "refresh": [Function],
     },
+    "data": Object {
+      "data": Array [
+        "Test",
+      ],
+      "pageNumber": 1,
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;
 
 exports[`data-loader supports paged data 2`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "completed": false,
-        "data": Object {
-          "data": Array [
-            "Test",
-          ],
-          "pageNumber": 1,
-        },
-        "failed": false,
-        "loading": true,
-      },
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 2,
+  "renderCount": 3,
+  "renderProps": Object {
+    "actions": Object {
+      "nextPage": [Function],
+      "refresh": [Function],
     },
+    "data": Object {
+      "data": Array [
+        "Test",
+      ],
+      "pageNumber": 1,
+    },
+    "isCompleted": false,
+    "isError": false,
+    "isLoaded": false,
+    "isLoading": true,
   },
-  "loadingCount": 1,
 }
 `;
 
 exports[`data-loader supports paged data 3`] = `
 Object {
-  "data": Object {
-    "testDataType": Object {
-      "testKey": Object {
-        "cached": false,
-        "completed": true,
-        "data": Object {
-          "data": Array [
-            "Test",
-            "Test2",
-          ],
-          "pageNumber": 1,
-        },
-        "dataFromServerSideRender": false,
-        "failed": false,
-        "loading": false,
-      },
+  "loadAllCompletedCalled": 2,
+  "loadDataCount": 2,
+  "renderCount": 4,
+  "renderProps": Object {
+    "actions": Object {
+      "nextPage": [Function],
+      "refresh": [Function],
     },
+    "data": Object {
+      "data": Array [
+        "Test",
+        "Test2",
+      ],
+      "pageNumber": 1,
+    },
+    "isCompleted": true,
+    "isError": false,
+    "isLoaded": true,
+    "isLoading": false,
   },
-  "loadingCount": 0,
 }
 `;

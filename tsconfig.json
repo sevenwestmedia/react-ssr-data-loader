@@ -18,6 +18,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": false,
+    "noUnusedParameters": true,
     "noUnusedLocals": true,
     "outDir": "dist",
     "rootDir": "src",
