@@ -1,51 +1,53 @@
-export interface CompletedSuccessfullyLoaderDataState {
-    cached: false
-    completed: true
-    loading: false
-    failed: false
-    dataFromServerSideRender: boolean
-    data: any
+export type SuccessAction = {
+    type: 'none' | 'initial-fetch' | 'refresh' | 'page'
+    success: true
 }
 
-export interface CachedLoaderDataState {
-    cached: true
-    completed: true
-    loading: false
-    failed: false
-    dataFromServerSideRender: boolean
-    data: any
-}
-
-export interface FailedLoaderDataState {
-    completed: true
-    loading: false
-    failed: true
+export type FailedAction = {
+    type: 'initial-fetch' | 'refresh' | 'page'
+    success: false
     error: string
 }
 
-export interface LoadingLoaderDataState {
-    completed: false
-    loading: true
-    failed: false
+export enum LoaderStatus { // The loader is ________ (the data/resource)
+    /**
+     * The loader has been instantiated and is fetching the resource for the first time
+     */
+    Fetching = 0,
+
+    /**
+     * The loader is inactive -- not performing any action
+     */
+    Idle = 1,
+
+    /**
+     * The loader is re-fetching the resource
+     */
+    Refreshing = 2,
+
+    /**
+     * The loader is fetching the next page of a resurce
+     */
+    Paging = 3,
 }
 
-export interface LoadingNextPageLoaderDataState {
-    completed: false
-    loading: true
-    failed: false
-    data: any
+export type LoaderState<TData> = {
+    status: LoaderStatus
+    lastAction: SuccessAction | FailedAction
+    /**
+     * Some kind of sentinel value so that the object doesn't become top heavy ???
+     */
+
+    data: Data<TData>
 }
 
-export type LoaderDataState = (
-    CompletedSuccessfullyLoaderDataState |
-    CachedLoaderDataState |
-    FailedLoaderDataState |
-    LoadingLoaderDataState |
-    LoadingNextPageLoaderDataState
-)
+// @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
+export type Data<TData> =
+    | { hasData: true, data: TData, dataFromServerSideRender: boolean }
+    | { hasData: false }
 
 export interface DataKeyMap {
-    [dataKey: string]: LoaderDataState
+    [dataKey: string]: LoaderState<any>
 }
 
 export interface DataLoaderState {
@@ -117,6 +119,28 @@ export type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
     | LOAD_DATA_FAILED | UNLOAD_DATA | LOAD_NEXT_DATA
     | REFRESH_DATA | NEXT_PAGE | INIT
 
+const defaultState: LoaderState<any> = {
+    data: { hasData: false },
+    status: LoaderStatus.Idle,
+    lastAction: { type: 'none', success: true }
+}
+
+const currentDataOrDefault = (meta: Meta, state: DataLoaderState): LoaderState<any> => {
+    const resourceTypeData = state.data[meta.dataType]
+    if (!resourceTypeData) { return defaultState }
+
+    const keyData = resourceTypeData[meta.dataKey]
+    if (!keyData) { return defaultState }
+
+    return keyData
+}
+
+const statusMap: { [key: number]: FailedAction['type'] } = {
+    [LoaderStatus.Paging]: 'page',
+    [LoaderStatus.Refreshing]: 'refresh',
+    [LoaderStatus.Fetching]: 'initial-fetch',
+}
+
 export const reducer = (state: DataLoaderState = {
     data: {},
     loadingCount: 0,
@@ -134,10 +158,11 @@ export const reducer = (state: DataLoaderState = {
             return newState
         }
         case LOAD_DATA: {
-            const loading: LoadingLoaderDataState = {
-                completed: false,
-                loading: true,
-                failed: false,
+            const defaultState = currentDataOrDefault(action.meta, state)
+            const loading: LoaderState<any> = {
+                status: LoaderStatus.Fetching,
+                lastAction: defaultState.lastAction, // TODO Should we always go back to idle?
+                data: defaultState.data,
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -151,11 +176,11 @@ export const reducer = (state: DataLoaderState = {
             }
         }
         case NEXT_PAGE: {
-            const loading: LoadingNextPageLoaderDataState = {
-                completed: false,
-                loading: true,
-                failed: false,
-                data: action.payload.existingData
+            const currentState = currentDataOrDefault(action.meta, state)
+            const loading: LoaderState<any> = {
+                status: LoaderStatus.Paging,
+                lastAction: { type: 'none', success: true },
+                data: currentState.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -169,24 +194,35 @@ export const reducer = (state: DataLoaderState = {
             }
         }
         case REFRESH_DATA: {
-            const stateWithCurrentRemoved = reducer(state, {
-                type: UNLOAD_DATA,
-                meta: action.meta
-            })
-            const newState = reducer(stateWithCurrentRemoved, {
-                type: LOAD_DATA,
-                meta: action.meta
-            })
-            return newState
+            const currentState = currentDataOrDefault(action.meta, state)
+            const loading: LoaderState<any> = {
+                status: LoaderStatus.Paging,
+                lastAction: { type: 'none', success: true },
+                data: currentState.data
+            }
+            return {
+                loadingCount: state.loadingCount + 1,
+                data: {
+                    ...state.data,
+                    [action.meta.dataType]: <DataKeyMap>{
+                        ...state.data[action.meta.dataType],
+                        [action.meta.dataKey]: loading
+                    }
+                }
+            }
         }
         case LOAD_DATA_COMPLETED: {
-            const completed: CompletedSuccessfullyLoaderDataState = {
-                cached: false,
-                dataFromServerSideRender: action.meta.dataFromServerSideRender,
-                completed: true,
-                loading: false,
-                failed: false,
-                data: action.payload
+            const currentState = currentDataOrDefault(action.meta, state)
+            const lastAction = statusMap[currentState.status]
+
+            const completed: LoaderState<any> = {
+                status: LoaderStatus.Idle,
+                lastAction: { type: lastAction, success: true },
+                data: {
+                    hasData: true,
+                    data: action.payload,
+                    dataFromServerSideRender: action.meta.dataFromServerSideRender
+                }
             }
             return {
                 loadingCount: state.loadingCount - 1,
@@ -200,11 +236,13 @@ export const reducer = (state: DataLoaderState = {
             }
         }
         case LOAD_DATA_FAILED: {
-            const failed: FailedLoaderDataState = {
-                completed: true,
-                loading: false,
-                failed: true,
-                error: action.payload,
+            const currentState = currentDataOrDefault(action.meta, state)
+            const lastAction = statusMap[currentState.status]
+
+            const failed: LoaderState<any> = {
+                status: LoaderStatus.Idle,
+                lastAction: { type: lastAction, success: false, error: action.payload },
+                data: currentState.data,
             }
             return {
                 loadingCount: state.loadingCount - 1,

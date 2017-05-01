@@ -1,14 +1,13 @@
 import * as React from 'react'
 import {
-    DataLoaderState, LoaderDataState, Actions, reducer,
-    CompletedSuccessfullyLoaderDataState,
+    DataLoaderState, LoaderState, Actions, reducer,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, LOAD_NEXT_DATA, REFRESH_DATA, NEXT_PAGE,
     INIT,
 } from './data-loader-actions'
 import DataLoaderResources from './data-loader-resources'
 
-export { LoaderDataState }
+export { LoaderState }
 
 export interface Props {
     initialState?: DataLoaderState
@@ -29,13 +28,9 @@ export interface MetaData<TArgs> {
     dataParams: TArgs
 }
 
-const ssrNeedsData = (state: LoaderDataState | undefined) => !state || (!state.completed && !state.loading)
-const hasValidData = (state: LoaderDataState | undefined): state is CompletedSuccessfullyLoaderDataState => (
-    !!(state && state.completed && !state.failed)
-)
-
-export type DataUpdateCallback = (newState: LoaderDataState) => void
+export type DataUpdateCallback = (newState: LoaderState<any>) => void
 export type StateSubscription = (state: DataLoaderState) => void
+const ssrNeedsData = (state: LoaderState<any> | undefined) => !state || !state.data.hasData
 
 export interface DataLoaderContext {
     isServerSideRender: boolean
@@ -112,8 +107,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
         if (!this.isServerSideRender && firstAttached) {
             // Data is left from a previous session
-            if (hasValidData(loadedState)) {
-                if (loadedState.dataFromServerSideRender) {
+            if (loadedState && loadedState.data.hasData) {
+                if (loadedState.data.dataFromServerSideRender) {
                     // TODO Need to flag data as cached
                 }
             } else {
@@ -141,8 +136,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
     async nextPage(metadata: MetaData<any>) {
         const currentState = this.getLoadedState(metadata)
-        const existingData = currentState && currentState.completed && !currentState.failed
-            ? currentState.data
+        const existingData = currentState && currentState.data.hasData
+            ? currentState.data.data
             : undefined
         this.dispatch<NEXT_PAGE>({
             type: NEXT_PAGE,
@@ -216,8 +211,8 @@ class DataLoaderContextInternal implements DataLoaderContext {
 
     private _loadData = async (metadata: MetaData<any>) => {
         const currentState = this.getLoadedState(metadata)
-        const existingData = currentState && currentState.completed && !currentState.failed
-            ? currentState.data
+        const existingData = currentState && currentState.data.hasData
+            ? currentState.data.data
             : undefined
         this.dispatch<LOAD_DATA>({
             type: LOAD_DATA,
@@ -255,7 +250,7 @@ class DataLoaderContextInternal implements DataLoaderContext {
         )
     }
 
-    private getLoadedState = (metadata: MetaData<any>): LoaderDataState | undefined => {
+    private getLoadedState = (metadata: MetaData<any>): LoaderState<any> | undefined => {
         const dataLookup = this.state.data[metadata.dataType]
         if (!dataLookup) {
             return undefined
