@@ -24,10 +24,10 @@ export default class ComponentFixture {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.testDataPromise2 = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource('dataType', (dataKey: string) => {
+        const TestDataLoader = this.resources.registerResource('dataType', (resourceId: string) => {
             return this.testDataPromise.promise
         })
-        const TestDataLoader2 = this.resources.registerResource('dataType2', (dataKey: string) => {
+        const TestDataLoader2 = this.resources.registerResource('dataType2', (resourceId: string) => {
             return this.testDataPromise2.promise
         })
         const TestComponent: React.SFC<any> = ({ }) => (
@@ -40,11 +40,11 @@ export default class ComponentFixture {
             >
                 <div>
                     <TestDataLoader
-                        dataKey={'dataKey'}
+                        resourceId='dataKey'
                         renderData={(props) => (<div />)}
                     />
                     <TestDataLoader2
-                        dataKey={'dataKey'}
+                        resourceId='dataKey'
                         renderData={(props) => (<div />)}
                     />
                     <IsLoading

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, BuiltInActions } from '../../src/data-loader'
+import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { PageActions, Paging } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState, LoaderStatus } from '../../src/data-loader-actions'
@@ -14,13 +14,13 @@ export default class ComponentFixture {
     renderCount = 0
     lastRenderProps: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
-    root: ReactWrapper<{ dataKey: string }, any>
+    root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<DataResource, PageActions>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
-    lastRenderActions: PageActions & BuiltInActions
+    lastRenderActions: PageActions
 
-    constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(initialState: DataLoaderState, resourceId: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
@@ -29,13 +29,13 @@ export default class ComponentFixture {
         }
         const TestDataLoader = this.resources.registerPagedResource<DataResource>(
             'testDataType',
-            (dataKey, paging, page) => {
+            (resourceId, paging, page) => {
                 this.loadDataCount++
                 return this.testDataPromise.promise
             }
         )
 
-        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -45,7 +45,7 @@ export default class ComponentFixture {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
-                    dataKey={dataKey}
+                    resourceId={resourceId}
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
                     renderData={(props, actions) => {
@@ -58,7 +58,7 @@ export default class ComponentFixture {
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent dataKey={dataKey} />)
+        this.root = mount(<TestComponent resourceId={resourceId} />)
 
         this.component = this.root.find(TestDataLoader)
     }

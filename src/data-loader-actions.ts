@@ -52,14 +52,14 @@ export interface DataKeyMap {
 
 export interface DataLoaderState {
     loadingCount: number
-    data: { [dataType: string]: DataKeyMap }
+    data: { [resourceType: string]: DataKeyMap }
 }
 
-export interface Meta {
-    dataType: string
-    dataKey: string
-    dataParams: any
-    dataFromServerSideRender: boolean
+export interface ResourceLoadInfo<TAdditionalParameters> {
+    resourceType: string
+    resourceId: string
+    /** Optional additional parameters required to load resource, i.e paging other */
+    resourceLoadParams?: TAdditionalParameters
 }
 
 export const INIT = 'resource-data-loader/INIT'
@@ -70,53 +70,47 @@ export interface INIT {
 export const REFRESH_DATA = 'resource-data-loader/REFRESH_DATA'
 export interface REFRESH_DATA {
     type: 'resource-data-loader/REFRESH_DATA'
-    meta: Meta
+    meta: ResourceLoadInfo<any>
 }
 
 export const NEXT_PAGE = 'resource-data-loader/NEXT_PAGE'
 export interface NEXT_PAGE {
     type: 'resource-data-loader/NEXT_PAGE'
-    meta: Meta
+    meta: ResourceLoadInfo<any>
     payload: { existingData: any }
 }
 
 export const LOAD_DATA = 'resource-data-loader/LOAD_DATA'
 export interface LOAD_DATA {
     type: 'resource-data-loader/LOAD_DATA'
-    meta: Meta
+    meta: ResourceLoadInfo<any>
 }
 
 export const LOAD_DATA_COMPLETED = 'resource-data-loader/LOAD_DATA_COMPLETED'
 export interface LOAD_DATA_COMPLETED {
     type: 'resource-data-loader/LOAD_DATA_COMPLETED'
-    meta: Meta
-    payload: any
+    meta: ResourceLoadInfo<any>
+    payload: {
+        data: any
+        dataFromServerSideRender: boolean
+    }
 }
 
 export const LOAD_DATA_FAILED = 'resource-data-loader/LOAD_DATA_FAILED'
 export interface LOAD_DATA_FAILED {
     type: 'resource-data-loader/LOAD_DATA_FAILED'
-    meta: Meta
+    meta: ResourceLoadInfo<any>
     payload: string
 }
 
 export const UNLOAD_DATA = 'resource-data-loader/UNLOAD_DATA'
 export interface UNLOAD_DATA {
     type: 'resource-data-loader/UNLOAD_DATA'
-    meta: Meta
-}
-
-export const LOAD_NEXT_DATA = 'resource-data-loader/LOAD_NEXT_DATA'
-export interface LOAD_NEXT_DATA {
-    type: 'resource-data-loader/LOAD_NEXT_DATA'
-    meta: {
-        current: Meta
-        next: Meta
-    }
+    meta: ResourceLoadInfo<any>
 }
 
 export type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
-    | LOAD_DATA_FAILED | UNLOAD_DATA | LOAD_NEXT_DATA
+    | LOAD_DATA_FAILED | UNLOAD_DATA
     | REFRESH_DATA | NEXT_PAGE | INIT
 
 const defaultState: LoaderState<any> = {
@@ -125,11 +119,11 @@ const defaultState: LoaderState<any> = {
     lastAction: { type: 'none', success: true }
 }
 
-const currentDataOrDefault = (meta: Meta, state: DataLoaderState): LoaderState<any> => {
-    const resourceTypeData = state.data[meta.dataType]
+const currentDataOrDefault = (meta: ResourceLoadInfo<any>, state: DataLoaderState): LoaderState<any> => {
+    const resourceTypeData = state.data[meta.resourceType]
     if (!resourceTypeData) { return defaultState }
 
-    const keyData = resourceTypeData[meta.dataKey]
+    const keyData = resourceTypeData[meta.resourceId]
     if (!keyData) { return defaultState }
 
     return keyData
@@ -146,17 +140,6 @@ export const reducer = (state: DataLoaderState = {
     loadingCount: 0,
 }, action: Actions): DataLoaderState => {
     switch (action.type) {
-        case LOAD_NEXT_DATA: {
-            const stateWithCurrentRemoved = reducer(state, {
-                type: UNLOAD_DATA,
-                meta: action.meta.current
-            })
-            const newState = reducer(stateWithCurrentRemoved, {
-                type: LOAD_DATA,
-                meta: action.meta.next
-            })
-            return newState
-        }
         case LOAD_DATA: {
             const defaultState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
@@ -168,9 +151,9 @@ export const reducer = (state: DataLoaderState = {
                 loadingCount: state.loadingCount + 1,
                 data: {
                     ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: loading
+                    [action.meta.resourceType]: <DataKeyMap>{
+                        ...state.data[action.meta.resourceType],
+                        [action.meta.resourceId]: loading
                     }
                 }
             }
@@ -186,9 +169,9 @@ export const reducer = (state: DataLoaderState = {
                 loadingCount: state.loadingCount + 1,
                 data: {
                     ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: loading
+                    [action.meta.resourceType]: <DataKeyMap>{
+                        ...state.data[action.meta.resourceType],
+                        [action.meta.resourceId]: loading
                     }
                 }
             }
@@ -204,9 +187,9 @@ export const reducer = (state: DataLoaderState = {
                 loadingCount: state.loadingCount + 1,
                 data: {
                     ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: loading
+                    [action.meta.resourceType]: <DataKeyMap>{
+                        ...state.data[action.meta.resourceType],
+                        [action.meta.resourceId]: loading
                     }
                 }
             }
@@ -220,17 +203,17 @@ export const reducer = (state: DataLoaderState = {
                 lastAction: { type: lastAction, success: true },
                 data: {
                     hasData: true,
-                    data: action.payload,
-                    dataFromServerSideRender: action.meta.dataFromServerSideRender
+                    data: action.payload.data,
+                    dataFromServerSideRender: action.payload.dataFromServerSideRender
                 }
             }
             return {
                 loadingCount: state.loadingCount - 1,
                 data: {
                     ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: completed
+                    [action.meta.resourceType]: <DataKeyMap>{
+                        ...state.data[action.meta.resourceType],
+                        [action.meta.resourceId]: completed
                     }
                 }
             }
@@ -248,22 +231,22 @@ export const reducer = (state: DataLoaderState = {
                 loadingCount: state.loadingCount - 1,
                 data: {
                     ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: failed
+                    [action.meta.resourceType]: <DataKeyMap>{
+                        ...state.data[action.meta.resourceType],
+                        [action.meta.resourceId]: failed
                     }
                 }
             }
         }
         case UNLOAD_DATA: {
             const newState = { loadingCount: state.loadingCount, data: { ...state.data } }
-            const dataType = newState.data[action.meta.dataType]
-            delete dataType[action.meta.dataKey]
+            const dataType = newState.data[action.meta.resourceType]
+            delete dataType[action.meta.resourceId]
 
             if (Object.keys(dataType).length === 0) {
-                delete newState.data[action.meta.dataType]
+                delete newState.data[action.meta.resourceType]
             } else {
-                newState.data[action.meta.dataType] = dataType
+                newState.data[action.meta.resourceType] = dataType
             }
 
             return newState

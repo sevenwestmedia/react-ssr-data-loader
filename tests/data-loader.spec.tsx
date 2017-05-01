@@ -35,7 +35,7 @@ describe('data-loader', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.resetPromise()
-        sut.root.setProps({ dataKey: "newData" })
+        sut.root.setProps({ resourceId: "newData" })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
 
         sut.assertState()

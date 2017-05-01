@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, BuiltInActions } from '../../src/data-loader'
+import { Props } from '../../src/data-loader'
 import DataProvider, { LoaderState } from '../../src/data-provider'
-import DataLoaderResources from '../../src/data-loader-resources'
+import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
 import { DataLoaderState, reducer, LoaderStatus } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
-import { Data, dataType } from './test-data'
+import { Data, resourceType } from './test-data'
 
 interface FixtureOptions {
     isServerSideRender: boolean
@@ -18,23 +18,23 @@ export default class ComponentFixture {
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ dataKey: string }, any>
+    root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     currentState: DataLoaderState
     lastRenderProps: LoaderState<Data>
-    lastRenderActions: BuiltInActions
+    lastRenderActions: RefreshAction
 
-    constructor(initialState: DataLoaderState, dataKey: string, options: FixtureOptions) {
+    constructor(initialState: DataLoaderState, resourceId: string, options: FixtureOptions) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(dataType, (dataKey: string) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, (resourceId: string) => {
             this.loadDataCount++
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={options.isServerSideRender}
@@ -44,7 +44,7 @@ export default class ComponentFixture {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
-                    dataKey={dataKey}
+                    resourceId={resourceId}
                     clientLoadOnly={options.clientLoadOnly}
                     unloadDataOnUnmount={options.unloadDataOnUnmount}
                     renderData={(props, actions) => {
@@ -57,7 +57,7 @@ export default class ComponentFixture {
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent dataKey={dataKey} />)
+        this.root = mount(<TestComponent resourceId={resourceId} />)
 
         this.component = this.root.find(TestDataLoader)
     }

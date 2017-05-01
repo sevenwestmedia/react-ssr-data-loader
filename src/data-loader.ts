@@ -5,40 +5,40 @@ export interface RenderData<T, TActions> {
     (loaderProps: LoaderState<T>, actions?: TActions): React.ReactElement<any> | null
 }
 export interface Props<T, TActions> {
-    dataKey: string
+    /** The id of the resource */
+    resourceId: string
     clientLoadOnly?: boolean
     unloadDataOnUnmount?: boolean // defaults to true
-    renderData: RenderData<T, TActions & BuiltInActions>
-}
-
-export interface BuiltInActions {
-    refresh: () => void
+    renderData: RenderData<T, TActions>
 }
 
 type State<T> = {
     loaderState: LoaderState<T>
 }
 
-// This function is because it's hard to consume open generic React Components and you have to
-// create a wrapping function anyway. 
-// TODO because the data loader is created when registering resources, can we remove this?
-export function createTypedDataLoader<TResource, TLoadArgs extends object, TActions extends object>(
-    dataType: string,
-    actions: (
+// This function needs to exist because for each resource we need a new react component
+// The function provides a closure for anything specific to the resource
+/**
+ * TLoadResourceParams is the type of the arguments to load the resource
+ * TActions is the type of additional actions provided by the renderData function (in addition to the BuildInActions like refresh)
+ */
+export function createTypedDataLoader<TResource, TLoadResourceParams, TActions extends object>(
+    resourceType: string,
+    /** Callback to provide additional actions */
+    actions?: (
         dataLoader: DataLoaderContext,
-        props: Props<TResource, TActions> & TLoadArgs,
+        props: Props<TResource, TActions> & TLoadResourceParams,
         handleStateUpdates: (loadedState: LoaderState<TResource>) => void
     ) => TActions
-) : React.ComponentClass<Props<TResource, TActions & BuiltInActions> & TLoadArgs> {
-    class DataLoader extends React.PureComponent<Props<TResource, TActions & BuiltInActions> & TLoadArgs, State<TResource>> {
-        context: { dataLoader: DataLoaderContext }
-        private _isMounted: boolean
-
+) : React.ComponentClass<Props<TResource, TActions> & TLoadResourceParams> {
+    class DataLoader extends React.PureComponent<Props<TResource, TActions> & TLoadResourceParams, State<TResource>> {
         static contextTypes = {
             dataLoader: React.PropTypes.object
         }
+        context: { dataLoader: DataLoaderContext }
+        private _isMounted: boolean
 
-        async componentWillMount(): Promise<void> {
+        componentWillMount() {
             this._isMounted = true
 
             if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
@@ -48,15 +48,15 @@ export function createTypedDataLoader<TResource, TLoadArgs extends object, TActi
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
-        async componentWillReceiveProps(nextProps: Props<TResource, TActions>) {
+        componentWillReceiveProps(nextProps: Props<TResource, TActions>) {
             if (
-                this.props.dataKey !== nextProps.dataKey
+                // When the resourceId has changed we need to unmount then load the new resource
+                // This happens when the loader is used on a page which can be routed to different content
+                // For example a blog entry, which navigates to another blog entry
+                this.props.resourceId !== nextProps.resourceId
             ) {
-                this.context.dataLoader.loadNextData(
-                    this.actionMeta(),
-                    this.actionMeta(nextProps),
-                    this.handleStateUpdate
-                )
+                this.componentWillUnmount()
+                this.context.dataLoader.loadData(this.actionMeta(nextProps), this.handleStateUpdate)
             }
         }
 
@@ -69,13 +69,16 @@ export function createTypedDataLoader<TResource, TLoadArgs extends object, TActi
             }
         }
 
-        private actionMeta = (props: { dataKey: string, clientLoadOnly?: boolean, renderData: any } = this.props) => {
-            const { dataKey, clientLoadOnly, renderData, ...dataParams } = props
+        private actionMeta = (props: Props<TResource, TActions> = this.props) => {
+            const { resourceId, clientLoadOnly, renderData, unloadDataOnUnmount, ...resourceLoadParams } = props
 
+            // TODO Add type safety here, am turning the remaing props into resourceLoadParams
+            // For example this could be paging into, or any other data which needs to be passed through
+            // the data loader to the resource loading function
             return {
-                dataType,
-                dataKey,
-                dataParams,
+                resourceType,
+                resourceId,
+                resourceLoadParams,
             }
         }
 
@@ -85,19 +88,19 @@ export function createTypedDataLoader<TResource, TLoadArgs extends object, TActi
             })
         }
 
-        private actions: TActions & BuiltInActions = {
-            ...actions(this.context.dataLoader, this.props, this.handleStateUpdate) as object,
-            refresh: () => { this.context.dataLoader.refresh(this.actionMeta()) }
-        } as TActions & BuiltInActions
-
         render() {
             if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
                 return null
             }
 
+            // These are the actions available for the renderData callback
+            const availableActions = this.state.loaderState.data.hasData && actions
+                ? actions(this.context.dataLoader, this.props, this.handleStateUpdate)
+                : undefined
+
             return this.props.renderData(
                 this.state.loaderState,
-                this.state.loaderState.data.hasData ? this.actions : undefined
+                availableActions,
             )
         }
     }
