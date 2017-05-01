@@ -35,7 +35,6 @@ export default class DataLoaderResources {
         return typedDataLoader
     }
 
-
     registerResource<TData>(
         dataType: string, loadResource: (dataKey: string) => Promise<TData>
     ): React.ComponentClass<Props<TData, {}>> {

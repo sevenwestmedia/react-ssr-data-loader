@@ -22,15 +22,15 @@ type State<T> = {
 // This function is because it's hard to consume open generic React Components and you have to
 // create a wrapping function anyway. 
 // TODO because the data loader is created when registering resources, can we remove this?
-export function createTypedDataLoader<T, TLoadArgs extends object, TActions extends object>(
+export function createTypedDataLoader<TResource, TLoadArgs extends object, TActions extends object>(
     dataType: string,
     actions: (
         dataLoader: DataLoaderContext,
-        props: Props<T, TActions> & TLoadArgs,
-        handleStateUpdates: (loadedState: LoaderState<T>) => void
+        props: Props<TResource, TActions> & TLoadArgs,
+        handleStateUpdates: (loadedState: LoaderState<TResource>) => void
     ) => TActions
-) : React.ComponentClass<Props<T, TActions & BuiltInActions> & TLoadArgs> {
-    class DataLoader extends React.PureComponent<Props<T, TActions & BuiltInActions> & TLoadArgs, State<T>> {
+) : React.ComponentClass<Props<TResource, TActions & BuiltInActions> & TLoadArgs> {
+    class DataLoader extends React.PureComponent<Props<TResource, TActions & BuiltInActions> & TLoadArgs, State<TResource>> {
         context: { dataLoader: DataLoaderContext }
         private _isMounted: boolean
 
@@ -48,7 +48,7 @@ export function createTypedDataLoader<T, TLoadArgs extends object, TActions exte
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
-        async componentWillReceiveProps(nextProps: Props<T, TActions>) {
+        async componentWillReceiveProps(nextProps: Props<TResource, TActions>) {
             if (
                 this.props.dataKey !== nextProps.dataKey
             ) {
@@ -79,7 +79,7 @@ export function createTypedDataLoader<T, TLoadArgs extends object, TActions exte
             }
         }
 
-        private handleStateUpdate = (loadedState: LoaderState<T>): void => {
+        private handleStateUpdate = (loadedState: LoaderState<TResource>): void => {
             this.setState({
                 loaderState: loadedState,
             })

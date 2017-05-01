@@ -32,23 +32,7 @@ export type DataUpdateCallback = (newState: LoaderState<any>) => void
 export type StateSubscription = (state: DataLoaderState) => void
 const ssrNeedsData = (state: LoaderState<any> | undefined) => !state || (!state.data.hasData && state.lastAction.success)
 
-export interface DataLoaderContext {
-    isServerSideRender: boolean
-    loadData(metadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
-    loadNextData(currentMetadata: MetaData<any>, nextMetadata: MetaData<any>, update: DataUpdateCallback): Promise<any>
-    unloadData(metadata: MetaData<any>, update: DataUpdateCallback): void
-    detach(metadata: MetaData<any>, update: DataUpdateCallback): void
-    refresh(metadata: MetaData<any>): Promise<any>
-    nextPage(metadata: MetaData<any>): Promise<any>
-
-    subscribe: (callback: StateSubscription) => void
-    unsubscribe: (callback: StateSubscription) => void
-    getDataLoaderState: () => DataLoaderState
-}
-
-// Keep the public methods used to notify the context of changes hidden from the data loader
-// component by using an internal class with an interface
-class DataLoaderContextInternal implements DataLoaderContext {
+export class DataLoaderContext {
     // We need to track this in two places, one with immediate effect,
     // one tied to reacts lifecycle
     private loadingCount = 0
@@ -307,13 +291,13 @@ export default class DataProvider extends React.Component<Props, {}> {
         dataLoader: React.PropTypes.object
     }
 
-    private dataLoader: DataLoaderContextInternal
+    private dataLoader: DataLoaderContext
     state: State = reducer(undefined, { type: INIT })
 
     constructor(props: Props, context: any) {
         super(props, context)
 
-        this.dataLoader = new DataLoaderContextInternal(
+        this.dataLoader = new DataLoaderContext(
             this.props.stateChanged || (() => {}),
             this.props.initialState,
             this.loadData,
