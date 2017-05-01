@@ -6,8 +6,7 @@ import {
     INIT, ResourceLoadInfo,
 } from './data-loader-actions'
 import DataLoaderResources from './data-loader-resources'
-
-export { LoaderState }
+import { Subscriptions, DataUpdateCallback } from './subscriptions'
 
 export interface Props {
     initialState?: DataLoaderState
@@ -22,21 +21,14 @@ export interface Props {
 export interface State extends DataLoaderState {
 }
 
-export type DataUpdateCallback = (newState: LoaderState<any>) => void
-export type StateSubscription = (state: DataLoaderState) => void
 const ssrNeedsData = (state: LoaderState<any> | undefined) => !state || (!state.data.hasData && state.lastAction.success)
 
 export class DataLoaderContext {
     // We need to track this in two places, one with immediate effect,
     // one tied to reacts lifecycle
     private loadingCount = 0
-    private _subscriptions: {
-        [resourceType: string]: {
-            [resourceId: string]: DataUpdateCallback[]
-        }
-    } = {}
-    private _stateSubscriptions: StateSubscription[] = []
     private state: DataLoaderState
+    private subscriptions = new Subscriptions()
 
     constructor(
         private onStateChanged: (state: DataLoaderState) => void,
@@ -57,19 +49,14 @@ export class DataLoaderContext {
 
     dispatch = <T extends Actions>(action: T): void => {
         this.state = reducer(this.state, action)
-        this.updateDataLoaders(this.state)
+        this.subscriptions.notifyStateSubscribersAndDataLoaders(this.state)
         this.onStateChanged(this.state)
     }
 
     getDataLoaderState = () => this.state
 
-    subscribe(callback: StateSubscription) {
-        this._stateSubscriptions.push(callback)
-    }
-
-    unsubscribe(callback: StateSubscription) {
-        this._stateSubscriptions.splice(this._stateSubscriptions.indexOf(callback), 1)
-    }
+    subscribe = this.subscriptions.subscribeToStateChanges
+    unsubscribe = this.subscriptions.unsubscribeFromStateChanges
 
     async loadData(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback) {
         const firstAttached = this.attach(metadata, update)
@@ -129,45 +116,13 @@ export class DataLoaderContext {
 
     // Returns true when data needs to be unloaded from redux
     detach(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback) {
-        const subscriptions = this.getSubscription(metadata)
+        const remainingSubscribers = this.subscriptions.unregisterDataLoader(
+            metadata.resourceType,
+            metadata.resourceId,
+            update,
+        )
 
-        if (subscriptions.length === 1) {
-            delete this._subscriptions[metadata.resourceType][metadata.resourceId]
-            if (Object.keys(this._subscriptions[metadata.resourceType]).length === 0) {
-                delete this._subscriptions[metadata.resourceType]
-            }
-
-            return true
-        }
-
-        const subscriptionIndex = subscriptions.indexOf(update)
-        const without = subscriptions.splice(subscriptionIndex, 1)
-        this._subscriptions[metadata.resourceType][metadata.resourceId] = without
-        return false
-    }
-
-    updateDataLoaders(state: DataLoaderState) {
-        const subscribedDataTypes = Object.keys(this._subscriptions)
-
-        // Notify any dataloaders
-        for (const subscribedDataType of subscribedDataTypes) {
-            const subscribedKeys = Object.keys(this._subscriptions[subscribedDataType])
-
-            for (const subscriberKey of subscribedKeys) {
-                const subscribers = this._subscriptions[subscribedDataType][subscriberKey]
-
-                for (const subscriber of subscribers) {
-                    if (state.data[subscribedDataType] && state.data[subscribedDataType][subscriberKey]) {
-                        subscriber(state.data[subscribedDataType][subscriberKey])
-                    }
-                }
-            }
-        }
-
-        // Notify any is-loading components
-        for (const stateSubscriber of this._stateSubscriptions) {
-            stateSubscriber(state)
-        }
+        return remainingSubscribers === 0
     }
 
     private _loadData = async (metadata: ResourceLoadInfo<any>) => {
@@ -183,32 +138,15 @@ export class DataLoaderContext {
         await this.performLoadData(metadata, existingData)
     }
 
-    private getSubscription(metadata: ResourceLoadInfo<any>) {
-        if (!this._subscriptions[metadata.resourceType]) {
-            this._subscriptions[metadata.resourceType] = {}
-        }
-
-        if (!this._subscriptions[metadata.resourceType][metadata.resourceId]) {
-            this._subscriptions[metadata.resourceType][metadata.resourceId] = []
-        }
-
-        return this._subscriptions[metadata.resourceType][metadata.resourceId]
-    }
-
-    private attach(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback) {
-        const subscriptions = this.getSubscription(metadata)
-
-        subscriptions.push(update)
-        const firstAttached = subscriptions.length === 1
-        return firstAttached
-    }
-
-    private _hasMountedComponents = (metadata: ResourceLoadInfo<any>) => {
-        return (
-            this._subscriptions[metadata.resourceType] &&
-            this._subscriptions[metadata.resourceType][metadata.resourceId] &&
-            this._subscriptions[metadata.resourceType][metadata.resourceId].length > 0
+    /** @returns true if this is the first data loader to attach to that type and id */
+    private attach(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback): boolean {
+        const totalDataLoaders = this.subscriptions.registerDataLoader(
+            metadata.resourceType,
+            metadata.resourceId,
+            update,
         )
+        const firstDataLoaderForResourceAndId = totalDataLoaders === 1
+        return firstDataLoaderForResourceAndId
     }
 
     private getLoadedState = (metadata: ResourceLoadInfo<any>): LoaderState<any> | undefined => {
@@ -225,7 +163,7 @@ export class DataLoaderContext {
             this.loadingCount++
             this.loadingCountChanged(this.loadingCount)
             const data = await this.performLoad(metadata, existingData)
-            if (!this._hasMountedComponents(metadata)) {
+            if (!this.subscriptions.hasRegisteredDataLoader(metadata.resourceType, metadata.resourceId)) {
                 return
             }
 
@@ -238,7 +176,7 @@ export class DataLoaderContext {
                 }
             })
         } catch (err) {
-            if (!this._hasMountedComponents(metadata)) {
+            if (!this.subscriptions.hasRegisteredDataLoader(metadata.resourceType, metadata.resourceId)) {
                 return
             }
 

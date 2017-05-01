@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { DataLoaderContext, LoaderState } from './data-provider'
+import { LoaderState } from './'
+import { DataLoaderContext } from './data-provider'
 
 export interface RenderData<T, TActions> {
     (loaderProps: LoaderState<T>, actions?: TActions): React.ReactElement<any> | null
