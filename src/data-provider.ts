@@ -82,7 +82,7 @@ export class DataLoaderContext {
         }
     }
 
-    async nextPage(metadata: ResourceLoadInfo<any>) {
+    nextPage(metadata: ResourceLoadInfo<any>) {
         const currentState = this.getLoadedState(metadata)
         const existingData = currentState && currentState.data.hasData
             ? currentState.data.data
@@ -93,16 +93,16 @@ export class DataLoaderContext {
             payload: { existingData }
         })
 
-        await this.performLoadData(metadata, existingData)
+        return this.performLoadData(metadata, existingData)
     }
 
-    async refresh(metadata: ResourceLoadInfo<any>) {
+    refresh(metadata: ResourceLoadInfo<any>) {
         this.dispatch<REFRESH_DATA>({
             type: REFRESH_DATA,
             meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
         })
 
-        await this.performLoadData(metadata, undefined)
+        return this.performLoadData(metadata, undefined)
     }
 
     unloadData(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback) {
@@ -163,6 +163,7 @@ export class DataLoaderContext {
             this.loadingCount++
             this.loadingCountChanged(this.loadingCount)
             const data = await this.performLoad(metadata, existingData)
+            // If we no longer have data loaders, they have been unmounted since we started loading
             if (!this.subscriptions.hasRegisteredDataLoader(metadata.resourceType, metadata.resourceId)) {
                 return
             }
@@ -176,6 +177,7 @@ export class DataLoaderContext {
                 }
             })
         } catch (err) {
+            // If we no longer have data loaders, they have been unmounted since we started loading
             if (!this.subscriptions.hasRegisteredDataLoader(metadata.resourceType, metadata.resourceId)) {
                 return
             }
@@ -196,8 +198,8 @@ export class DataLoaderContext {
                 payload: payload
             })
         } finally {
+            this.loadingCountChanged(this.loadingCount)
             if (--this.loadingCount === 0) {
-                this.loadingCountChanged(this.loadingCount)
                 this.loadAllCompleted()
             }
         }
