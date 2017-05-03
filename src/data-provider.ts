@@ -89,7 +89,7 @@ export class DataLoaderContext {
             : undefined
         this.dispatch<NEXT_PAGE>({
             type: NEXT_PAGE,
-            meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
+            meta: metadata,
             payload: { existingData }
         })
 
@@ -99,7 +99,7 @@ export class DataLoaderContext {
     refresh(metadata: ResourceLoadInfo<any>) {
         this.dispatch<REFRESH_DATA>({
             type: REFRESH_DATA,
-            meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
+            meta: metadata,
         })
 
         return this.performLoadData(metadata, undefined)
@@ -109,7 +109,7 @@ export class DataLoaderContext {
         if (this.detach(metadata, update)) {
             this.dispatch<UNLOAD_DATA>({
                 type: UNLOAD_DATA,
-                meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
+                meta: metadata,
             })
         }
     }
@@ -132,7 +132,7 @@ export class DataLoaderContext {
             : undefined
         this.dispatch<LOAD_DATA>({
             type: LOAD_DATA,
-            meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender }
+            meta: metadata
         })
 
         await this.performLoadData(metadata, existingData)
@@ -194,7 +194,7 @@ export class DataLoaderContext {
 
             this.dispatch<LOAD_DATA_FAILED>({
                 type: LOAD_DATA_FAILED,
-                meta: { ...metadata, dataFromServerSideRender: this.isServerSideRender },
+                meta: metadata,
                 payload: payload
             })
         } finally {
