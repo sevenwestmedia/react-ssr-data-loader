@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
-import { reducer, DataLoaderState, LoaderState } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
 
@@ -16,16 +16,16 @@ export default class ComponentFixture<T extends object> {
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     passedParams: T
-    currentState: DataLoaderState
+    currentState: DataLoaderState | undefined
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction
 
-    constructor(initialState: DataLoaderState, resourceId: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(initialState: DataLoaderState | undefined, resourceId: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
         
-        const TestDataLoader = this.resources.registerResource(resourceType, (resourceId: string, params: T) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, (_: string, params: T) => {
             this.loadDataCount++
             this.passedParams = params
             return this.testDataPromise.promise

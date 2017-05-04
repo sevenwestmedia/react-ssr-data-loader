@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { LoadedState, default as IsLoading } from '../../src/is-loading'
 import PromiseCompletionSource from './promise-completion-source'
 import DataLoaderResources from '../../src/data-loader-resources'
@@ -24,10 +24,10 @@ export default class ComponentFixture {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.testDataPromise2 = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource('dataType', (resourceId: string) => {
+        const TestDataLoader = this.resources.registerResource('dataType', () => {
             return this.testDataPromise.promise
         })
-        const TestDataLoader2 = this.resources.registerResource('dataType2', (resourceId: string) => {
+        const TestDataLoader2 = this.resources.registerResource('dataType2', () => {
             return this.testDataPromise2.promise
         })
         const TestComponent: React.SFC<any> = ({ }) => (
@@ -41,11 +41,11 @@ export default class ComponentFixture {
                 <div>
                     <TestDataLoader
                         resourceId='dataKey'
-                        renderData={(props) => (<div />)}
+                        renderData={() => (<div />)}
                     />
                     <TestDataLoader2
                         resourceId='dataKey'
-                        renderData={(props) => (<div />)}
+                        renderData={() => (<div />)}
                     />
                     <IsLoading
                         renderData={(props) => {

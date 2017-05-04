@@ -4,7 +4,7 @@ import { DataLoaderContext } from './data-provider'
 import { DataUpdateCallback } from "./subscriptions";
 
 export interface RenderData<T, TActions> {
-    (loaderProps: LoaderState<T>, actions?: TActions): React.ReactElement<any> | null
+    (loaderProps: LoaderState<T>, actions: TActions): React.ReactElement<any> | null
 }
 export interface Props<T, TActions> {
     /** The id of the resource */
@@ -37,7 +37,7 @@ export function createTypedDataLoader<
     resourceType: string,
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
-    actions?: (
+    actions: (
         dataLoader: DataLoaderContext,
         props: Props<TResource, TActions> & TDataLoaderParams,
         internalState: TInternalState
@@ -114,12 +114,10 @@ export function createTypedDataLoader<
             }
 
             // These are the actions available for the renderData callback
-            const availableActions = actions
-                ? actions(
+            const availableActions = actions(
                     this.context.dataLoader,
                     this.props,
                     this.state.internalState)
-                : undefined
 
             return this.props.renderData(
                 this.state.loaderState,

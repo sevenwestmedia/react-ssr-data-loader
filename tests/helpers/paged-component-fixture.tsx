@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
-import DataLoaderResources, { PageActions, Paging } from '../../src/data-loader-resources'
+import DataLoaderResources, { PageActions } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState, LoaderStatus } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 
-interface DataResource {}
+export interface DataResource {}
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
@@ -17,19 +17,16 @@ export default class ComponentFixture {
     root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<DataResource, PageActions>, any>
     resources: DataLoaderResources
-    currentState: DataLoaderState
+    currentState: DataLoaderState | undefined
     lastRenderActions: PageActions
 
-    constructor(initialState: DataLoaderState, resourceId: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(initialState: DataLoaderState | undefined, resourceId: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        const paging: Paging = {
-            pageSize: 10,
-        }
         const TestDataLoader = this.resources.registerPagedResource<DataResource>(
             'testDataType',
-            (resourceId, paging, page) => {
+            () => {
                 this.loadDataCount++
                 return this.testDataPromise.promise
             }

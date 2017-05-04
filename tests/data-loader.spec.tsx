@@ -1,10 +1,4 @@
-import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { createTypedDataLoader } from '../src/data-loader'
-import { DataLoaderState } from '../src/data-loader-actions'
-import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
-import PagedComponentFixture from './helpers/paged-component-fixture'
 import ComponentWithArgsFixture from './helpers/component-with-args-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
@@ -64,18 +58,6 @@ describe('data-loader', () => {
         await sut.testDataPromise.resolve({ result: 'Test' })
 
         expect(sut.passedParams).toEqual(foo)
-        sut.assertState()
-    })
-
-    it('supports paged data', async () => {
-        const sut = new PagedComponentFixture(undefined, "testKey", false)
-
-        await sut.testDataPromise.resolve(['Test'])
-        sut.assertState()
-        sut.nextPage()
-        sut.assertState()
-
-        await sut.testDataPromise.resolve(['Test2'])
         sut.assertState()
     })
 

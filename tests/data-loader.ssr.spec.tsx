@@ -1,20 +1,9 @@
-import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { createTypedDataLoader } from '../src/data-loader'
-import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 
 describe('server side render', () => {
     it('should start loading data if not loaded', () => {
         const sut = new ComponentFixture(undefined, "testKey", { isServerSideRender: true })
-
-        sut.assertState()
-    })
-
-    it('multiple data loaders with same key should not load data multiple times', () => {
-        const sut = new ComponentFixture(undefined, "testKey", { isServerSideRender: true })
-        const sut2 = new ComponentFixture(undefined, "testKey", { isServerSideRender: true })
 
         sut.assertState()
     })
@@ -72,6 +61,6 @@ describe('server side render', () => {
         await sut.testDataPromise.resolve({ result: 'Success!' })
         let sut2 = new SharedDataComponentFixture(sut.currentState, "testKey", true)
 
-        sut.assertState()
+        sut2.assertState()
     })
 })

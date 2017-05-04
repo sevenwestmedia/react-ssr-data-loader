@@ -1,0 +1,143 @@
+exports[`server side render can have two components in the same render tree 1`] = `
+Object {
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
+  "renderCount": 1,
+  "renderCount2": 1,
+  "renderProps1": Object {
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
+  },
+  "renderProps2": Object {
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
+  },
+}
+`;
+
+exports[`server side render does not render on the server if clientLoadOnlySet 1`] = `
+Object {
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 0,
+  "renderActions": undefined,
+  "renderCount": 0,
+  "renderProps": undefined,
+}
+`;
+
+exports[`server side render second SSR with two components in same tree uses data 1`] = `
+Object {
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 0,
+  "renderCount": 1,
+  "renderCount2": 1,
+  "renderProps1": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Success!",
+      },
+      "dataFromServerSideRender": true,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
+  },
+  "renderProps2": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Success!",
+      },
+      "dataFromServerSideRender": true,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
+  },
+}
+`;
+
+exports[`server side render should pass failure when data load fails 1`] = `
+Object {
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "error": "Boom!",
+      "success": false,
+      "type": "initial-fetch",
+    },
+    "status": 0,
+  },
+}
+`;
+
+exports[`server side render should pass loaded data once promise resolves 1`] = `
+Object {
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Success!",
+      },
+      "dataFromServerSideRender": true,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
+  },
+}
+`;
+
+exports[`server side render should start loading data if not loaded 1`] = `
+Object {
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 1,
+  "renderProps": Object {
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": 1,
+  },
+}
+`;

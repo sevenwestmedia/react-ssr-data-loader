@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
-import DataProvider, { LoaderState } from '../../src/data-provider'
+import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
-import { DataLoaderState, reducer, LoaderStatus } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderStatus, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
 
-interface FixtureOptions {
+export interface FixtureOptions {
     isServerSideRender: boolean
     clientLoadOnly?: boolean
     unloadDataOnUnmount?: boolean
@@ -21,15 +21,15 @@ export default class ComponentFixture {
     root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
-    currentState: DataLoaderState
+    currentState: DataLoaderState | undefined
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction
 
-    constructor(initialState: DataLoaderState, resourceId: string, options: FixtureOptions) {
+    constructor(initialState: DataLoaderState | undefined, resourceId: string, options: FixtureOptions) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(resourceType, (resourceId: string) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, () => {
             this.loadDataCount++
             return this.testDataPromise.promise
         })

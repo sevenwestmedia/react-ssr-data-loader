@@ -1,8 +1,3 @@
-import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { createTypedDataLoader } from '../src/data-loader'
-import { reducer } from '../src/data-loader-actions'
-import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
 
 describe('Client side render', () => {
