@@ -67,18 +67,6 @@ describe('data-loader', () => {
         sut.assertState()
     })
 
-    it('can refresh data', async () => {
-        const sut = new ComponentFixture(undefined, "testKey", { isServerSideRender: false })
-
-        await sut.testDataPromise.resolve({ result: 'Test' })
-        sut.assertState()
-        sut.refreshData()
-
-        sut.assertState()
-        await sut.testDataPromise.resolve({ result: 'Test2' })
-        sut.assertState()
-    })
-
     it('supports paged data', async () => {
         const sut = new PagedComponentFixture(undefined, "testKey", false)
 
