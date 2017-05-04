@@ -71,6 +71,7 @@ describe('data-loader', () => {
         const sut = new ComponentFixture(undefined, "testKey", { isServerSideRender: false })
 
         await sut.testDataPromise.resolve({ result: 'Test' })
+        sut.assertState()
         sut.refreshData()
 
         sut.assertState()

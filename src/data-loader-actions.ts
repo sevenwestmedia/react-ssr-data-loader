@@ -180,7 +180,7 @@ export const reducer = (state: DataLoaderState = {
         case REFRESH_DATA: {
             const currentState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
-                status: LoaderStatus.Paging,
+                status: LoaderStatus.Refreshing,
                 lastAction: { type: 'none', success: true },
                 data: currentState.data
             }

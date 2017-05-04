@@ -42,13 +42,13 @@ export default class DataLoaderResources {
         const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, {}, RefreshAction>(
             resourceType, 
             {},
-            (dataLoaderContext, props) => {
+            (dataLoaderContext, props, internalState) => {
                 return {
                     refresh: () => dataLoaderContext.refresh({
                         resourceType,
                         resourceId: props.resourceId,
-                        resourceLoadParams: {},
-                        internalState: {},
+                        resourceLoadParams: props,
+                        internalState,
                     })
                 }
             })

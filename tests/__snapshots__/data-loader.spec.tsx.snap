@@ -33,6 +33,31 @@ Object {
 exports[`data-loader can refresh data 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
+  },
+}
+`;
+
+exports[`data-loader can refresh data 2`] = `
+Object {
+  "loadAllCompletedCalled": 1,
   "loadDataCount": 2,
   "renderActions": Object {
     "refresh": [Function],
@@ -50,12 +75,12 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 3,
+    "status": 2,
   },
 }
 `;
 
-exports[`data-loader can refresh data 2`] = `
+exports[`data-loader can refresh data 3`] = `
 Object {
   "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
@@ -73,7 +98,7 @@ Object {
     },
     "lastAction": Object {
       "success": true,
-      "type": "page",
+      "type": "refresh",
     },
     "status": 0,
   },
