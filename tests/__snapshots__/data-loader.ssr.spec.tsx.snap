@@ -41,7 +41,9 @@ exports[`server side render multiple data loaders with same key should not load 
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 1,
-  "renderActions": undefined,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 1,
   "renderProps": Object {
     "data": Object {
@@ -97,7 +99,9 @@ exports[`server side render should pass failure when data load fails 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
-  "renderActions": undefined,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
@@ -142,7 +146,9 @@ exports[`server side render should start loading data if not loaded 1`] = `
 Object {
   "loadAllCompletedCalled": 0,
   "loadDataCount": 1,
-  "renderActions": undefined,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 1,
   "renderProps": Object {
     "data": Object {

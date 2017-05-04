@@ -196,7 +196,9 @@ exports[`data-loader ignores completion if unmounted first 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
-  "renderActions": undefined,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
   "renderCount": 1,
   "renderProps": Object {
     "data": Object {

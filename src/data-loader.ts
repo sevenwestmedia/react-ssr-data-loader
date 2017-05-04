@@ -114,7 +114,7 @@ export function createTypedDataLoader<
             }
 
             // These are the actions available for the renderData callback
-            const availableActions = this.state.loaderState.data.hasData && actions
+            const availableActions = actions
                 ? actions(
                     this.context.dataLoader,
                     this.props,
