@@ -25,7 +25,7 @@ export default class ComponentFixture<T extends object> {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
         
-        const TestDataLoader = this.resources.registerResourceWithParameters(resourceType, (resourceId: string, params: T) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, (resourceId: string, params: T) => {
             this.loadDataCount++
             this.passedParams = params
             return this.testDataPromise.promise

@@ -33,7 +33,7 @@ export class DataLoaderContext {
     constructor(
         private onStateChanged: (state: DataLoaderState) => void,
         initialState: DataLoaderState | undefined,
-        private performLoad: (metadata: ResourceLoadInfo<any>, existingData: any) => Promise<any>,
+        private performLoad: (metadata: ResourceLoadInfo<any, any>, existingData: any) => Promise<any>,
         private loadAllCompleted: () => void,
         private loadingCountChanged: (loadingCount: number) => void,
         private onError: (err: string) => void,
@@ -47,9 +47,9 @@ export class DataLoaderContext {
         }
     }
 
-    dispatch = <T extends Actions>(action: T): void => {
+    dispatch = <T extends Actions>(action: T, metadata: ResourceLoadInfo<any, any>): void => {
         this.state = reducer(this.state, action)
-        this.subscriptions.notifyStateSubscribersAndDataLoaders(this.state)
+        this.subscriptions.notifyStateSubscribersAndDataLoaders(this.state, metadata)
         this.onStateChanged(this.state)
     }
 
@@ -58,7 +58,10 @@ export class DataLoaderContext {
     subscribe = this.subscriptions.subscribeToStateChanges
     unsubscribe = this.subscriptions.unsubscribeFromStateChanges
 
-    async loadData(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback) {
+    async loadData<TAdditionalParameters, TInternalState>(
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>,
+        update: DataUpdateCallback
+    ) {
         const firstAttached = this.attach(metadata, update)
         const loadedState = this.getLoadedState(metadata)
 
@@ -67,7 +70,9 @@ export class DataLoaderContext {
         } else {
             // Give the data-loader it's state
             const loaderState = this.getLoadedState(metadata)
-            loaderState && update(loaderState)
+            loaderState && update(
+                loaderState, metadata.internalState
+            )
         }
 
         if (!this.isServerSideRender && firstAttached) {
@@ -82,40 +87,51 @@ export class DataLoaderContext {
         }
     }
 
-    nextPage(metadata: ResourceLoadInfo<any>) {
+    nextPage<TAdditionalParameters, TInternalState>(
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
+    ) {
         const currentState = this.getLoadedState(metadata)
         const existingData = currentState && currentState.data.hasData
             ? currentState.data.data
             : undefined
+
         this.dispatch<NEXT_PAGE>({
             type: NEXT_PAGE,
             meta: metadata,
             payload: { existingData }
-        })
+        }, metadata)
 
         return this.performLoadData(metadata, existingData)
     }
 
-    refresh(metadata: ResourceLoadInfo<any>) {
+    refresh<TAdditionalParameters, TInternalState>(
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
+    ) {
         this.dispatch<REFRESH_DATA>({
             type: REFRESH_DATA,
             meta: metadata,
-        })
+        }, metadata)
 
         return this.performLoadData(metadata, undefined)
     }
 
-    unloadData(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback) {
+    unloadData<TAdditionalParameters, TInternalState>(
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>,
+        update: DataUpdateCallback
+    ) {
         if (this.detach(metadata, update)) {
             this.dispatch<UNLOAD_DATA>({
                 type: UNLOAD_DATA,
                 meta: metadata,
-            })
+            }, metadata)
         }
     }
 
     // Returns true when data needs to be unloaded from redux
-    detach(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback) {
+    detach<TAdditionalParameters, TInternalState>(
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>,
+        update: DataUpdateCallback
+    ) {
         const remainingSubscribers = this.subscriptions.unregisterDataLoader(
             metadata.resourceType,
             metadata.resourceId,
@@ -125,7 +141,7 @@ export class DataLoaderContext {
         return remainingSubscribers === 0
     }
 
-    private _loadData = async (metadata: ResourceLoadInfo<any>) => {
+    private _loadData = (metadata: ResourceLoadInfo<any, any>) => {
         const currentState = this.getLoadedState(metadata)
         const existingData = currentState && currentState.data.hasData
             ? currentState.data.data
@@ -133,13 +149,16 @@ export class DataLoaderContext {
         this.dispatch<LOAD_DATA>({
             type: LOAD_DATA,
             meta: metadata
-        })
+        }, metadata)
 
-        await this.performLoadData(metadata, existingData)
+        return this.performLoadData(metadata, existingData)
     }
 
     /** @returns true if this is the first data loader to attach to that type and id */
-    private attach(metadata: ResourceLoadInfo<any>, update: DataUpdateCallback): boolean {
+    private attach<TAdditionalParameters, TInternalState>(
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>,
+        update: DataUpdateCallback
+    ): boolean {
         const totalDataLoaders = this.subscriptions.registerDataLoader(
             metadata.resourceType,
             metadata.resourceId,
@@ -149,7 +168,7 @@ export class DataLoaderContext {
         return firstDataLoaderForResourceAndId
     }
 
-    private getLoadedState = (metadata: ResourceLoadInfo<any>): LoaderState<any> | undefined => {
+    private getLoadedState = (metadata: ResourceLoadInfo<any, any>): LoaderState<any> | undefined => {
         const dataLookup = this.state.data[metadata.resourceType]
         if (!dataLookup) {
             return undefined
@@ -158,7 +177,7 @@ export class DataLoaderContext {
         return dataLookup[metadata.resourceId]
     }
 
-    private performLoadData = async (metadata: ResourceLoadInfo<any>, existingData: any) => {
+    private performLoadData = async (metadata: ResourceLoadInfo<any, any>, existingData: any) => {
         try {
             this.loadingCount++
             this.loadingCountChanged(this.loadingCount)
@@ -175,7 +194,7 @@ export class DataLoaderContext {
                     data,
                     dataFromServerSideRender: this.isServerSideRender
                 }
-            })
+            }, metadata)
         } catch (err) {
             // If we no longer have data loaders, they have been unmounted since we started loading
             if (!this.subscriptions.hasRegisteredDataLoader(metadata.resourceType, metadata.resourceId)) {
@@ -196,7 +215,7 @@ export class DataLoaderContext {
                 type: LOAD_DATA_FAILED,
                 meta: metadata,
                 payload: payload
-            })
+            }, metadata)
         } finally {
             this.loadingCountChanged(this.loadingCount)
             if (--this.loadingCount === 0) {
@@ -228,13 +247,16 @@ export default class DataProvider extends React.Component<Props, {}> {
         )
     }
 
-    private loadData = (metadata: ResourceLoadInfo<any>, existingData: any): Promise<any> => {
+    private loadData = (metadata: ResourceLoadInfo<any, any>, existingData: any): Promise<any> => {
         const dataLoader = this.props.resources.getResourceLoader(metadata.resourceType)
         if (!dataLoader) {
             return Promise.reject(`No data loader present for ${metadata.resourceType}`)
         }
 
-        return dataLoader(metadata.resourceId, metadata.resourceLoadParams, existingData)
+        return dataLoader(
+            metadata.resourceId,
+            { ...metadata.resourceLoadParams, ...metadata.internalState },
+            existingData)
     }
 
     getChildContext = (): { dataLoader: DataLoaderContext } => ({ dataLoader: this.dataLoader })

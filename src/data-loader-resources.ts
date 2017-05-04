@@ -1,9 +1,15 @@
 import * as React from 'react'
 import { Props, createTypedDataLoader } from './data-loader'
+import { ResourceLoadInfo } from './data-loader-actions'
 
-export type LoadResource = (resourceId: string, resourceParameters?: any, existingData?: any) => Promise<any>
+export type LoadResource<TData, TResourceParameters> = (
+    resourceId: string,
+    resourceParameters: TResourceParameters,
+    existingData: TData
+) => Promise<TData>
+
 interface Resources {
-    [dataType: string]: LoadResource
+    [dataType: string]: LoadResource<any, any>
 }
 
 export interface PagedData<Datum> {
@@ -19,7 +25,8 @@ export interface Paging {
     initialSize?: number
     pageSize: number
 }
-export type PageProps = { page: number, paging: Paging }
+export type PageComponentProps =  { paging: Paging }
+type PageState = { page: number }
 
 export default class DataLoaderResources {
     private resources: Resources = {}
@@ -28,16 +35,20 @@ export default class DataLoaderResources {
      * When using parameterised resources you cannot have multiple instances of the returned data loader
      * with the same resourceId.
      */
-    registerResourceWithParameters<TData, TResourceParameters>(
-        resourceType: string, loadResource: (resourceId: string, resourceParameters: TResourceParameters, existingData: TData) => Promise<TData>
+    registerResource<TData, TResourceParameters>(
+        resourceType: string,
+        loadResource: LoadResource<TData, TResourceParameters>
     ): React.ComponentClass<Props<TData, RefreshAction> & TResourceParameters> {
-        const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, RefreshAction>(
+        const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, {}, RefreshAction>(
             resourceType, 
+            {},
             (dataLoaderContext, props) => {
                 return {
                     refresh: () => dataLoaderContext.refresh({
                         resourceType,
                         resourceId: props.resourceId,
+                        resourceLoadParams: {},
+                        internalState: {},
                     })
                 }
             })
@@ -46,30 +57,27 @@ export default class DataLoaderResources {
         return typedDataLoader
     }
 
-    registerResource<TData>(
-        resourceType: string, loadResource: (resourceId: string) => Promise<TData>
-    ): React.ComponentClass<Props<TData, RefreshAction>> {
-        return this.registerResourceWithParameters(resourceType, loadResource)
-    }
-
     /** Page numbers start at 1 */
     registerPagedResource<TData>(
-        resourceType: string, loadResource: (resourceId: string, paging: Paging, page: number) => Promise<TData[]>
-    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & { paging: Paging }> {
-        const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageProps, PageActions>(
+        resourceType: string,
+        loadResource: (resourceId: string, paging: Paging, page: number) => Promise<TData[]>
+    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & PageComponentProps> {
+        const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageComponentProps, PageState, PageActions>(
             resourceType,
-            (dataLoaderContext, props) => {
+            { page: 1 },
+            (dataLoaderContext, props, internalState) => {
+                const getResourceInfo = (): ResourceLoadInfo<PageComponentProps, PageState> => ({
+                    resourceType,
+                    resourceId: props.resourceId,
+                    resourceLoadParams: { paging: props.paging },
+                    internalState,
+                })
                 return {
-                    refresh: () => dataLoaderContext.refresh({
-                        resourceType,
-                        resourceId: props.resourceId,
-                        resourceLoadParams: { paging: props.paging, page: 1 },
-                    }),
+                    refresh: () => dataLoaderContext.refresh(getResourceInfo()),
                     // Loads next page
                     nextPage: () => dataLoaderContext.nextPage({
-                        resourceType,
-                        resourceId: props.resourceId,
-                        resourceLoadParams: { paging: props.paging, page: props.page },
+                        ...getResourceInfo(),
+                        internalState: { page: internalState.page + 1 }
                     }),
                 }
             }
@@ -78,7 +86,11 @@ export default class DataLoaderResources {
         // This async function performs the loading of the paged data
         // it takes care of passing the correct params to the loadResource function
         // then merging the new data when it comes back
-        this.resources[resourceType] = async (dataKey, pageInfo: PageProps, existingData: PagedData<TData>): Promise<PagedData<TData>> => {
+        this.resources[resourceType] = async (
+            dataKey,
+            pageInfo: PageComponentProps & { page: number },
+            existingData: PagedData<TData>
+        ): Promise<PagedData<TData>> => {
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
             const data = await loadResource(dataKey, pageInfo.paging, pageNumber)
             if (existingData && existingData.data) {
@@ -97,7 +109,7 @@ export default class DataLoaderResources {
         return typedDataLoader
     }
 
-    getResourceLoader(dataType: any): LoadResource {
+    getResourceLoader(dataType: any): LoadResource<any, any> {
         return this.resources[dataType]
     }
 }

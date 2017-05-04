@@ -55,11 +55,12 @@ export interface DataLoaderState {
     data: { [resourceType: string]: DataKeyMap }
 }
 
-export interface ResourceLoadInfo<TAdditionalParameters> {
+export interface ResourceLoadInfo<TAdditionalParameters, TInternalState> {
     resourceType: string
     resourceId: string
     /** Optional additional parameters required to load resource, i.e paging other */
-    resourceLoadParams?: TAdditionalParameters
+    resourceLoadParams: TAdditionalParameters
+    internalState: TInternalState
 }
 
 export const INIT = 'resource-data-loader/INIT'
@@ -70,26 +71,26 @@ export interface INIT {
 export const REFRESH_DATA = 'resource-data-loader/REFRESH_DATA'
 export interface REFRESH_DATA {
     type: 'resource-data-loader/REFRESH_DATA'
-    meta: ResourceLoadInfo<any>
+    meta: ResourceLoadInfo<any, any>
 }
 
 export const NEXT_PAGE = 'resource-data-loader/NEXT_PAGE'
 export interface NEXT_PAGE {
     type: 'resource-data-loader/NEXT_PAGE'
-    meta: ResourceLoadInfo<any>
+    meta: ResourceLoadInfo<any, any>
     payload: { existingData: any }
 }
 
 export const LOAD_DATA = 'resource-data-loader/LOAD_DATA'
 export interface LOAD_DATA {
     type: 'resource-data-loader/LOAD_DATA'
-    meta: ResourceLoadInfo<any>
+    meta: ResourceLoadInfo<any, any>
 }
 
 export const LOAD_DATA_COMPLETED = 'resource-data-loader/LOAD_DATA_COMPLETED'
 export interface LOAD_DATA_COMPLETED {
     type: 'resource-data-loader/LOAD_DATA_COMPLETED'
-    meta: ResourceLoadInfo<any>
+    meta: ResourceLoadInfo<any, any>
     payload: {
         data: any
         dataFromServerSideRender: boolean
@@ -99,14 +100,14 @@ export interface LOAD_DATA_COMPLETED {
 export const LOAD_DATA_FAILED = 'resource-data-loader/LOAD_DATA_FAILED'
 export interface LOAD_DATA_FAILED {
     type: 'resource-data-loader/LOAD_DATA_FAILED'
-    meta: ResourceLoadInfo<any>
+    meta: ResourceLoadInfo<any, any>
     payload: string
 }
 
 export const UNLOAD_DATA = 'resource-data-loader/UNLOAD_DATA'
 export interface UNLOAD_DATA {
     type: 'resource-data-loader/UNLOAD_DATA'
-    meta: ResourceLoadInfo<any>
+    meta: ResourceLoadInfo<any, any>
 }
 
 export type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
@@ -119,7 +120,7 @@ const defaultState: LoaderState<any> = {
     lastAction: { type: 'none', success: true }
 }
 
-const currentDataOrDefault = (meta: ResourceLoadInfo<any>, state: DataLoaderState): LoaderState<any> => {
+const currentDataOrDefault = (meta: ResourceLoadInfo<any, any>, state: DataLoaderState): LoaderState<any> => {
     const resourceTypeData = state.data[meta.resourceType]
     if (!resourceTypeData) { return defaultState }
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { LoaderState } from './'
 import { DataLoaderContext } from './data-provider'
+import { DataUpdateCallback } from "./subscriptions";
 
 export interface RenderData<T, TActions> {
     (loaderProps: LoaderState<T>, actions?: TActions): React.ReactElement<any> | null
@@ -13,9 +14,13 @@ export interface Props<T, TActions> {
     renderData: RenderData<T, TActions>
 }
 
-type State<T> = {
-    loaderState: LoaderState<T>
+type State<T, TInternalState extends object> = {
+    loaderState?: LoaderState<T>
+    internalState: TInternalState
 }
+
+export type Return<TResource, TActions, TDataLoaderParams> =
+    React.ComponentClass<Props<TResource, TActions> & TDataLoaderParams>
 
 // This function needs to exist because for each resource we need a new react component
 // The function provides a closure for anything specific to the resource
@@ -23,20 +28,32 @@ type State<T> = {
  * TLoadResourceParams is the type of the arguments to load the resource
  * TActions is the type of additional actions provided by the renderData function (in addition to the BuildInActions like refresh)
  */
-export function createTypedDataLoader<TResource, TLoadResourceParams, TActions extends object>(
+export function createTypedDataLoader<
+    TResource,
+    TDataLoaderParams,
+    TInternalState extends object,
+    TActions extends object
+>(
     resourceType: string,
+    initialInternalState: TInternalState,
     /** Callback to provide additional actions */
     actions?: (
         dataLoader: DataLoaderContext,
-        props: Props<TResource, TActions> & TLoadResourceParams,
-        handleStateUpdates: (loadedState: LoaderState<TResource>) => void
+        props: Props<TResource, TActions> & TDataLoaderParams,
+        internalState: TInternalState
     ) => TActions
-) : React.ComponentClass<Props<TResource, TActions> & TLoadResourceParams> {
-    class DataLoader extends React.PureComponent<Props<TResource, TActions> & TLoadResourceParams, State<TResource>> {
+) : Return<TResource, TActions, TDataLoaderParams> {
+    type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
+    type ComponentState = State<TResource, TInternalState>
+
+    class DataLoader extends React.PureComponent<ComponentProps, ComponentState> {
         static contextTypes = {
             dataLoader: React.PropTypes.object
         }
         context: { dataLoader: DataLoaderContext }
+        state: ComponentState = {
+            internalState: initialInternalState,
+        }
         private _isMounted: boolean
 
         componentWillMount() {
@@ -80,23 +97,28 @@ export function createTypedDataLoader<TResource, TLoadResourceParams, TActions e
                 resourceType,
                 resourceId,
                 resourceLoadParams,
+                internalState: this.state.internalState,
             }
         }
 
-        private handleStateUpdate = (loadedState: LoaderState<TResource>): void => {
+        private handleStateUpdate: DataUpdateCallback = (loadedState: LoaderState<TResource>, internalState: TInternalState): void => {
             this.setState({
                 loaderState: loadedState,
+                internalState
             })
         }
 
         render() {
-            if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
+            if (!this.state.loaderState || this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
                 return null
             }
 
             // These are the actions available for the renderData callback
             const availableActions = this.state.loaderState.data.hasData && actions
-                ? actions(this.context.dataLoader, this.props, this.handleStateUpdate)
+                ? actions(
+                    this.context.dataLoader,
+                    this.props,
+                    this.state.internalState)
                 : undefined
 
             return this.props.renderData(

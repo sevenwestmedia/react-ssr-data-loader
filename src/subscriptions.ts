@@ -1,8 +1,8 @@
 import {
-    DataLoaderState, LoaderState,
+    DataLoaderState, LoaderState, ResourceLoadInfo,
 } from './data-loader-actions'
 
-export type DataUpdateCallback = (newState: LoaderState<any>) => void
+export type DataUpdateCallback = (newState: LoaderState<any>, internalState: any) => void
 export type StateSubscription = (state: DataLoaderState) => void
 
 export class Subscriptions {
@@ -56,21 +56,26 @@ export class Subscriptions {
         return without.length
     }
 
-    notifyStateSubscribersAndDataLoaders = (state: DataLoaderState) => {
-        const subscribedDataTypes = Object.keys(this.subscriptions)
+    notifyStateSubscribersAndDataLoaders = (
+        state: DataLoaderState,
+        metadata: ResourceLoadInfo<any, any>
+    ) => {
+        const resourceTypeSubscriptions = this.subscriptions[metadata.resourceType]
+        if (!resourceTypeSubscriptions) {
+            return
+        }
 
-        // Notify any dataloaders
-        for (const subscribedDataType of subscribedDataTypes) {
-            const subscribedKeys = Object.keys(this.subscriptions[subscribedDataType])
+        const resourceIdSubscriptions = resourceTypeSubscriptions[metadata.resourceId]
+        if (!resourceIdSubscriptions) {
+            return
+        }
 
-            for (const subscriberKey of subscribedKeys) {
-                const subscribers = this.subscriptions[subscribedDataType][subscriberKey]
-
-                for (const subscriber of subscribers) {
-                    if (state.data[subscribedDataType] && state.data[subscribedDataType][subscriberKey]) {
-                        subscriber(state.data[subscribedDataType][subscriberKey])
-                    }
-                }
+        for (const subscriber of resourceIdSubscriptions) {
+            const typeState = state.data[metadata.resourceType]
+            if (typeState && typeState[metadata.resourceId]) {
+                subscriber(
+                    typeState[metadata.resourceId],
+                    metadata.internalState)
             }
         }
 
