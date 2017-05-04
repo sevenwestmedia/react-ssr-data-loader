@@ -3,7 +3,7 @@ import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { PageActions } from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState, LoaderStatus } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 
 export interface DataResource {}
@@ -61,21 +61,13 @@ export default class ComponentFixture {
     }
 
     refreshData() {
-        if (this.lastRenderProps.status === LoaderStatus.Idle) {
-            this.resetPromise()
-            this.lastRenderActions.refresh()
-        } else {
-            throw new Error('Not in success state, can\'t refresh')
-        }
+        this.resetPromise()
+        this.lastRenderActions.refresh()
     }
 
     nextPage() {
-        if (this.lastRenderProps.status === LoaderStatus.Idle) {
-            this.resetPromise()
-            this.lastRenderActions.nextPage()
-        } else {
-            throw new Error('Not in success state, can\'t refresh')
-        }
+        this.resetPromise()
+        this.lastRenderActions.nextPage()
     }
 
     assertState() {

@@ -12,4 +12,13 @@ describe('data-loader', () => {
         await sut.testDataPromise.resolve(['Test2'])
         sut.assertState()
     })
+
+    it('calling nextPage when already loading a page ignores the action', async () => {
+        const sut = new PagedComponentFixture(undefined, "testKey", false)
+
+        await sut.testDataPromise.resolve(['Test'])
+        sut.nextPage()
+        sut.nextPage()
+        sut.assertState()
+    })
 })

@@ -3,7 +3,7 @@ import {
     DataLoaderState, LoaderState, Actions, reducer,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, REFRESH_DATA, NEXT_PAGE,
-    INIT, ResourceLoadInfo,
+    INIT, ResourceLoadInfo, LoaderStatus,
 } from './data-loader-actions'
 import DataLoaderResources from './data-loader-resources'
 import { Subscriptions, DataUpdateCallback } from './subscriptions'
@@ -91,6 +91,11 @@ export class DataLoaderContext {
         metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
     ) {
         const currentState = this.getLoadedState(metadata)
+
+        if (currentState && currentState.status !== LoaderStatus.Idle) {
+            return
+        }
+
         const existingData = currentState && currentState.data.hasData
             ? currentState.data.data
             : undefined
@@ -107,6 +112,11 @@ export class DataLoaderContext {
     refresh<TAdditionalParameters, TInternalState>(
         metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
     ) {
+        const currentState = this.getLoadedState(metadata)
+        if (currentState && currentState.status !== LoaderStatus.Idle) {
+            return
+        }
+
         this.dispatch<REFRESH_DATA>({
             type: REFRESH_DATA,
             meta: metadata,
