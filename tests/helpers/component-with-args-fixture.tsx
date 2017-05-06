@@ -12,7 +12,7 @@ export default class ComponentFixture<T extends object> {
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ resourceId: string }, any>
+    root: ReactWrapper<{ resourceId: string } & T, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     passedParams: T
@@ -20,7 +20,14 @@ export default class ComponentFixture<T extends object> {
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction
 
-    constructor(initialState: DataLoaderState | undefined, resourceId: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(
+        initialState: DataLoaderState | undefined, resourceId: string,
+        args: T,
+        isServerSideRender: boolean,
+        // For some reason the typescript compiler is not validating the JSX below properly
+        // And is saying this variable is not used
+        _clientLoadOnly = false
+    ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
@@ -31,7 +38,7 @@ export default class ComponentFixture<T extends object> {
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
+        const TestComponent: React.SFC<{ resourceId: string } & T> = (props) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -41,9 +48,8 @@ export default class ComponentFixture<T extends object> {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
-                    {...args}
-                    resourceId={resourceId}
-                    clientLoadOnly={clientLoadOnly}
+                    {...props as any}
+                    clientLoadOnly={_clientLoadOnly}
                     renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
@@ -55,7 +61,7 @@ export default class ComponentFixture<T extends object> {
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent resourceId={resourceId} />)
+        this.root = mount(<TestComponent resourceId={resourceId} {...args as any} />)
 
         this.component = this.root.find(TestDataLoader)
     }

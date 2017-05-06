@@ -47,7 +47,7 @@ export class Subscriptions {
                 delete this.subscriptions[resourceType]
             }
 
-            return subscriptions.length
+            return 0
         }
 
         const subscriptionIndex = subscriptions.indexOf(update)

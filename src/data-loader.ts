@@ -2,6 +2,7 @@ import * as React from 'react'
 import { LoaderState } from './'
 import { DataLoaderContext } from './data-provider'
 import { DataUpdateCallback } from './subscriptions'
+import * as shallowCompare from 'react-addons-shallow-compare'
 
 export type RenderData<T, TActions> =
     (loaderProps: LoaderState<T>, actions: TActions) => React.ReactElement<any> | null
@@ -74,21 +75,27 @@ export function createTypedDataLoader<
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
-        componentWillReceiveProps(nextProps: Props<TResource, TActions>) {
+        componentWillReceiveProps(nextProps: ComponentProps, nextState: ComponentState) {
             if (
                 // When the resourceId has changed we need to unmount then load the new resource
                 // This happens when the loader is used on a page which can be
                 // routed to different content
                 // For example a blog entry, which navigates to another blog entry
-                this.props.resourceId !== nextProps.resourceId
+
+                // We can use Reacts shallow compare because we force the params to be flattened
+                // onto the component, rather than having a params prop which contains everything
+                shallowCompare(this, nextProps, nextState)
             ) {
-                this.componentWillUnmount()
+                this.unloadOrDetachData()
                 this.context.dataLoader.loadData(this.actionMeta(nextProps), this.handleStateUpdate)
             }
         }
 
         componentWillUnmount() {
             this._isMounted = false
+        }
+
+        unloadOrDetachData() {
             if (this.props.unloadDataOnUnmount === false) {
                 this.context.dataLoader.detach(this.actionMeta(), this.handleStateUpdate)
             } else {
