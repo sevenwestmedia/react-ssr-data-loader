@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Props, createTypedDataLoader } from './data-loader'
-import { ResourceLoadInfo } from './data-loader-actions'
 
 export type LoadResource<TData, TResourceParameters> = (
     resourceId: string,
@@ -24,6 +23,11 @@ export interface Paging {
     /** Overrides pageSize for initial page */
     initialSize?: number
     pageSize: number
+    /**
+     * If true, new page data gets appended to existing data
+     * if false, only the current page will be kept
+     * Defaults to true */
+    keepPreviousPagesData?: boolean
 }
 export type PageComponentProps =  { paging: Paging }
 type PageState = { page: number }
@@ -66,17 +70,18 @@ export default class DataLoaderResources {
             resourceType,
             { page: 1 },
             (dataLoaderContext, props, internalState) => {
-                const getResourceInfo = (): ResourceLoadInfo<PageComponentProps, PageState> => ({
-                    resourceType,
-                    resourceId: props.resourceId,
-                    resourceLoadParams: { paging: props.paging },
-                    internalState,
-                })
                 return {
-                    refresh: () => dataLoaderContext.refresh(getResourceInfo()),
+                    refresh: () => dataLoaderContext.refresh({
+                        resourceType,
+                        resourceId: props.resourceId,
+                        resourceLoadParams: { paging: { ...props.paging, keepPreviousPagesData: false } },
+                        internalState: { page: 1 }
+                    }),
                     // Loads next page
                     nextPage: () => dataLoaderContext.nextPage({
-                        ...getResourceInfo(),
+                        resourceType,
+                        resourceId: props.resourceId,
+                        resourceLoadParams: { paging: { keepPreviousPagesData: true, ...props.paging } },
                         internalState: { page: internalState.page + 1 }
                     }),
                 }
@@ -93,7 +98,7 @@ export default class DataLoaderResources {
         ): Promise<PagedData<TData>> => {
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
             const data = await loadResource(dataKey, pageInfo.paging, pageNumber)
-            if (existingData && existingData.data) {
+            if (existingData && existingData.data && pageInfo.paging.keepPreviousPagesData) {
                 return {
                     pageNumber,
                     data: [...existingData.data, ...data]

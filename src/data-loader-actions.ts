@@ -1,12 +1,12 @@
 export type SuccessAction = {
     type: 'none' | 'initial-fetch' | 'refresh' | 'page'
-    success: true
+    success: true,
 }
 
 export type FailedAction = {
     type: 'initial-fetch' | 'refresh' | 'page'
     success: false
-    error: string
+    error: string,
 }
 
 export enum LoaderStatus { // The loader is ________ (the data/resource)
@@ -38,7 +38,7 @@ export type LoaderState<TData> = {
      * Some kind of sentinel value so that the object doesn't become top heavy ???
      */
 
-    data: Data<TData>
+    data: Data<TData>,
 }
 
 // @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
@@ -69,12 +69,14 @@ export interface INIT {
 }
 
 export const REFRESH_DATA = 'resource-data-loader/REFRESH_DATA'
+// tslint:disable-next-line:class-name
 export interface REFRESH_DATA {
     type: 'resource-data-loader/REFRESH_DATA'
     meta: ResourceLoadInfo<any, any>
 }
 
 export const NEXT_PAGE = 'resource-data-loader/NEXT_PAGE'
+// tslint:disable-next-line:class-name
 export interface NEXT_PAGE {
     type: 'resource-data-loader/NEXT_PAGE'
     meta: ResourceLoadInfo<any, any>
@@ -82,22 +84,25 @@ export interface NEXT_PAGE {
 }
 
 export const LOAD_DATA = 'resource-data-loader/LOAD_DATA'
+// tslint:disable-next-line:class-name
 export interface LOAD_DATA {
     type: 'resource-data-loader/LOAD_DATA'
     meta: ResourceLoadInfo<any, any>
 }
 
 export const LOAD_DATA_COMPLETED = 'resource-data-loader/LOAD_DATA_COMPLETED'
+// tslint:disable-next-line:class-name
 export interface LOAD_DATA_COMPLETED {
     type: 'resource-data-loader/LOAD_DATA_COMPLETED'
     meta: ResourceLoadInfo<any, any>
     payload: {
         data: any
-        dataFromServerSideRender: boolean
+        dataFromServerSideRender: boolean,
     }
 }
 
 export const LOAD_DATA_FAILED = 'resource-data-loader/LOAD_DATA_FAILED'
+// tslint:disable-next-line:class-name
 export interface LOAD_DATA_FAILED {
     type: 'resource-data-loader/LOAD_DATA_FAILED'
     meta: ResourceLoadInfo<any, any>
@@ -105,6 +110,7 @@ export interface LOAD_DATA_FAILED {
 }
 
 export const UNLOAD_DATA = 'resource-data-loader/UNLOAD_DATA'
+// tslint:disable-next-line:class-name
 export interface UNLOAD_DATA {
     type: 'resource-data-loader/UNLOAD_DATA'
     meta: ResourceLoadInfo<any, any>
@@ -117,10 +123,12 @@ export type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
 const defaultState: LoaderState<any> = {
     data: { hasData: false },
     status: LoaderStatus.Idle,
-    lastAction: { type: 'none', success: true }
+    lastAction: { type: 'none', success: true },
 }
 
-const currentDataOrDefault = (meta: ResourceLoadInfo<any, any>, state: DataLoaderState): LoaderState<any> => {
+const currentDataOrDefault = (
+    meta: ResourceLoadInfo<any, any>, state: DataLoaderState,
+): LoaderState<any> => {
     const resourceTypeData = state.data[meta.resourceType]
     if (!resourceTypeData) { return defaultState }
 
@@ -142,59 +150,62 @@ export const reducer = (state: DataLoaderState = {
 }, action: Actions): DataLoaderState => {
     switch (action.type) {
         case LOAD_DATA: {
-            const defaultState = currentDataOrDefault(action.meta, state)
+            const currentOrDefault = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Fetching,
-                lastAction: defaultState.lastAction, // TODO Should we always go back to idle?
-                data: defaultState.data,
+                lastAction: currentOrDefault.lastAction, // TODO Should we always go back to idle?
+                data: currentOrDefault.data,
             }
             return {
                 loadingCount: state.loadingCount + 1,
                 data: {
                     ...state.data,
-                    [action.meta.resourceType]: <DataKeyMap>{
+                    [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading
-                    }
-                }
+                        [action.meta.resourceId]: loading,
+                    } as DataKeyMap,
+                },
             }
         }
+        // tslint:disable-next-line:no-switch-case-fall-through
         case NEXT_PAGE: {
             const currentState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Paging,
                 lastAction: { type: 'none', success: true },
-                data: currentState.data
+                data: currentState.data,
             }
             return {
                 loadingCount: state.loadingCount + 1,
                 data: {
                     ...state.data,
-                    [action.meta.resourceType]: <DataKeyMap>{
+                    [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading
-                    }
-                }
+                        [action.meta.resourceId]: loading,
+                    } as DataKeyMap,
+                },
             }
         }
+        // tslint:disable-next-line:no-switch-case-fall-through
         case REFRESH_DATA: {
             const currentState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Refreshing,
                 lastAction: { type: 'none', success: true },
-                data: currentState.data
+                data: currentState.data,
             }
             return {
                 loadingCount: state.loadingCount + 1,
                 data: {
                     ...state.data,
-                    [action.meta.resourceType]: <DataKeyMap>{
+                    [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading
-                    }
-                }
+                        [action.meta.resourceId]: loading,
+                    } as DataKeyMap,
+                },
             }
         }
+        // tslint:disable-next-line:no-switch-case-fall-through
         case LOAD_DATA_COMPLETED: {
             const currentState = currentDataOrDefault(action.meta, state)
             const lastAction = statusMap[currentState.status]
@@ -205,20 +216,21 @@ export const reducer = (state: DataLoaderState = {
                 data: {
                     hasData: true,
                     data: action.payload.data,
-                    dataFromServerSideRender: action.payload.dataFromServerSideRender
-                }
+                    dataFromServerSideRender: action.payload.dataFromServerSideRender,
+                },
             }
             return {
                 loadingCount: state.loadingCount - 1,
                 data: {
                     ...state.data,
-                    [action.meta.resourceType]: <DataKeyMap>{
+                    [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: completed
-                    }
-                }
+                        [action.meta.resourceId]: completed,
+                    } as DataKeyMap,
+                },
             }
         }
+        // tslint:disable-next-line:no-switch-case-fall-through
         case LOAD_DATA_FAILED: {
             const currentState = currentDataOrDefault(action.meta, state)
             const lastAction = statusMap[currentState.status]
@@ -232,13 +244,14 @@ export const reducer = (state: DataLoaderState = {
                 loadingCount: state.loadingCount - 1,
                 data: {
                     ...state.data,
-                    [action.meta.resourceType]: <DataKeyMap>{
+                    [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: failed
-                    }
-                }
+                        [action.meta.resourceId]: failed,
+                    } as DataKeyMap,
+                },
             }
         }
+        // tslint:disable-next-line:no-switch-case-fall-through
         case UNLOAD_DATA: {
             const newState = { loadingCount: state.loadingCount, data: { ...state.data } }
             const dataType = newState.data[action.meta.resourceType]
@@ -252,7 +265,9 @@ export const reducer = (state: DataLoaderState = {
 
             return newState
         }
-    }
 
-    return state
+        // tslint:disable-next-line:no-switch-case-fall-through
+        default:
+            return state
+    }
 }

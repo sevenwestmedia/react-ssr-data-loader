@@ -21,4 +21,15 @@ describe('data-loader', () => {
         sut.nextPage()
         sut.assertState()
     })
+
+    it('refresh causes page to go back to page 1', async () => {
+        const sut = new PagedComponentFixture(undefined, "testKey", false)
+
+        await sut.testDataPromise.resolve(['Test'])
+        sut.nextPage()
+        await sut.testDataPromise.resolve(['Test2'])
+        sut.refreshData()
+        await sut.testDataPromise.resolve(['Test'])
+        sut.assertState()
+    })
 })

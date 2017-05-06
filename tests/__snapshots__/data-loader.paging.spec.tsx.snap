@@ -27,6 +27,35 @@ Object {
 }
 `;
 
+exports[`data-loader refresh causes page to go back to page 1 1`] = `
+Object {
+  "loadAllCompletedCalled": 3,
+  "loadDataCount": 3,
+  "renderActions": Object {
+    "nextPage": [Function],
+    "refresh": [Function],
+  },
+  "renderCount": 6,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "data": Array [
+          "Test",
+        ],
+        "pageNumber": 1,
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "refresh",
+    },
+    "status": 0,
+  },
+}
+`;
+
 exports[`data-loader supports paged data 1`] = `
 Object {
   "loadAllCompletedCalled": 1,

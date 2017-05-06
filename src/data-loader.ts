@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { LoaderState } from './'
 import { DataLoaderContext } from './data-provider'
-import { DataUpdateCallback } from "./subscriptions";
+import { DataUpdateCallback } from './subscriptions'
 
-export interface RenderData<T, TActions> {
-    (loaderProps: LoaderState<T>, actions: TActions): React.ReactElement<any> | null
-}
+export type RenderData<T, TActions> =
+    (loaderProps: LoaderState<T>, actions: TActions) => React.ReactElement<any> | null
+
 export interface Props<T, TActions> {
     /** The id of the resource */
     resourceId: string
@@ -26,7 +26,8 @@ export type Return<TResource, TActions, TDataLoaderParams> =
 // The function provides a closure for anything specific to the resource
 /**
  * TLoadResourceParams is the type of the arguments to load the resource
- * TActions is the type of additional actions provided by the renderData function (in addition to the BuildInActions like refresh)
+ * TActions is the type of additional actions provided by the renderData function
+ * (in addition to the BuildInActions like refresh)
  */
 export function createTypedDataLoader<
     TResource,
@@ -40,9 +41,9 @@ export function createTypedDataLoader<
     actions: (
         dataLoader: DataLoaderContext,
         props: Props<TResource, TActions> & TDataLoaderParams,
-        internalState: TInternalState
-    ) => TActions
-) : Return<TResource, TActions, TDataLoaderParams> {
+        internalState: TInternalState,
+    ) => TActions,
+): Return<TResource, TActions, TDataLoaderParams> {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
@@ -69,7 +70,8 @@ export function createTypedDataLoader<
         componentWillReceiveProps(nextProps: Props<TResource, TActions>) {
             if (
                 // When the resourceId has changed we need to unmount then load the new resource
-                // This happens when the loader is used on a page which can be routed to different content
+                // This happens when the loader is used on a page which can be
+                // routed to different content
                 // For example a blog entry, which navigates to another blog entry
                 this.props.resourceId !== nextProps.resourceId
             ) {
@@ -87,12 +89,36 @@ export function createTypedDataLoader<
             }
         }
 
+        render() {
+            if (!this.state.loaderState
+                || this.context.dataLoader.isServerSideRender
+                && this.props.clientLoadOnly
+            ) {
+                return null
+            }
+
+            const meta = this.actionMeta()
+
+            // These are the actions available for the renderData callback
+            const availableActions = actions(
+                    this.context.dataLoader,
+                    { ...this.props as any, ...meta.internalState as any },
+                    this.state.internalState)
+
+            return this.props.renderData(
+                this.state.loaderState,
+                availableActions,
+            )
+        }
+
         private actionMeta = (props: Props<TResource, TActions> = this.props) => {
-            const { resourceId, clientLoadOnly, renderData, unloadDataOnUnmount, ...resourceLoadParams } = props
+            const {
+                resourceId, clientLoadOnly, renderData, unloadDataOnUnmount, ...resourceLoadParams,
+            } = props
 
             // TODO Add type safety here, am turning the remaing props into resourceLoadParams
-            // For example this could be paging into, or any other data which needs to be passed through
-            // the data loader to the resource loading function
+            // For example this could be paging into, or any other data which needs
+            // to be passed through the data loader to the resource loading function
             return {
                 resourceType,
                 resourceId,
@@ -101,28 +127,13 @@ export function createTypedDataLoader<
             }
         }
 
-        private handleStateUpdate: DataUpdateCallback = (loadedState: LoaderState<TResource>, internalState: TInternalState): void => {
+        private handleStateUpdate: DataUpdateCallback = (
+            loadedState: LoaderState<TResource>, internalState: TInternalState
+        ): void => {
             this.setState({
                 loaderState: loadedState,
-                internalState
+                internalState,
             })
-        }
-
-        render() {
-            if (!this.state.loaderState || this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
-                return null
-            }
-
-            // These are the actions available for the renderData callback
-            const availableActions = actions(
-                    this.context.dataLoader,
-                    this.props,
-                    this.state.internalState)
-
-            return this.props.renderData(
-                this.state.loaderState,
-                availableActions,
-            )
         }
     }
 

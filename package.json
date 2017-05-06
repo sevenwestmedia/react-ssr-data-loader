@@ -1,6 +1,6 @@
 {
   "name": "redux-data-loader",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "src/index.js",
   "typings": "src/",
   "publishConfig": {
@@ -31,7 +31,7 @@
     "typescript": "^2.2.2"
   },
   "scripts": {
-    "build": "tsc -p . -d",
+    "build": "tsc -p .",
     "prepublish": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
