@@ -65,20 +65,20 @@ export interface ResourceLoadInfo<TAdditionalParameters, TInternalState> {
 
 export const INIT = 'resource-data-loader/INIT'
 export interface INIT {
-    type: 'resource-data-loader/INIT'
+    type: typeof INIT
 }
 
 export const REFRESH_DATA = 'resource-data-loader/REFRESH_DATA'
 // tslint:disable-next-line:class-name
 export interface REFRESH_DATA {
-    type: 'resource-data-loader/REFRESH_DATA'
+    type: typeof REFRESH_DATA
     meta: ResourceLoadInfo<any, any>
 }
 
 export const NEXT_PAGE = 'resource-data-loader/NEXT_PAGE'
 // tslint:disable-next-line:class-name
 export interface NEXT_PAGE {
-    type: 'resource-data-loader/NEXT_PAGE'
+    type: typeof NEXT_PAGE
     meta: ResourceLoadInfo<any, any>
     payload: { existingData: any }
 }
@@ -104,7 +104,7 @@ export interface LOAD_DATA_COMPLETED {
 export const LOAD_DATA_FAILED = 'resource-data-loader/LOAD_DATA_FAILED'
 // tslint:disable-next-line:class-name
 export interface LOAD_DATA_FAILED {
-    type: 'resource-data-loader/LOAD_DATA_FAILED'
+    type: typeof LOAD_DATA_FAILED
     meta: ResourceLoadInfo<any, any>
     payload: string
 }
@@ -112,7 +112,7 @@ export interface LOAD_DATA_FAILED {
 export const UNLOAD_DATA = 'resource-data-loader/UNLOAD_DATA'
 // tslint:disable-next-line:class-name
 export interface UNLOAD_DATA {
-    type: 'resource-data-loader/UNLOAD_DATA'
+    type: typeof UNLOAD_DATA
     meta: ResourceLoadInfo<any, any>
 }
 
