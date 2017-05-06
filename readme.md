@@ -98,6 +98,7 @@ The `DataProvider` is the component which is responsible for actually fetching t
 
 ### TODOS
  - Gracefully handle if no data loader keys are present
+ - Add logging hooks
 
 ### Things to consider/discuss
  - Should renderProps/actions be the same object?

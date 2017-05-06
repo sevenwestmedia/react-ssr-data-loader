@@ -1,5 +1,4 @@
 import ComponentFixture from './helpers/component-fixture'
-import ComponentWithArgsFixture from './helpers/component-with-args-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
 
@@ -49,16 +48,6 @@ describe('data-loader', () => {
         expect(sut.loadAllCompletedCalled).toBe(0)
         await sut.testDataPromise.resolve({ result: 'Test' })
         expect(sut.loadAllCompletedCalled).toBe(1)
-    })
-
-    it('can specify arguments for data loader', async () => {
-        const foo = { bar: 1 }
-        const sut = new ComponentWithArgsFixture(undefined, "testKey", foo, false)
-
-        await sut.testDataPromise.resolve({ result: 'Test' })
-
-        expect(sut.passedParams).toEqual(foo)
-        sut.assertState()
     })
 
     it('can support preserving data on unmount', async () => {
