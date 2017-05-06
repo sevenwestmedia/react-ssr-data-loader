@@ -28,7 +28,7 @@ Object {
 
 exports[`data-loader updates data when params change 1`] = `
 Object {
-  "loadAllCompletedCalled": 1,
+  "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
   "passedParams": Object {
     "bar": 2,
@@ -36,7 +36,7 @@ Object {
   "renderActions": Object {
     "refresh": [Function],
   },
-  "renderCount": 3,
+  "renderCount": 4,
   "renderProps": Object {
     "data": Object {
       "data": Object {
