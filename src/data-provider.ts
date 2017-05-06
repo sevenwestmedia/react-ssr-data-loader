@@ -1,10 +1,11 @@
 import * as React from 'react'
 import {
-    DataLoaderState, LoaderState, Actions, reducer,
+    DataLoaderState, LoaderState, Actions,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
     UNLOAD_DATA, REFRESH_DATA, NEXT_PAGE,
     INIT, ResourceLoadInfo, LoaderStatus,
 } from './data-loader-actions'
+import reducer from './data-loader-reducer'
 import DataLoaderResources from './data-loader-resources'
 import { Subscriptions, DataUpdateCallback } from './subscriptions'
 
