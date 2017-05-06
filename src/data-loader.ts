@@ -22,12 +22,19 @@ type State<T, TInternalState extends object> = {
 export type Return<TResource, TActions, TDataLoaderParams> =
     React.ComponentClass<Props<TResource, TActions> & TDataLoaderParams>
 
-// This function needs to exist because for each resource we need a new react component
-// The function provides a closure for anything specific to the resource
+// The `createTypedDataLoader` function needs to exist because for each
+// resource we need a new react component
+// The function provides a closure for anything specific to that resource
+
 /**
- * TLoadResourceParams is the type of the arguments to load the resource
+ * TDataLoaderParams is the type of the arguments to load the resource
+ * 
  * TActions is the type of additional actions provided by the renderData function
  * (in addition to the BuildInActions like refresh)
+ * 
+ * TInternalState allows a resource to track some sort of state without
+ * exposing it to the end user. This is where the current page number
+ * is stored for instance
  */
 export function createTypedDataLoader<
     TResource,
