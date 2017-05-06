@@ -2,6 +2,9 @@ exports[`data-loader can specify arguments for data loader 1`] = `
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
+  "passedParams": Object {
+    "bar": 1,
+  },
   "renderActions": Object {
     "refresh": [Function],
   },
