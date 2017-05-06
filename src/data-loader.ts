@@ -75,24 +75,32 @@ export function createTypedDataLoader<
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
-        componentWillReceiveProps(nextProps: ComponentProps, nextState: ComponentState) {
+        componentWillReceiveProps(nextProps: ComponentProps) {
             if (
-                // When the resourceId has changed we need to unmount then load the new resource
+                // When the resource params has changed we need to update the resource data
                 // This happens when the loader is used on a page which can be
                 // routed to different content
                 // For example a blog entry, which navigates to another blog entry
 
                 // We can use Reacts shallow compare because we force the params to be flattened
                 // onto the component, rather than having a params prop which contains everything
-                shallowCompare(this, nextProps, nextState)
+                // We also always want to only take props into account, so this.state is intentially passed
+                shallowCompare(this, nextProps, this.state)
             ) {
-                this.unloadOrDetachData()
-                this.context.dataLoader.loadData(this.actionMeta(nextProps), this.handleStateUpdate)
+                if (this.props.resourceId !== nextProps.resourceId) {
+                    this.unloadOrDetachData()
+                    this.context.dataLoader.loadData(this.actionMeta(nextProps), this.handleStateUpdate)
+                    return
+                }
+
+                this.context.dataLoader.update(this.actionMeta(nextProps))
             }
         }
 
         componentWillUnmount() {
             this._isMounted = false
+            // TODO This was missing and no tests were failing... Add test
+            this.unloadOrDetachData()
         }
 
         unloadOrDetachData() {

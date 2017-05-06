@@ -2,7 +2,7 @@ import {
     LoaderState, LoaderStatus, ResourceLoadInfo, DataLoaderState,
     FailedAction, Actions, LOAD_DATA, DataKeyMap,
     NEXT_PAGE, REFRESH_DATA, LOAD_DATA_COMPLETED,
-    LOAD_DATA_FAILED, UNLOAD_DATA
+    LOAD_DATA_FAILED, UNLOAD_DATA, UPDATE_DATA,
 } from './data-loader-actions'
 
 const defaultState: LoaderState<any> = {
@@ -26,6 +26,7 @@ const currentDataOrDefault = (
 const statusMap: { [key: number]: FailedAction['type'] } = {
     [LoaderStatus.Paging]: 'page',
     [LoaderStatus.Refreshing]: 'refresh',
+    [LoaderStatus.Updating]: 'update',
     [LoaderStatus.Fetching]: 'initial-fetch',
 }
 
@@ -57,6 +58,25 @@ export default (state: DataLoaderState = {
             const currentState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Paging,
+                lastAction: { type: 'none', success: true },
+                data: currentState.data,
+            }
+            return {
+                loadingCount: state.loadingCount + 1,
+                data: {
+                    ...state.data,
+                    [action.meta.resourceType]: {
+                        ...state.data[action.meta.resourceType],
+                        [action.meta.resourceId]: loading,
+                    } as DataKeyMap,
+                },
+            }
+        }
+        // tslint:disable-next-line:no-switch-case-fall-through
+        case UPDATE_DATA: {
+            const currentState = currentDataOrDefault(action.meta, state)
+            const loading: LoaderState<any> = {
+                status: LoaderStatus.Updating,
                 lastAction: { type: 'none', success: true },
                 data: currentState.data,
             }

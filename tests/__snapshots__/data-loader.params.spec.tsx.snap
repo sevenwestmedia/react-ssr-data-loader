@@ -26,6 +26,12 @@ Object {
 }
 `;
 
+exports[`data-loader existing data is passed when params change 1`] = `
+Object {
+  "result": "Test",
+}
+`;
+
 exports[`data-loader updates data when params change 1`] = `
 Object {
   "loadAllCompletedCalled": 2,
@@ -47,7 +53,7 @@ Object {
     },
     "lastAction": Object {
       "success": true,
-      "type": "initial-fetch",
+      "type": "update",
     },
     "status": 0,
   },

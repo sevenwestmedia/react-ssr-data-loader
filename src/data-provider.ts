@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
     DataLoaderState, LoaderState, Actions,
     LOAD_DATA, LOAD_DATA_FAILED, LOAD_DATA_COMPLETED,
-    UNLOAD_DATA, REFRESH_DATA, NEXT_PAGE,
+    UNLOAD_DATA, REFRESH_DATA, NEXT_PAGE, UPDATE_DATA,
     INIT, ResourceLoadInfo, LoaderStatus,
 } from './data-loader-actions'
 import reducer from './data-loader-reducer'
@@ -64,15 +64,14 @@ export class DataLoaderContext {
         update: DataUpdateCallback
     ) {
         const firstAttached = this.attach(metadata, update)
-        const loadedState = this.getLoadedState(metadata)
+        const loadedState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
 
         if (this.isServerSideRender && ssrNeedsData(loadedState) && firstAttached) {
             return await this._loadData(metadata)
         } else {
-            // Give the data-loader it's state
-            const loaderState = this.getLoadedState(metadata)
-            loaderState && update(
-                loaderState, metadata.internalState
+            // Give the data-loader it's state, if it has any
+            loadedState && update(
+                loadedState, metadata.internalState
             )
         }
 
@@ -91,7 +90,7 @@ export class DataLoaderContext {
     nextPage<TAdditionalParameters, TInternalState>(
         metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
     ) {
-        const currentState = this.getLoadedState(metadata)
+        const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
 
         if (currentState && currentState.status !== LoaderStatus.Idle) {
             return
@@ -110,10 +109,33 @@ export class DataLoaderContext {
         return this.performLoadData(metadata, existingData)
     }
 
+    /** Update is similar to refresh, but semantically different
+     * Updating is used when the id or params have changed and the data
+     * needs to be updated
+     */
+    update<TAdditionalParameters, TInternalState>(
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>,
+    ) {
+        const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
+        if (currentState && currentState.status !== LoaderStatus.Idle) {
+            return
+        }
+        const existingData = currentState && currentState.data.hasData
+            ? currentState.data.data
+            : undefined
+
+        this.dispatch<UPDATE_DATA>({
+            type: UPDATE_DATA,
+            meta: metadata,
+        }, metadata)
+
+        return this.performLoadData(metadata, existingData)
+    }
+
     refresh<TAdditionalParameters, TInternalState>(
         metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
     ) {
-        const currentState = this.getLoadedState(metadata)
+        const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         if (currentState && currentState.status !== LoaderStatus.Idle) {
             return
         }
@@ -153,7 +175,7 @@ export class DataLoaderContext {
     }
 
     private _loadData = (metadata: ResourceLoadInfo<any, any>) => {
-        const currentState = this.getLoadedState(metadata)
+        const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         const existingData = currentState && currentState.data.hasData
             ? currentState.data.data
             : undefined
@@ -179,13 +201,13 @@ export class DataLoaderContext {
         return firstDataLoaderForResourceAndId
     }
 
-    private getLoadedState = (metadata: ResourceLoadInfo<any, any>): LoaderState<any> | undefined => {
-        const dataLookup = this.state.data[metadata.resourceType]
+    private getLoadedState = (resourceType: string, resourceId: string): LoaderState<any> | undefined => {
+        const dataLookup = this.state.data[resourceType]
         if (!dataLookup) {
             return undefined
         }
 
-        return dataLookup[metadata.resourceId]
+        return dataLookup[resourceId]
     }
 
     private performLoadData = async (metadata: ResourceLoadInfo<any, any>, existingData: any) => {

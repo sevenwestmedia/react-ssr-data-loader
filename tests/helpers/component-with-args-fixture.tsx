@@ -19,6 +19,7 @@ export default class ComponentFixture<T extends object> {
     currentState: DataLoaderState | undefined
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction
+    existingData: Data
 
     constructor(
         initialState: DataLoaderState | undefined, resourceId: string,
@@ -32,9 +33,10 @@ export default class ComponentFixture<T extends object> {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
         
-        const TestDataLoader = this.resources.registerResource(resourceType, (_: string, params: T) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, (_: string, params: T, existingData: Data) => {
             this.loadDataCount++
             this.passedParams = params
+            this.existingData = existingData
             return this.testDataPromise.promise
         })
 
