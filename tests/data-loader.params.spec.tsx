@@ -11,7 +11,7 @@ describe('data-loader', () => {
         sut.assertState()
     })
 
-    it.only('updates data when params change', async () => {
+    it('updates data when params change', async () => {
         const args = { bar: 1 }
         const sut = new ComponentWithArgsFixture(undefined, "testKey", args, false)
         await sut.testDataPromise.resolve({ result: 'Test' })
