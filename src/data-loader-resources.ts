@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Props, createTypedDataLoader } from './data-loader'
+import { Props, createTypedDataLoader, ActionContext } from './data-loader'
 
 export type LoadResource<TData, TResourceParameters> = (
     resourceId: string,
@@ -43,19 +43,21 @@ export default class DataLoaderResources {
         resourceType: string,
         loadResource: LoadResource<TData, TResourceParameters>
     ): React.ComponentClass<Props<TData, RefreshAction> & TResourceParameters> {
+        type ActionsThis = ActionContext<TData, TResourceParameters, {}>
         const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, {}, RefreshAction>(
             resourceType, 
             {},
-            (dataLoaderContext, props, internalState) => {
-                return {
-                    refresh: () => dataLoaderContext.refresh({
+            {
+                refresh: function(this: ActionsThis) {
+                    return this.context.dataLoader.refresh({
                         resourceType,
-                        resourceId: props.resourceId,
-                        resourceLoadParams: props,
-                        internalState,
+                        resourceId: this.props.resourceId,
+                        resourceLoadParams: this.props,
+                        internalState: this.internalState,
                     })
                 }
-            })
+            }
+        )
         this.resources[resourceType] = loadResource
 
         return typedDataLoader
@@ -66,24 +68,32 @@ export default class DataLoaderResources {
         resourceType: string,
         loadResource: (resourceId: string, paging: Paging, page: number) => Promise<TData[]>
     ): React.ComponentClass<Props<PagedData<TData>, PageActions> & PageComponentProps> {
+        type ActionsThis = ActionContext<TData, PageComponentProps, PageState>
+        
         const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageComponentProps, PageState, PageActions>(
             resourceType,
             { page: 1 },
-            (dataLoaderContext, props, internalState) => {
-                return {
-                    refresh: () => dataLoaderContext.refresh({
+            {
+                refresh: function(this: ActionsThis) {
+                    return this.context.dataLoader.refresh({
                         resourceType,
-                        resourceId: props.resourceId,
-                        resourceLoadParams: { paging: { ...props.paging, keepPreviousPagesData: false } },
+                        resourceId: this.props.resourceId,
+                        resourceLoadParams: {
+                            paging: { ...this.props.paging, keepPreviousPagesData: false }
+                        },
                         internalState: { page: 1 }
-                    }),
-                    // Loads next page
-                    nextPage: () => dataLoaderContext.nextPage({
+                    })
+                },
+                // Loads next page
+                nextPage: function(this: ActionsThis) {
+                    return this.context.dataLoader.nextPage({
                         resourceType,
-                        resourceId: props.resourceId,
-                        resourceLoadParams: { paging: { keepPreviousPagesData: true, ...props.paging } },
-                        internalState: { page: internalState.page + 1 }
-                    }),
+                        resourceId: this.props.resourceId,
+                        resourceLoadParams: {
+                            paging: { keepPreviousPagesData: true, ...this.props.paging }
+                        },
+                        internalState: { page: this.internalState().page + 1 }
+                    })
                 }
             }
         )

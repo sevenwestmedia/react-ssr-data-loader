@@ -22,6 +22,7 @@ type State<T, TInternalState extends object> = {
 
 export type Return<TResource, TActions, TDataLoaderParams> =
     React.ComponentClass<Props<TResource, TActions> & TDataLoaderParams>
+type Context = { dataLoader: DataLoaderContext }
 
 // The `createTypedDataLoader` function needs to exist because for each
 // resource we need a new react component
@@ -37,33 +38,51 @@ export type Return<TResource, TActions, TDataLoaderParams> =
  * exposing it to the end user. This is where the current page number
  * is stored for instance
  */
+export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
+    context: Context,
+    props: Props<TResource, any> & TDataLoaderParams,
+    internalState: () => TInternalState
+}
 export function createTypedDataLoader<
     TResource,
     TDataLoaderParams,
     TInternalState extends object,
-    TActions extends object
+    TActions extends {
+        // We bind this so we can reuse the same function so actions do not cause
+        // PureComponent's to re-render
+        [actionName: string]: (this: ActionContext<TResource, TDataLoaderParams, TInternalState>) => void
+    }
 >(
     resourceType: string,
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
-    actions: (
-        dataLoader: DataLoaderContext,
-        props: Props<TResource, TActions> & TDataLoaderParams,
-        internalState: TInternalState,
-    ) => TActions,
+    actions: TActions,
 ): Return<TResource, TActions, TDataLoaderParams> {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
-    class DataLoader extends React.PureComponent<ComponentProps, ComponentState> {
+    class DataLoader
+        extends React.PureComponent<ComponentProps, ComponentState>
+        implements ActionContext<TResource, TDataLoaderParams, TInternalState>
+    {
         static contextTypes = {
             dataLoader: React.PropTypes.object
         }
-        context: { dataLoader: DataLoaderContext }
+        context: Context
         state: ComponentState = {
             internalState: initialInternalState,
         }
         private _isMounted: boolean
+
+        constructor(props: ComponentProps, context: Context) {
+            super(props, context)
+
+            // Bind each action to the instance of this data loader
+            // so the actions can access current state/props when they need to
+            Object.keys(actions).forEach(key => {
+                actions[key] = actions[key].bind(this)
+            })
+        }
 
         componentWillMount() {
             this._isMounted = true
@@ -111,6 +130,10 @@ export function createTypedDataLoader<
             }
         }
 
+        internalState = () => {
+            return this.state.internalState
+        }
+
         render() {
             if (!this.state.loaderState
                 || this.context.dataLoader.isServerSideRender
@@ -119,17 +142,9 @@ export function createTypedDataLoader<
                 return null
             }
 
-            const meta = this.actionMeta()
-
-            // These are the actions available for the renderData callback
-            const availableActions = actions(
-                    this.context.dataLoader,
-                    { ...this.props as any, ...meta.internalState as any },
-                    this.state.internalState)
-
             return this.props.renderData(
                 this.state.loaderState,
-                availableActions,
+                actions,
             )
         }
 
