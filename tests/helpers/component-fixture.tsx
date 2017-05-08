@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState } from '../../src/data-loader'
+import { mount, ReactWrapper } from 'enzyme'
+import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
-import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState, reducer } from '../../src/data-loader-actions'
+import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
-import { Data, dataType } from './test-data'
+import { Data, resourceType } from './test-data'
 
-interface FixtureOptions {
+export interface FixtureOptions {
     isServerSideRender: boolean
     clientLoadOnly?: boolean
     unloadDataOnUnmount?: boolean
@@ -18,22 +18,25 @@ export default class ComponentFixture {
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ dataKey: string }, any>
+    root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
-    currentState: DataLoaderState
-    lastRenderProps: LoadedState<Data, {}>
+    currentState: DataLoaderState | undefined
+    lastRenderProps: LoaderState<Data>
+    lastRenderActions: RefreshAction
+    lastExistingData: Data
 
-    constructor(initialState: DataLoaderState, dataKey: string, options: FixtureOptions) {
+    constructor(initialState: DataLoaderState | undefined, resourceId: string, options: FixtureOptions) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(dataType, (dataKey: string) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, (_, __, existingData: Data) => {
+            this.lastExistingData = existingData
             this.loadDataCount++
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={options.isServerSideRender}
@@ -43,19 +46,20 @@ export default class ComponentFixture {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
-                    dataKey={dataKey}
+                    resourceId={resourceId}
                     clientLoadOnly={options.clientLoadOnly}
                     unloadDataOnUnmount={options.unloadDataOnUnmount}
-                    renderData={(props) => {
+                    renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
+                        this.lastRenderActions = actions
                         return null
                     }}
                 />
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent dataKey={dataKey} />)
+        this.root = mount(<TestComponent resourceId={resourceId} />)
 
         this.component = this.root.find(TestDataLoader)
     }
@@ -65,17 +69,14 @@ export default class ComponentFixture {
             renderCount: this.renderCount,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
+            renderActions: this.lastRenderActions,
             loadDataCount: this.loadDataCount
         }).toMatchSnapshot()
     }
 
     refreshData() {
-        if (this.lastRenderProps.isLoaded) {
-            this.resetPromise()
-            this.lastRenderProps.actions.refresh()
-        } else {
-            throw new Error('Not in success state, can\'t refresh')
-        }
+        this.resetPromise()
+        this.lastRenderActions.refresh()
     }
 
     resetPromise() {

@@ -1,75 +1,114 @@
 import * as React from 'react'
-import { Props, createTypedDataLoader } from './data-loader'
+import { Props, createTypedDataLoader, ActionContext } from './data-loader'
 
-export type LoadResource = (dataKey: string, resourceParameters?: any, existingData?: any) => Promise<any>
+export type LoadResource<TData, TResourceParameters> = (
+    resourceId: string,
+    resourceParameters: TResourceParameters,
+    existingData: TData
+) => Promise<TData>
+
 interface Resources {
-    [dataType: string]: LoadResource
+    [dataType: string]: LoadResource<any, any>
 }
 
 export interface PagedData<Datum> {
     pageNumber: number
     data: Datum[]
 }
-export type PageActions = { nextPage: () => void }
+export type RefreshAction = { refresh: () => void }
+export type PageActions = { nextPage: () => void } & RefreshAction
 export interface Paging {
     /** Defaults to 0 */
     initialOffset?: number
     /** Overrides pageSize for initial page */
     initialSize?: number
     pageSize: number
+    /**
+     * If true, new page data gets appended to existing data
+     * if false, only the current page will be kept
+     * Defaults to true */
+    keepPreviousPagesData?: boolean
 }
-export type PageProps = { page: number, paging: Paging }
+export type PageComponentProps =  { paging: Paging }
+type PageState = { page: number }
 
 export default class DataLoaderResources {
     private resources: Resources = {}
 
-    /** WARNING: If you use multiple instances of this data loader
-     * the second 
+    /**
+     * When using parameterised resources you cannot have multiple instances of the returned data loader
+     * with the same resourceId.
      */
-    registerResourceWithParameters<T extends object, TData>(
-        dataType: string, loadResource: (dataKey: string, resourceParameters: T, existingData: TData) => Promise<TData>
-    ): React.ComponentClass<Props<TData, {}> & T> {
-        const typedDataLoader = createTypedDataLoader<TData, T, {}>(dataType, () => ({}))
-        this.resources[dataType] = loadResource
-
-        return typedDataLoader
-    }
-
-
-    registerResource<TData>(
-        dataType: string, loadResource: (dataKey: string) => Promise<TData>
-    ): React.ComponentClass<Props<TData, {}>> {
-        const typedDataLoader = createTypedDataLoader<TData, {}, {}>(dataType, () => ({}))
-        this.resources[dataType] = loadResource
+    registerResource<TData, TResourceParameters>(
+        resourceType: string,
+        loadResource: LoadResource<TData, TResourceParameters>
+    ): React.ComponentClass<Props<TData, RefreshAction> & TResourceParameters> {
+        type ActionsThis = ActionContext<TData, TResourceParameters, {}>
+        const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, {}, RefreshAction>(
+            resourceType, 
+            {},
+            {
+                refresh: function(this: ActionsThis) {
+                    return this.context.dataLoader.refresh({
+                        resourceType,
+                        resourceId: this.props.resourceId,
+                        resourceLoadParams: this.props,
+                        internalState: this.internalState,
+                    })
+                }
+            }
+        )
+        this.resources[resourceType] = loadResource
 
         return typedDataLoader
     }
 
     /** Page numbers start at 1 */
     registerPagedResource<TData>(
-        dataType: string, loadResource: (dataKey: string, paging: Paging, page: number) => Promise<TData[]>
-    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & { paging: Paging }> {
-        const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageProps, PageActions>(
-            dataType,
-            (dataLoaderContext, props, _handleUpdate) => {
-                const metadata = {
-                    dataType,
-                    dataKey: props.dataKey,
-                    dataParams: { paging: props.paging, page: 1 }
-                }
-                return {
-                    // Refresh action needs to reset to 1st page
-                    refresh: () => dataLoaderContext.refresh(metadata),
-                    // Loads next page
-                    nextPage: () => dataLoaderContext.nextPage(metadata),
+        resourceType: string,
+        loadResource: (resourceId: string, paging: Paging, page: number) => Promise<TData[]>
+    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & PageComponentProps> {
+        type ActionsThis = ActionContext<TData, PageComponentProps, PageState>
+        
+        const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageComponentProps, PageState, PageActions>(
+            resourceType,
+            { page: 1 },
+            {
+                refresh: function(this: ActionsThis) {
+                    return this.context.dataLoader.refresh({
+                        resourceType,
+                        resourceId: this.props.resourceId,
+                        resourceLoadParams: {
+                            paging: { ...this.props.paging, keepPreviousPagesData: false }
+                        },
+                        internalState: { page: 1 }
+                    })
+                },
+                // Loads next page
+                nextPage: function(this: ActionsThis) {
+                    return this.context.dataLoader.nextPage({
+                        resourceType,
+                        resourceId: this.props.resourceId,
+                        resourceLoadParams: {
+                            paging: { keepPreviousPagesData: true, ...this.props.paging }
+                        },
+                        internalState: { page: this.internalState().page + 1 }
+                    })
                 }
             }
         )
 
-        this.resources[dataType] = async (dataKey, pageInfo: PageProps, existingData: PagedData<TData>): Promise<PagedData<TData>> => {
+        // This async function performs the loading of the paged data
+        // it takes care of passing the correct params to the loadResource function
+        // then merging the new data when it comes back
+        this.resources[resourceType] = async (
+            dataKey,
+            pageInfo: PageComponentProps & { page: number },
+            existingData: PagedData<TData>
+        ): Promise<PagedData<TData>> => {
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
             const data = await loadResource(dataKey, pageInfo.paging, pageNumber)
-            if (existingData && existingData.data) {
+            if (existingData && existingData.data && pageInfo.paging.keepPreviousPagesData) {
                 return {
                     pageNumber,
                     data: [...existingData.data, ...data]
@@ -85,7 +124,7 @@ export default class DataLoaderResources {
         return typedDataLoader
     }
 
-    getResourceLoader(dataType: any): LoadResource {
+    getResourceLoader(dataType: any): LoadResource<any, any> {
         return this.resources[dataType]
     }
 }

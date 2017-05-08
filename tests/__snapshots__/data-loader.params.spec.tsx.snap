@@ -1,0 +1,61 @@
+exports[`data-loader can specify arguments for data loader 1`] = `
+Object {
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "passedParams": Object {
+    "bar": 1,
+  },
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
+  },
+}
+`;
+
+exports[`data-loader existing data is passed when params change 1`] = `
+Object {
+  "result": "Test",
+}
+`;
+
+exports[`data-loader updates data when params change 1`] = `
+Object {
+  "loadAllCompletedCalled": 2,
+  "loadDataCount": 2,
+  "passedParams": Object {
+    "bar": 2,
+  },
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 4,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Test2",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "update",
+    },
+    "status": 0,
+  },
+}
+`;

@@ -1,236 +1,134 @@
-export interface CompletedSuccessfullyLoaderDataState {
-    cached: false
-    completed: true
-    loading: false
-    failed: false
-    dataFromServerSideRender: boolean
-    data: any
+export type SuccessAction = {
+    type: 'none' | 'initial-fetch' | 'refresh' | 'page' | 'update'
+    success: true,
 }
 
-export interface CachedLoaderDataState {
-    cached: true
-    completed: true
-    loading: false
-    failed: false
-    dataFromServerSideRender: boolean
-    data: any
+export type FailedAction = {
+    type: 'initial-fetch' | 'refresh' | 'page' | 'update'
+    success: false
+    error: string,
 }
 
-export interface FailedLoaderDataState {
-    completed: true
-    loading: false
-    failed: true
-    error: string
+export enum LoaderStatus { // The loader is ________ (the data/resource)
+    /**
+     * The loader is inactive -- not performing any action
+     */
+    Idle = 0,
+
+    /**
+     * The loader has been instantiated and is fetching the resource for the first time
+     */
+    Fetching = 1,
+
+    /**
+     * The loader is re-fetching the resource
+     */
+    Refreshing = 2,
+
+    /**
+     * The loader is fetching the next page of a resurce
+     */
+    Paging = 3,
+
+    /**
+     * The loader is updating the resource
+     */
+    Updating = 4
 }
 
-export interface LoadingLoaderDataState {
-    completed: false
-    loading: true
-    failed: false
+export type LoaderState<TData> = {
+    status: LoaderStatus
+    lastAction: SuccessAction | FailedAction
+    /**
+     * Some kind of sentinel value so that the object doesn't become top heavy ???
+     */
+
+    data: Data<TData>,
 }
 
-export interface LoadingNextPageLoaderDataState {
-    completed: false
-    loading: true
-    failed: false
-    data: any
-}
-
-export type LoaderDataState = (
-    CompletedSuccessfullyLoaderDataState |
-    CachedLoaderDataState |
-    FailedLoaderDataState |
-    LoadingLoaderDataState |
-    LoadingNextPageLoaderDataState
-)
+// @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
+export type Data<TData> =
+    | { hasData: true, data: TData, dataFromServerSideRender: boolean }
+    | { hasData: false }
 
 export interface DataKeyMap {
-    [dataKey: string]: LoaderDataState
+    [dataKey: string]: LoaderState<any>
 }
 
 export interface DataLoaderState {
     loadingCount: number
-    data: { [dataType: string]: DataKeyMap }
+    data: { [resourceType: string]: DataKeyMap }
 }
 
-export interface Meta {
-    dataType: string
-    dataKey: string
-    dataParams: any
-    dataFromServerSideRender: boolean
+export interface ResourceLoadInfo<TAdditionalParameters, TInternalState> {
+    resourceType: string
+    resourceId: string
+    /** Optional additional parameters required to load resource, i.e paging other */
+    resourceLoadParams: TAdditionalParameters
+    internalState: TInternalState
 }
 
 export const INIT = 'resource-data-loader/INIT'
 export interface INIT {
-    type: 'resource-data-loader/INIT'
+    type: typeof INIT
 }
 
 export const REFRESH_DATA = 'resource-data-loader/REFRESH_DATA'
+// tslint:disable-next-line:class-name
 export interface REFRESH_DATA {
-    type: 'resource-data-loader/REFRESH_DATA'
-    meta: Meta
+    type: typeof REFRESH_DATA
+    meta: ResourceLoadInfo<any, any>
+}
+
+export const UPDATE_DATA = 'resource-data-loader/UPDATE_DATA'
+// tslint:disable-next-line:class-name
+export interface UPDATE_DATA {
+    type: typeof UPDATE_DATA
+    meta: ResourceLoadInfo<any, any>
 }
 
 export const NEXT_PAGE = 'resource-data-loader/NEXT_PAGE'
+// tslint:disable-next-line:class-name
 export interface NEXT_PAGE {
-    type: 'resource-data-loader/NEXT_PAGE'
-    meta: Meta
+    type: typeof NEXT_PAGE
+    meta: ResourceLoadInfo<any, any>
     payload: { existingData: any }
 }
 
 export const LOAD_DATA = 'resource-data-loader/LOAD_DATA'
+// tslint:disable-next-line:class-name
 export interface LOAD_DATA {
     type: 'resource-data-loader/LOAD_DATA'
-    meta: Meta
+    meta: ResourceLoadInfo<any, any>
 }
 
 export const LOAD_DATA_COMPLETED = 'resource-data-loader/LOAD_DATA_COMPLETED'
+// tslint:disable-next-line:class-name
 export interface LOAD_DATA_COMPLETED {
     type: 'resource-data-loader/LOAD_DATA_COMPLETED'
-    meta: Meta
-    payload: any
+    meta: ResourceLoadInfo<any, any>
+    payload: {
+        data: any
+        dataFromServerSideRender: boolean,
+    }
 }
 
 export const LOAD_DATA_FAILED = 'resource-data-loader/LOAD_DATA_FAILED'
+// tslint:disable-next-line:class-name
 export interface LOAD_DATA_FAILED {
-    type: 'resource-data-loader/LOAD_DATA_FAILED'
-    meta: Meta
+    type: typeof LOAD_DATA_FAILED
+    meta: ResourceLoadInfo<any, any>
     payload: string
 }
 
 export const UNLOAD_DATA = 'resource-data-loader/UNLOAD_DATA'
+// tslint:disable-next-line:class-name
 export interface UNLOAD_DATA {
-    type: 'resource-data-loader/UNLOAD_DATA'
-    meta: Meta
-}
-
-export const LOAD_NEXT_DATA = 'resource-data-loader/LOAD_NEXT_DATA'
-export interface LOAD_NEXT_DATA {
-    type: 'resource-data-loader/LOAD_NEXT_DATA'
-    meta: {
-        current: Meta
-        next: Meta
-    }
+    type: typeof UNLOAD_DATA
+    meta: ResourceLoadInfo<any, any>
 }
 
 export type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
-    | LOAD_DATA_FAILED | UNLOAD_DATA | LOAD_NEXT_DATA
+    | LOAD_DATA_FAILED | UNLOAD_DATA
     | REFRESH_DATA | NEXT_PAGE | INIT
-
-export const reducer = (state: DataLoaderState = {
-    data: {},
-    loadingCount: 0,
-}, action: Actions): DataLoaderState => {
-    switch (action.type) {
-        case LOAD_NEXT_DATA: {
-            const stateWithCurrentRemoved = reducer(state, {
-                type: UNLOAD_DATA,
-                meta: action.meta.current
-            })
-            const newState = reducer(stateWithCurrentRemoved, {
-                type: LOAD_DATA,
-                meta: action.meta.next
-            })
-            return newState
-        }
-        case LOAD_DATA: {
-            const loading: LoadingLoaderDataState = {
-                completed: false,
-                loading: true,
-                failed: false,
-            }
-            return {
-                loadingCount: state.loadingCount + 1,
-                data: {
-                    ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: loading
-                    }
-                }
-            }
-        }
-        case NEXT_PAGE: {
-            const loading: LoadingNextPageLoaderDataState = {
-                completed: false,
-                loading: true,
-                failed: false,
-                data: action.payload.existingData
-            }
-            return {
-                loadingCount: state.loadingCount + 1,
-                data: {
-                    ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: loading
-                    }
-                }
-            }
-        }
-        case REFRESH_DATA: {
-            const stateWithCurrentRemoved = reducer(state, {
-                type: UNLOAD_DATA,
-                meta: action.meta
-            })
-            const newState = reducer(stateWithCurrentRemoved, {
-                type: LOAD_DATA,
-                meta: action.meta
-            })
-            return newState
-        }
-        case LOAD_DATA_COMPLETED: {
-            const completed: CompletedSuccessfullyLoaderDataState = {
-                cached: false,
-                dataFromServerSideRender: action.meta.dataFromServerSideRender,
-                completed: true,
-                loading: false,
-                failed: false,
-                data: action.payload
-            }
-            return {
-                loadingCount: state.loadingCount - 1,
-                data: {
-                    ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: completed
-                    }
-                }
-            }
-        }
-        case LOAD_DATA_FAILED: {
-            const failed: FailedLoaderDataState = {
-                completed: true,
-                loading: false,
-                failed: true,
-                error: action.payload,
-            }
-            return {
-                loadingCount: state.loadingCount - 1,
-                data: {
-                    ...state.data,
-                    [action.meta.dataType]: <DataKeyMap>{
-                        ...state.data[action.meta.dataType],
-                        [action.meta.dataKey]: failed
-                    }
-                }
-            }
-        }
-        case UNLOAD_DATA: {
-            const newState = { loadingCount: state.loadingCount, data: { ...state.data } }
-            const dataType = newState.data[action.meta.dataType]
-            delete dataType[action.meta.dataKey]
-
-            if (Object.keys(dataType).length === 0) {
-                delete newState.data[action.meta.dataType]
-            } else {
-                newState.data[action.meta.dataType] = dataType
-            }
-
-            return newState
-        }
-    }
-
-    return state
-}
+    | UPDATE_DATA

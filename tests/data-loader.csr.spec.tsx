@@ -1,8 +1,3 @@
-import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { LoadedState, createTypedDataLoader } from '../src/data-loader'
-import { reducer } from '../src/data-loader-actions'
-import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
 
 describe('Client side render', () => {
@@ -27,7 +22,7 @@ describe('Client side render', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.resetPromise()
-        sut.root.setProps({ dataKey: "newData" })
+        sut.root.setProps({ resourceId: "newData" })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
 
         sut.assertState()

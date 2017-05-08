@@ -1,40 +1,38 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState } from '../../src/data-loader'
+import { mount, ReactWrapper } from 'enzyme'
+import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
-import DataLoaderResources, { PageActions, Paging } from '../../src/data-loader-resources'
-import { DataLoaderState } from '../../src/data-loader-actions'
+import DataLoaderResources, { PageActions } from '../../src/data-loader-resources'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 
-interface DataResource {}
+export interface DataResource {}
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps: LoadedState<DataResource, PageActions>
+    lastRenderProps: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
-    root: ReactWrapper<{ dataKey: string }, any>
+    root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<DataResource, PageActions>, any>
     resources: DataLoaderResources
-    currentState: DataLoaderState
+    currentState: DataLoaderState | undefined
+    lastRenderActions: PageActions
 
-    constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(initialState: DataLoaderState | undefined, resourceId: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        const paging: Paging = {
-            pageSize: 10,
-        }
         const TestDataLoader = this.resources.registerPagedResource<DataResource>(
             'testDataType',
-            (dataKey, paging, page) => {
+            () => {
                 this.loadDataCount++
                 return this.testDataPromise.promise
             }
         )
 
-        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -44,39 +42,32 @@ export default class ComponentFixture {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
-                    dataKey={dataKey}
+                    resourceId={resourceId}
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
-                    renderData={(props) => {
+                    renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
+                        this.lastRenderActions = actions
                         return null
                     }}
                 />
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent dataKey={dataKey} />)
+        this.root = mount(<TestComponent resourceId={resourceId} />)
 
         this.component = this.root.find(TestDataLoader)
     }
 
     refreshData() {
-        if (this.lastRenderProps.isLoaded) {
-            this.resetPromise()
-            this.lastRenderProps.actions.refresh()
-        } else {
-            throw new Error('Not in success state, can\'t refresh')
-        }
+        this.resetPromise()
+        this.lastRenderActions.refresh()
     }
 
     nextPage() {
-        if (this.lastRenderProps.isLoaded) {
-            this.resetPromise()
-            this.lastRenderProps.actions.nextPage()
-        } else {
-            throw new Error('Not in success state, can\'t refresh')
-        }
+        this.resetPromise()
+        this.lastRenderActions.nextPage()
     }
 
     assertState() {
@@ -84,6 +75,7 @@ export default class ComponentFixture {
             renderCount: this.renderCount,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
+            renderActions: this.lastRenderActions,
             loadDataCount: this.loadDataCount
         }).toMatchSnapshot()
     }

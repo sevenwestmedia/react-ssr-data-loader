@@ -1,8 +1,8 @@
 {
   "name": "redux-data-loader",
-  "version": "0.2.0",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "version": "0.3.6",
+  "main": "src/index.js",
+  "typings": "src/",
   "publishConfig": {
     "registry": "https://nexus.swmdigital.io/repository/js-private"
   },
@@ -10,28 +10,32 @@
   "license": "MIT",
   "dependencies": {},
   "peerDependencies": {
-    "react": "^15.4.2"
+    "@types/react-addons-shallow-compare": "^0.14.19",
+    "react": "^15.4.2",
+    "react-addons-shallow-compare": "^15.5.2"
   },
   "devDependencies": {
-    "@types/enzyme": "^2.7.2",
+    "@types/enzyme": "^2.8.0",
     "@types/jest": "^16.0.4",
-    "@types/react": "^15.0.1",
+    "@types/react": "^15.0.24",
+    "@types/react-addons-shallow-compare": "^0.14.19",
     "@types/react-dom": "^0.14.20",
     "@types/react-redux": "^4.4.35",
     "@types/redux": "^3.6.0",
-    "enzyme": "^2.7.1",
+    "enzyme": "^2.8.2",
     "jest": "^18.1.0",
     "react": "^15.4.2",
+    "react-addons-shallow-compare": "^15.5.2",
     "react-addons-test-utils": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",
     "redux": "^3.6.0",
     "source-map-loader": "^0.1.6",
     "ts-jest": "^18.0.1",
-    "typescript": "^2.2.2"
+    "typescript": "^2.3.2"
   },
   "scripts": {
-    "build": "tsc -p . -d",
+    "build": "tsc -p .",
     "prepublish": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -42,7 +46,7 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",

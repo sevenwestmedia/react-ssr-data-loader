@@ -1,8 +1,7 @@
 exports[`data-loader can load multiple dataloaders with different keys 1`] = `
 Object {
   "loadAllCompletedCalled": 0,
-  "loadDataCount1": 1,
-  "loadDataCount2": 1,
+  "loadDataCount": 2,
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
@@ -52,6 +51,31 @@ Object {
     "status": 0,
   },
   "renderProps2": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Test",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": 0,
+  },
+}
+`;
+
+exports[`data-loader can specify arguments for data loader 1`] = `
+Object {
+  "loadAllCompletedCalled": 1,
+  "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
     "data": Object {
       "data": Object {
         "result": "Test",

@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState, createTypedDataLoader } from '../../src/data-loader'
+import { mount, ReactWrapper } from 'enzyme'
+import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
-import { Data, dataType } from './test-data'
+import { Data, resourceType } from './test-data'
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
@@ -14,23 +14,23 @@ export default class ComponentFixture {
     renderCount2 = 0
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ dataKey: string }, any>
+    root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
-    currentState: DataLoaderState
-    lastRenderProps: LoadedState<Data, {}>
-    lastRenderProps2: LoadedState<Data, {}>
+    currentState: DataLoaderState | undefined
+    lastRenderProps: LoaderState<Data>
+    lastRenderProps2: LoaderState<Data>
 
-    constructor(initialState: DataLoaderState, dataKey: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(initialState: DataLoaderState | undefined, resourceId: string, isServerSideRender: boolean, clientLoadOnly = false) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(dataType, (dataKey: string) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, () => {
             this.loadDataCount++
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -41,7 +41,7 @@ export default class ComponentFixture {
             >
                 <div>
                     <TestDataLoader
-                        dataKey={dataKey}
+                        resourceId={resourceId}
                         clientLoadOnly={clientLoadOnly}
                         renderData={(props) => {
                             this.renderCount++
@@ -50,7 +50,7 @@ export default class ComponentFixture {
                         }}
                     />
                     <TestDataLoader
-                        dataKey={dataKey}
+                        resourceId={resourceId}
                         clientLoadOnly={clientLoadOnly}
                         renderData={(props) => {
                             this.renderCount2++
@@ -62,7 +62,7 @@ export default class ComponentFixture {
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent dataKey={dataKey} />)
+        this.root = mount(<TestComponent resourceId={resourceId} />)
 
         this.component = this.root.find(TestDataLoader)
     }

@@ -1,0 +1,26 @@
+exports[`Is loading component should be loading if any data loaders are loading 1`] = `
+Object {
+  "renderCount": 1,
+  "renderProps": Object {
+    "isLoading": true,
+  },
+}
+`;
+
+exports[`Is loading component should be loading if one of two have finished loading 1`] = `
+Object {
+  "renderCount": 2,
+  "renderProps": Object {
+    "isLoading": true,
+  },
+}
+`;
+
+exports[`Is loading component should not be loading once all data loaders have completed 1`] = `
+Object {
+  "renderCount": 3,
+  "renderProps": Object {
+    "isLoading": false,
+  },
+}
+`;

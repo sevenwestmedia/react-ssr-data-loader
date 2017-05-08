@@ -43,3 +43,10 @@ jspm_packages
 
 .vscode
 .idea
+
+src/**/*.js
+src/**/*.js.map
+tests/**/*.js
+tests/**/*.js.map
+
+.DS_Store

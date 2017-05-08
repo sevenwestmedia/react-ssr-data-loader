@@ -1,36 +1,46 @@
 import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { Props, LoadedState } from '../../src/data-loader'
+import { mount, ReactWrapper } from 'enzyme'
+import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
-import DataLoaderResources from '../../src/data-loader-resources'
-import { reducer, DataLoaderState } from '../../src/data-loader-actions'
+import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
-import { Data, dataType } from './test-data'
+import { Data, resourceType } from './test-data'
 
 export default class ComponentFixture<T extends object> {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ dataKey: string }, any>
+    root: ReactWrapper<{ resourceId: string } & T, any>
     component: ReactWrapper<Props<Data, {}>, any>
     resources: DataLoaderResources
     passedParams: T
-    currentState: DataLoaderState
-    lastRenderProps: LoadedState<Data, {}>
+    currentState: DataLoaderState | undefined
+    lastRenderProps: LoaderState<Data>
+    lastRenderActions: RefreshAction
+    existingData: Data
 
-    constructor(initialState: DataLoaderState, dataKey: string, args: T, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(
+        initialState: DataLoaderState | undefined, resourceId: string,
+        args: T,
+        isServerSideRender: boolean,
+        // For some reason the typescript compiler is not validating the JSX below properly
+        // And is saying this variable is not used
+        _clientLoadOnly = false
+    ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
         
-        const TestDataLoader = this.resources.registerResourceWithParameters(dataType, (dataKey: string, params: T) => {
+        const TestDataLoader = this.resources.registerResource(resourceType, (_: string, params: T, existingData: Data) => {
             this.loadDataCount++
             this.passedParams = params
+            this.existingData = existingData
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
+        const TestComponent: React.SFC<{ resourceId: string } & T> = (props) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -40,12 +50,12 @@ export default class ComponentFixture<T extends object> {
                 onError={err => console.error(err)}
             >
                 <TestDataLoader
-                    {...args}
-                    dataKey={dataKey}
-                    clientLoadOnly={clientLoadOnly}
-                    renderData={(props) => {
+                    {...props as any}
+                    clientLoadOnly={_clientLoadOnly}
+                    renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
+                        this.lastRenderActions = actions
 
                         return null
                     }}
@@ -53,7 +63,7 @@ export default class ComponentFixture<T extends object> {
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent dataKey={dataKey} />)
+        this.root = mount(<TestComponent resourceId={resourceId} {...args as any} />)
 
         this.component = this.root.find(TestDataLoader)
     }
@@ -63,7 +73,9 @@ export default class ComponentFixture<T extends object> {
             renderCount: this.renderCount,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
-            loadDataCount: this.loadDataCount
+            renderActions: this.lastRenderActions,
+            loadDataCount: this.loadDataCount,
+            passedParams: this.passedParams
         }).toMatchSnapshot()
     }
 

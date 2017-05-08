@@ -1,11 +1,4 @@
-import * as React from 'react'
-import { mount, render, ReactWrapper } from 'enzyme'
-import { LoadedState, createTypedDataLoader } from '../src/data-loader'
-import { DataLoaderState } from '../src/data-loader-actions'
-import PromiseCompletionSource from './helpers/promise-completion-source'
 import ComponentFixture from './helpers/component-fixture'
-import PagedComponentFixture from './helpers/paged-component-fixture'
-import ComponentWithArgsFixture from './helpers/component-with-args-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
 
@@ -35,7 +28,7 @@ describe('data-loader', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.resetPromise()
-        sut.root.setProps({ dataKey: "newData" })
+        sut.root.setProps({ resourceId: "newData" })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
 
         sut.assertState()
@@ -55,39 +48,6 @@ describe('data-loader', () => {
         expect(sut.loadAllCompletedCalled).toBe(0)
         await sut.testDataPromise.resolve({ result: 'Test' })
         expect(sut.loadAllCompletedCalled).toBe(1)
-    })
-
-    it('can specify arguments for data loader', async () => {
-        const foo = { bar: 1 }
-        const sut = new ComponentWithArgsFixture(undefined, "testKey", foo, false)
-
-        await sut.testDataPromise.resolve({ result: 'Test' })
-
-        expect(sut.passedParams).toEqual(foo)
-        sut.assertState()
-    })
-
-    it('can refresh data', async () => {
-        const sut = new ComponentFixture(undefined, "testKey", { isServerSideRender: false })
-
-        await sut.testDataPromise.resolve({ result: 'Test' })
-        sut.refreshData()
-
-        sut.assertState()
-        await sut.testDataPromise.resolve({ result: 'Test2' })
-        sut.assertState()
-    })
-
-    it('supports paged data', async () => {
-        const sut = new PagedComponentFixture(undefined, "testKey", false)
-
-        await sut.testDataPromise.resolve(['Test'])
-        sut.assertState()
-        sut.nextPage()
-        sut.assertState()
-
-        await sut.testDataPromise.resolve(['Test2'])
-        sut.assertState()
     })
 
     it('can support preserving data on unmount', async () => {

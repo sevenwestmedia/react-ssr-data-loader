@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "sourceMap": false,
-    "declaration": true,
     "target": "ES5",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -9,29 +8,24 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
+    "noImplicitThis": true,
     "removeComments": true,
     "strictNullChecks": true,
     "inlineSourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/",
     "jsx": "react",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": false,
     "allowSyntheticDefaultImports": false,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "outDir": "dist",
-    "rootDir": "src",
     "lib": [
         "dom",
         "es5",
         "es2015.promise"
     ]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ],
   "exclude": [
     "node_modules"
   ]
