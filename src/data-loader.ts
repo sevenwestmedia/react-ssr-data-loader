@@ -40,7 +40,7 @@ type Context = { dataLoader: DataLoaderContext }
  */
 export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
     context: Context,
-    props: Props<TResource, any> & TDataLoaderParams,
+    props: Readonly<Props<TResource, any> & TDataLoaderParams>,
     internalState: () => TInternalState
 }
 export function createTypedDataLoader<
