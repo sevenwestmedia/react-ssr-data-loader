@@ -68,6 +68,8 @@ export function createTypedDataLoader<
         static contextTypes = {
             dataLoader: React.PropTypes.object
         }
+        // Need to capture actions, otherwise instances will share bound actions
+        actions: TActions
         context: Context
         state: ComponentState = {
             internalState: initialInternalState,
@@ -79,9 +81,11 @@ export function createTypedDataLoader<
 
             // Bind each action to the instance of this data loader
             // so the actions can access current state/props when they need to
+            const boundActions: any = {}
             Object.keys(actions).forEach(key => {
-                actions[key] = actions[key].bind(this)
+                boundActions[key] = actions[key].bind(this)
             })
+            this.actions = boundActions
         }
 
         componentWillMount() {
@@ -144,7 +148,7 @@ export function createTypedDataLoader<
 
             return this.props.renderData(
                 this.state.loaderState,
-                actions,
+                this.actions,
             )
         }
 

@@ -1,7 +1,8 @@
 exports[`data-loader can load multiple dataloaders with different keys 1`] = `
 Object {
   "loadAllCompletedCalled": 0,
-  "loadDataCount": 2,
+  "loadDataCount1": 1,
+  "loadDataCount2": 1,
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {

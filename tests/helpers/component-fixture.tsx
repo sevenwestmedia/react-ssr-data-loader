@@ -24,12 +24,14 @@ export default class ComponentFixture {
     currentState: DataLoaderState | undefined
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction
+    lastExistingData: Data
 
     constructor(initialState: DataLoaderState | undefined, resourceId: string, options: FixtureOptions) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(resourceType, () => {
+        const TestDataLoader = this.resources.registerResource(resourceType, (_, __, existingData: Data) => {
+            this.lastExistingData = existingData
             this.loadDataCount++
             return this.testDataPromise.promise
         })
