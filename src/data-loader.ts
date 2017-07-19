@@ -20,6 +20,8 @@ type State<T, TInternalState extends object> = {
     internalState: TInternalState
 }
 
+export type Return<TResource, TActions, TDataLoaderParams> =
+    React.ComponentClass<Props<TResource, TActions> & TDataLoaderParams>
 type Context = { dataLoader: DataLoaderContext }
 
 // The `createTypedDataLoader` function needs to exist because for each
@@ -56,7 +58,7 @@ export function createTypedDataLoader<
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
     actions: TActions,
-) {
+): Return<TResource, TActions, TDataLoaderParams> {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
