@@ -15,14 +15,14 @@
     "react-addons-shallow-compare": "^15.5.2"
   },
   "devDependencies": {
-    "@types/enzyme": "^2.8.0",
+    "@types/enzyme": "^2.8.2",
     "@types/jest": "^16.0.4",
-    "@types/react": "^15.0.24",
-    "@types/react-addons-shallow-compare": "^0.14.19",
-    "@types/react-dom": "^0.14.20",
+    "@types/react": "^15.0.38",
+    "@types/react-addons-shallow-compare": "^0.14.20",
+    "@types/react-dom": "^15.5.1",
     "@types/react-redux": "^4.4.35",
     "@types/redux": "^3.6.0",
-    "enzyme": "^2.8.2",
+    "enzyme": "^2.9.1",
     "jest": "^18.1.0",
     "react": "^15.4.2",
     "react-addons-shallow-compare": "^15.5.2",
@@ -32,7 +32,7 @@
     "redux": "^3.6.0",
     "source-map-loader": "^0.1.6",
     "ts-jest": "^18.0.1",
-    "typescript": "^2.3.2"
+    "typescript": "^2.4.1"
   },
   "scripts": {
     "build": "tsc -p .",

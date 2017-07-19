@@ -81,7 +81,7 @@ export default class ComponentFixture {
     }
 
     resetPromise() {
-        this.testDataPromise = new PromiseCompletionSource<DataResource>()
+        this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
     }
 
     unmount = async() => {
