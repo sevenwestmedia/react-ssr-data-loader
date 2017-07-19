@@ -20,8 +20,6 @@ type State<T, TInternalState extends object> = {
     internalState: TInternalState
 }
 
-export type Return<TResource, TActions, TDataLoaderParams> =
-    React.ComponentClass<Props<TResource, TActions> & TDataLoaderParams>
 type Context = { dataLoader: DataLoaderContext }
 
 // The `createTypedDataLoader` function needs to exist because for each
@@ -40,9 +38,10 @@ type Context = { dataLoader: DataLoaderContext }
  */
 export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
     context: Context,
-    props: Readonly<Props<TResource, any> & TDataLoaderParams>,
+    props: Readonly<{ children?: React.ReactNode }> & Readonly<Props<TResource, any> & TDataLoaderParams>,
     internalState: () => TInternalState
 }
+
 export function createTypedDataLoader<
     TResource,
     TDataLoaderParams,
@@ -57,7 +56,7 @@ export function createTypedDataLoader<
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
     actions: TActions,
-): Return<TResource, TActions, TDataLoaderParams> {
+) {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
@@ -98,7 +97,10 @@ export function createTypedDataLoader<
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
-        componentWillReceiveProps(nextProps: ComponentProps) {
+        componentWillReceiveProps(readOnlyNextProps: any) {
+            // The types are Readonly<P>, TypeScript limitations with unions, generics etc cause
+            // this to be required for TS > 2.4
+            const nextProps: ComponentProps = readOnlyNextProps
             if (
                 // When the resource params has changed we need to update the resource data
                 // This happens when the loader is used on a page which can be
