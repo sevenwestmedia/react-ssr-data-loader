@@ -35,7 +35,7 @@
     "typescript": "^2.4.1"
   },
   "scripts": {
-    "build": "tsc -p .",
+    "build": "tsc -p . && tsc -p src/",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:update-snapshots": "jest -u",

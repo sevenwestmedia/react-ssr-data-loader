@@ -14,7 +14,7 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/",
-    "outDir": "dist",
+    "noEmit": true,
     "jsx": "react",
     "emitDecoratorMetadata": false,
     "experimentalDecorators": false,
