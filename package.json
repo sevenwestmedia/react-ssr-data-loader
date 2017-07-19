@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {},
   "peerDependencies": {
-    "@types/react-addons-shallow-compare": "^0.14.19",
+    "@types/react-addons-shallow-compare": "^0.14.20",
     "react": "^15.4.2",
     "react-addons-shallow-compare": "^15.5.2"
   },
@@ -36,7 +36,6 @@
   },
   "scripts": {
     "build": "tsc -p .",
-    "prepublish": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:update-snapshots": "jest -u",
