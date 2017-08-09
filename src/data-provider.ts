@@ -17,6 +17,7 @@ export interface Props {
     stateChanged?: (state: DataLoaderState) => void
     isServerSideRender?: boolean
     resources: DataLoaderResources
+    additionalLoaderProps: object
 }
 
 export interface State extends DataLoaderState {
@@ -288,8 +289,9 @@ export default class DataProvider extends React.Component<Props, {}> {
 
         return dataLoader(
             metadata.resourceId,
-            { ...metadata.resourceLoadParams, ...metadata.internalState },
-            existingData)
+            { ...metadata.resourceLoadParams, ...metadata.internalState, ...this.props.additionalLoaderProps },
+            existingData,
+        )
     }
 
     getChildContext = (): { dataLoader: DataLoaderContext } => ({ dataLoader: this.dataLoader })
