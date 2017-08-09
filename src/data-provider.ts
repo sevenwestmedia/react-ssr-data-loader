@@ -17,7 +17,7 @@ export interface Props {
     stateChanged?: (state: DataLoaderState) => void
     isServerSideRender?: boolean
     resources: DataLoaderResources
-    additionalLoaderProps: object
+    additionalLoaderProps?: object
 }
 
 export interface State extends DataLoaderState {
