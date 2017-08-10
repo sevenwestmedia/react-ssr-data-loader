@@ -13,27 +13,27 @@ export enum LoaderStatus { // The loader is ________ (the data/resource)
     /**
      * The loader is inactive -- not performing any action
      */
-    Idle = 0,
+    Idle = 'Idle',
 
     /**
      * The loader has been instantiated and is fetching the resource for the first time
      */
-    Fetching = 1,
+    Fetching = 'Fetching',
 
     /**
      * The loader is re-fetching the resource
      */
-    Refreshing = 2,
+    Refreshing = 'Refreshing',
 
     /**
      * The loader is fetching the next page of a resurce
      */
-    Paging = 3,
+    Paging = 'Paging',
 
     /**
      * The loader is updating the resource
      */
-    Updating = 4
+    Updating = 'Updating'
 }
 
 export type LoaderState<TData> = {

@@ -23,7 +23,7 @@ const currentDataOrDefault = (
     return keyData
 }
 
-const statusMap: { [key: number]: FailedAction['type'] } = {
+const statusMap: { [key: string]: FailedAction['type'] } = {
     [LoaderStatus.Paging]: 'page',
     [LoaderStatus.Refreshing]: 'refresh',
     [LoaderStatus.Updating]: 'update',
