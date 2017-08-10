@@ -32,7 +32,8 @@ export interface Paging {
 export type PageComponentProps =  { paging: Paging }
 type PageState = { page: number }
 
-export default class DataLoaderResources {
+/** TAdditionalParameters is the type passed to `additionalLoaderProps` on the DataProvider */
+export default class DataLoaderResources<TAdditionalParameters> {
     private resources: Resources = {}
 
     /**
@@ -41,7 +42,7 @@ export default class DataLoaderResources {
      */
     registerResource<TData, TResourceParameters>(
         resourceType: string,
-        loadResource: LoadResource<TData, TResourceParameters>
+        loadResource: LoadResource<TData, TResourceParameters & TAdditionalParameters>
     ): React.ComponentClass<Props<TData, RefreshAction> & TResourceParameters> {
         type ActionsThis = ActionContext<TData, TResourceParameters, {}>
         const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, {}, RefreshAction>(

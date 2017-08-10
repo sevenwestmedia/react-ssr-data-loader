@@ -20,7 +20,7 @@ export default class ComponentFixture {
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<Data, {}>, any>
-    resources: DataLoaderResources
+    resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction

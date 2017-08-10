@@ -16,7 +16,7 @@ export default class ComponentFixture {
     testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<DataResource, PageActions>, any>
-    resources: DataLoaderResources
+    resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
     lastRenderActions: PageActions
 

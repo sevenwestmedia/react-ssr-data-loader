@@ -16,7 +16,7 @@ export interface Props {
     loadAllCompleted?: () => void
     stateChanged?: (state: DataLoaderState) => void
     isServerSideRender?: boolean
-    resources: DataLoaderResources
+    resources: DataLoaderResources<any>
     additionalLoaderProps?: object
 }
 
