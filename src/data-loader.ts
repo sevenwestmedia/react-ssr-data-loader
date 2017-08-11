@@ -182,6 +182,8 @@ export function createTypedDataLoader<
                 }
                 return
             }
+            // Don't set state during SSR
+            if (this.context.dataLoader.isServerSideRender) { return }
             this.setState({
                 loaderState: loadedState,
                 internalState,
