@@ -90,13 +90,12 @@ export function createTypedDataLoader<
         }
 
         componentWillMount() {
-            this._isMounted = true
-
             if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
                 return
             }
 
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
+            this._isMounted = true
         }
 
         componentWillReceiveProps(readOnlyNextProps: any) {
