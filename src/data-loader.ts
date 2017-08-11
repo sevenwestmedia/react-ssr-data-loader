@@ -144,8 +144,7 @@ export function createTypedDataLoader<
 
         render() {
             if (!this.state.loaderState
-                || this.context.dataLoader.isServerSideRender
-                && this.props.clientLoadOnly
+                || (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly)
             ) {
                 return null
             }
@@ -175,8 +174,14 @@ export function createTypedDataLoader<
         private handleStateUpdate: DataUpdateCallback = (
             loadedState: LoaderState<TResource>, internalState: TInternalState
         ): void => {
-            // We don't want to trigger state updates on server side render
-            if (this.context.dataLoader.isServerSideRender) { return }
+            // If we are not mounted yet we should just load the state in
+            if (!this._isMounted) {
+                this.state = {
+                    loaderState: loadedState,
+                    internalState,
+                }
+                return
+            }
             this.setState({
                 loaderState: loadedState,
                 internalState,
