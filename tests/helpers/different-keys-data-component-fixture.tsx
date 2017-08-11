@@ -45,9 +45,15 @@ export default class ComponentFixture {
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
-                loadAllCompleted={() => this.loadAllCompletedCalled++}
-                stateChanged={state => this.currentState = state}
-                onError={err => console.error(err)}
+                onEvent={(event) => {
+                    if (event.type === 'data-load-completed') {
+                        this.loadAllCompletedCalled++
+                    } else if (event.type === 'state-changed') {
+                        this.currentState = event.state
+                    } else if (event.type === 'load-error') {
+                        console.error(event.error)
+                    }
+                }}
             >
                 <div>
                     <TestDataLoader

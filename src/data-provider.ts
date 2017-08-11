@@ -9,12 +9,35 @@ import reducer from './data-loader-reducer'
 import DataLoaderResources from './data-loader-resources'
 import { Subscriptions, DataUpdateCallback } from './subscriptions'
 
+export interface BeginLoadingEvent {
+    type: 'begin-loading-event'
+    numberLoading: number
+}
+export interface EndLoadingEvent {
+    type: 'end-loading-event'
+    numberLoading: number
+}
+export interface DataLoadCompletedEvent {
+    type: 'data-load-completed'
+}
+export interface StateChangedEvent {
+    type: 'state-changed',
+    state: DataLoaderState
+}
+export interface LoadErrorEvent {
+    type: 'load-error',
+    error: Error
+}
+export type DataProviderEvents =
+    | BeginLoadingEvent
+    | EndLoadingEvent
+    | DataLoadCompletedEvent
+    | StateChangedEvent
+    | LoadErrorEvent
+
 export interface Props {
     initialState?: DataLoaderState
-    onError?: (err: string) => void
-    loadingCountUpdated?: (loadingCount: number) => void
-    loadAllCompleted?: () => void
-    stateChanged?: (state: DataLoaderState) => void
+    onEvent?: (event: DataProviderEvents) => void
     isServerSideRender?: boolean
     resources: DataLoaderResources<any>
     additionalLoaderProps?: object
@@ -33,26 +56,29 @@ export class DataLoaderContext {
     private subscriptions = new Subscriptions()
 
     constructor(
-        private onStateChanged: (state: DataLoaderState) => void,
+        private onEvent: (event: DataProviderEvents) => void,
         initialState: DataLoaderState | undefined,
         private performLoad: (metadata: ResourceLoadInfo<any, any>, existingData: any) => Promise<any>,
-        private loadAllCompleted: () => void,
-        private loadingCountChanged: (loadingCount: number) => void,
-        private onError: (err: string) => void,
         public isServerSideRender: boolean
     ) {
         if (initialState) {
             this.state = initialState
         } else {
             this.state = reducer(undefined, { type: INIT })
-            onStateChanged(this.state)
+            onEvent({
+                type: 'state-changed',
+                state: this.state
+            })
         }
     }
 
     dispatch = <T extends Actions>(action: T, metadata: ResourceLoadInfo<any, any>): void => {
         this.state = reducer(this.state, action)
         this.subscriptions.notifyStateSubscribersAndDataLoaders(this.state, metadata)
-        this.onStateChanged(this.state)
+        this.onEvent({
+            type: 'state-changed',
+            state: this.state
+        })
     }
 
     getDataLoaderState = () => this.state
@@ -214,7 +240,10 @@ export class DataLoaderContext {
     private performLoadData = async (metadata: ResourceLoadInfo<any, any>, existingData: any) => {
         try {
             this.loadingCount++
-            this.loadingCountChanged(this.loadingCount)
+            this.onEvent({
+                type: 'begin-loading-event',
+                numberLoading: this.loadingCount,
+            })
             const data = await this.performLoad(metadata, existingData)
             // If we no longer have data loaders, they have been unmounted since we started loading
             if (!this.subscriptions.hasRegisteredDataLoader(metadata.resourceType, metadata.resourceId)) {
@@ -235,25 +264,38 @@ export class DataLoaderContext {
                 return
             }
 
-            let payload: string
+            const createErrorMessage = (msg: string) => `Error when loading ${JSON.stringify(metadata)}:
+
+${msg}`
+            let error: Error
             if (err instanceof Error) {
-                payload = err.message
+                error = err
+                error.message = createErrorMessage(error.message)
+            } else if (typeof err === 'string') {
+                error = new Error(createErrorMessage(err))
             } else {
-                payload = err ? err.toString() : ''
+                error = new Error(createErrorMessage((err || 'Unknown').toString()))
             }
 
-            this.onError(`Error when loading ${JSON.stringify(metadata)}:
-    ${payload}`)
+            this.onEvent({
+                type: 'load-error',
+                error,
+            })
 
             this.dispatch<LOAD_DATA_FAILED>({
                 type: LOAD_DATA_FAILED,
                 meta: metadata,
-                payload: payload
+                payload: error.message
             }, metadata)
         } finally {
-            this.loadingCountChanged(this.loadingCount)
+            this.onEvent({
+                type: 'end-loading-event',
+                numberLoading: this.loadingCount,
+            })
             if (--this.loadingCount === 0) {
-                this.loadAllCompleted()
+                this.onEvent({
+                    type: 'data-load-completed',
+                })
             }
         }
     }
@@ -271,12 +313,9 @@ export default class DataProvider extends React.Component<Props, {}> {
         super(props, context)
 
         this.dataLoader = new DataLoaderContext(
-            this.props.stateChanged || (() => {}),
+            this.props.onEvent || (() => {}),
             this.props.initialState,
             this.loadData,
-            this.props.loadAllCompleted || (() => {}),
-            this.props.loadingCountUpdated || (() => {}),
-            this.props.onError || (() => {}),
             this.props.isServerSideRender || false,
         )
     }

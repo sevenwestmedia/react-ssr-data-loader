@@ -175,6 +175,8 @@ export function createTypedDataLoader<
         private handleStateUpdate: DataUpdateCallback = (
             loadedState: LoaderState<TResource>, internalState: TInternalState
         ): void => {
+            // We don't want to trigger state updates on server side render
+            if (this.context.dataLoader.isServerSideRender) { return }
             this.setState({
                 loaderState: loadedState,
                 internalState,
