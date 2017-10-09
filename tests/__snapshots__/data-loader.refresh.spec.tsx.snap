@@ -18,7 +18,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 2,
+    "status": "Refreshing",
   },
 }
 `;
@@ -43,7 +43,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -68,7 +68,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 2,
+    "status": "Refreshing",
   },
 }
 `;
@@ -93,7 +93,7 @@ Object {
       "success": true,
       "type": "refresh",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;

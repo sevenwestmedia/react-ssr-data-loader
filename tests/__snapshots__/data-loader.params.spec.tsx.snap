@@ -21,7 +21,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -55,7 +55,7 @@ Object {
       "success": true,
       "type": "update",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
