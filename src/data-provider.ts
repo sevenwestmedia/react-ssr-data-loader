@@ -11,14 +11,29 @@ import { Subscriptions, DataUpdateCallback } from './subscriptions'
 
 export interface BeginLoadingEvent {
     type: 'begin-loading-event'
-    numberLoading: number
+    data: {
+        numberLoading: number
+        resourceType: string
+        resourceId: string
+    }
 }
 export interface EndLoadingEvent {
     type: 'end-loading-event'
-    numberLoading: number
+    
+    data: {
+        numberLoading: number
+        resourceType: string
+        resourceId: string
+    }
 }
 export interface DataLoadCompletedEvent {
     type: 'data-load-completed'
+    
+    data: {
+        numberLoading: number
+        resourceType: string
+        resourceId: string
+    }
 }
 export interface StateChangedEvent {
     type: 'state-changed',
@@ -26,7 +41,12 @@ export interface StateChangedEvent {
 }
 export interface LoadErrorEvent {
     type: 'load-error',
-    error: Error
+    
+    data: {
+        error: Error
+        resourceType: string
+        resourceId: string
+    }
 }
 export type DataProviderEvents =
     | BeginLoadingEvent
@@ -242,7 +262,11 @@ export class DataLoaderContext {
             this.loadingCount++
             this.onEvent({
                 type: 'begin-loading-event',
-                numberLoading: this.loadingCount,
+                data: {
+                    numberLoading: this.loadingCount,
+                    resourceType: metadata.resourceType,
+                    resourceId: metadata.resourceId
+                }
             })
             const data = await this.performLoad(metadata, existingData)
             // If we no longer have data loaders, they have been unmounted since we started loading
@@ -279,7 +303,12 @@ ${msg}`
 
             this.onEvent({
                 type: 'load-error',
-                error,
+
+                data: {
+                    error,
+                    resourceType: metadata.resourceType,
+                    resourceId: metadata.resourceId
+                }
             })
 
             this.dispatch<LOAD_DATA_FAILED>({
@@ -290,11 +319,21 @@ ${msg}`
         } finally {
             this.onEvent({
                 type: 'end-loading-event',
-                numberLoading: this.loadingCount,
+                
+                data: {
+                    numberLoading: this.loadingCount,
+                    resourceType: metadata.resourceType,
+                    resourceId: metadata.resourceId
+                }
             })
             if (--this.loadingCount === 0) {
                 this.onEvent({
                     type: 'data-load-completed',
+                    data: {
+                        numberLoading: this.loadingCount,
+                        resourceType: metadata.resourceType,
+                        resourceId: metadata.resourceId
+                    }
                 })
             }
         }
