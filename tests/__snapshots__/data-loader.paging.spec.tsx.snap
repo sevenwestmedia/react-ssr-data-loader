@@ -22,7 +22,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 3,
+    "status": "Paging",
   },
 }
 `;
@@ -51,7 +51,7 @@ Object {
       "success": true,
       "type": "refresh",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -80,7 +80,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -109,7 +109,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 3,
+    "status": "Paging",
   },
 }
 `;
@@ -139,7 +139,7 @@ Object {
       "success": true,
       "type": "page",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;

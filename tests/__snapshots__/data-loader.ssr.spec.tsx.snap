@@ -12,7 +12,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
   "renderProps2": Object {
     "data": Object {
@@ -22,7 +22,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
 }
 `;
@@ -55,7 +55,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
   "renderProps2": Object {
     "data": Object {
@@ -69,7 +69,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -81,17 +81,16 @@ Object {
   "renderActions": Object {
     "refresh": [Function],
   },
-  "renderCount": 2,
+  "renderCount": 1,
   "renderProps": Object {
     "data": Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "error": "Boom!",
-      "success": false,
-      "type": "initial-fetch",
+      "success": true,
+      "type": "none",
     },
-    "status": 0,
+    "status": "Fetching",
   },
 }
 `;
@@ -103,20 +102,16 @@ Object {
   "renderActions": Object {
     "refresh": [Function],
   },
-  "renderCount": 2,
+  "renderCount": 1,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
-      "dataFromServerSideRender": true,
-      "hasData": true,
+      "hasData": false,
     },
     "lastAction": Object {
       "success": true,
-      "type": "initial-fetch",
+      "type": "none",
     },
-    "status": 0,
+    "status": "Fetching",
   },
 }
 `;
@@ -137,7 +132,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
 }
 `;

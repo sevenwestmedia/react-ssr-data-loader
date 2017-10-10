@@ -18,7 +18,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -43,7 +43,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -64,7 +64,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
 }
 `;
@@ -82,11 +82,13 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "error": "Boom!",
+      "error": "Error when loading {\"resourceType\":\"testDataType\",\"resourceId\":\"testKey\",\"resourceLoadParams\":{},\"internalState\":{}}:
+
+Boom!",
       "success": false,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -111,7 +113,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -136,7 +138,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -157,7 +159,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
 }
 `;

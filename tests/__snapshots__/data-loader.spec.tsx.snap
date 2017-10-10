@@ -16,7 +16,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
   "renderProps2": Object {
     "data": Object {
@@ -26,7 +26,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
 }
 `;
@@ -49,7 +49,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
   "renderProps2": Object {
     "data": Object {
@@ -63,7 +63,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -88,7 +88,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -113,7 +113,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -134,7 +134,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
 }
 `;
@@ -157,7 +157,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
   "renderProps2": Object {
     "data": Object {
@@ -171,7 +171,7 @@ Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "status": 0,
+    "status": "Idle",
   },
 }
 `;
@@ -190,7 +190,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
   "renderProps2": Object {
     "data": Object {
@@ -200,7 +200,7 @@ Object {
       "success": true,
       "type": "none",
     },
-    "status": 1,
+    "status": "Fetching",
   },
 }
 `;

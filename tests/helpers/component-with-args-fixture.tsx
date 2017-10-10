@@ -51,7 +51,7 @@ export default class ComponentFixture<T extends object> {
                     } else if (event.type === 'state-changed') {
                         this.currentState = event.state
                     } else if (event.type === 'load-error') {
-                        console.error(event.error)
+                        console.error(event.data.error)
                     }
                 }}
             >
