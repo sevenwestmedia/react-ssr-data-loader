@@ -1,6 +1,7 @@
 import ComponentFixture from './helpers/component-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
+import { DataLoaderResources } from '../src/index';
 
 describe('data-loader', () => {
     it('supports multiple loaders using the same key when data loading', async () => {
@@ -65,5 +66,19 @@ describe('data-loader', () => {
             unloadDataOnUnmount: false
         })
         sut.assertState()
+    })
+
+    it('throws when the same resource is registered multiple times', () => {
+        const resources = new DataLoaderResources()
+
+        resources.registerResource('test', () => Promise.resolve('test'))
+        expect(() => resources.registerResource('test', () => Promise.resolve('test'))).toThrow()
+    })
+
+    it('throws when the same paged resource is registered multiple times', () => {
+        const resources = new DataLoaderResources()
+
+        resources.registerResource('test', () => Promise.resolve('test'))
+        expect(() => resources.registerResource('test', () => Promise.resolve('test'))).toThrow()
     })
 })
