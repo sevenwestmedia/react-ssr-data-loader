@@ -44,6 +44,10 @@ export default class DataLoaderResources<TAdditionalParameters> {
         resourceType: string,
         loadResource: LoadResource<TData, TResourceParameters & TAdditionalParameters>
     ): React.ComponentClass<Props<TData, RefreshAction> & TResourceParameters> {
+        if (this.resources[resourceType]) {
+            throw new Error(`The resource type ${resourceType} has already been registered`)
+        }
+
         type ActionsThis = ActionContext<TData, TResourceParameters, {}>
         const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, {}, RefreshAction>(
             resourceType, 
@@ -69,8 +73,11 @@ export default class DataLoaderResources<TAdditionalParameters> {
         resourceType: string,
         loadResource: (resourceId: string, paging: Paging, page: number) => Promise<TData[]>
     ): React.ComponentClass<Props<PagedData<TData>, PageActions> & PageComponentProps> {
+        if (this.resources[resourceType]) {
+            throw new Error(`The resource type ${resourceType} has already been registered`)
+        }
+
         type ActionsThis = ActionContext<TData, PageComponentProps, PageState>
-        
         const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageComponentProps, PageState, PageActions>(
             resourceType,
             { page: 1 },
