@@ -82,9 +82,7 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "error": "Error when loading {\"resourceType\":\"testDataType\",\"resourceId\":\"testKey\",\"resourceLoadParams\":{},\"internalState\":{}}:
-
-Boom!",
+      "error": "Error when loading testDataType testKey: Boom!",
       "success": false,
       "type": "initial-fetch",
     },
