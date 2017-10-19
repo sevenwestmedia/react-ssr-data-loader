@@ -288,9 +288,9 @@ export class DataLoaderContext {
                 return
             }
 
-            const createErrorMessage = (msg: string) => `Error when loading ${JSON.stringify(metadata)}:
+            const createErrorMessage = (msg: string) =>
+                `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
 
-${msg}`
             let error: Error
             if (err instanceof Error) {
                 error = err
@@ -298,7 +298,7 @@ ${msg}`
             } else if (typeof err === 'string') {
                 error = new Error(createErrorMessage(err))
             } else {
-                error = new Error(createErrorMessage((err || 'Unknown').toString()))
+                error = new Error(createErrorMessage((err || 'Unknown performLoadData error').toString()))
             }
 
             this.onEvent({
