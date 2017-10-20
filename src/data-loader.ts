@@ -3,6 +3,7 @@ import { LoaderState } from './'
 import { DataLoaderContext } from './data-provider'
 import { DataUpdateCallback } from './subscriptions'
 import * as shallowCompare from 'react-addons-shallow-compare'
+import * as PropTypes from 'prop-types'
 
 export type RenderData<T, TActions> = (
     loaderProps: LoaderState<T>,
@@ -71,7 +72,7 @@ export function createTypedDataLoader<
     class DataLoader extends React.PureComponent<ComponentProps, ComponentState>
         implements ActionContext<TResource, TDataLoaderParams, TInternalState> {
         static contextTypes = {
-            dataLoader: React.PropTypes.object
+            dataLoader: PropTypes.object
         }
         // Need to capture actions, otherwise instances will share bound actions
         actions: TActions

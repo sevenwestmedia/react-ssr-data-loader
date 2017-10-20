@@ -17,6 +17,7 @@ import {
 import reducer from './data-loader-reducer'
 import DataLoaderResources from './data-loader-resources'
 import { Subscriptions, DataUpdateCallback } from './subscriptions'
+import * as PropTypes from 'prop-types'
 
 export interface BeginLoadingEvent {
     type: 'begin-loading-event'
@@ -387,7 +388,7 @@ export class DataLoaderContext {
 // tslint:disable-next-line:max-classes-per-file
 export default class DataProvider extends React.Component<Props, {}> {
     static childContextTypes = {
-        dataLoader: React.PropTypes.object
+        dataLoader: PropTypes.object
     }
 
     state: State = reducer(undefined, { type: INIT })
