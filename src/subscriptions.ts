@@ -1,6 +1,4 @@
-import {
-    DataLoaderState, LoaderState, ResourceLoadInfo,
-} from './data-loader-actions'
+import { DataLoaderState, LoaderState, ResourceLoadInfo } from './data-loader-actions'
 
 export type DataUpdateCallback = (newState: LoaderState<any>, internalState: any) => void
 export type StateSubscription = (state: DataLoaderState) => void
@@ -30,7 +28,11 @@ export class Subscriptions {
     }
 
     /** @returns new number of subscribers */
-    registerDataLoader = (resourceType: string, resourceId: string, update: DataUpdateCallback): number => {
+    registerDataLoader = (
+        resourceType: string,
+        resourceId: string,
+        update: DataUpdateCallback
+    ): number => {
         const subscriptions = this.getSubscription(resourceType, resourceId)
 
         subscriptions.push(update)
@@ -38,7 +40,11 @@ export class Subscriptions {
     }
 
     /** @returns remaining number of subscribers */
-    unregisterDataLoader = (resourceType: string, resourceId: string, update: DataUpdateCallback): number => {
+    unregisterDataLoader = (
+        resourceType: string,
+        resourceId: string,
+        update: DataUpdateCallback
+    ): number => {
         const subscriptions = this.getSubscription(resourceType, resourceId)
 
         if (subscriptions.length === 1) {
@@ -73,9 +79,7 @@ export class Subscriptions {
         for (const subscriber of resourceIdSubscriptions) {
             const typeState = state.data[metadata.resourceType]
             if (typeState && typeState[metadata.resourceId]) {
-                subscriber(
-                    typeState[metadata.resourceId],
-                    metadata.internalState)
+                subscriber(typeState[metadata.resourceId], metadata.internalState)
             }
         }
 

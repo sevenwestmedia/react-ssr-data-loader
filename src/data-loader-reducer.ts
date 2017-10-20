@@ -1,24 +1,38 @@
 import {
-    LoaderState, LoaderStatus, ResourceLoadInfo, DataLoaderState,
-    FailedAction, Actions, LOAD_DATA, DataKeyMap,
-    NEXT_PAGE, REFRESH_DATA, LOAD_DATA_COMPLETED,
-    LOAD_DATA_FAILED, UNLOAD_DATA, UPDATE_DATA,
+    LoaderState,
+    LoaderStatus,
+    ResourceLoadInfo,
+    DataLoaderState,
+    FailedAction,
+    Actions,
+    LOAD_DATA,
+    NEXT_PAGE,
+    REFRESH_DATA,
+    LOAD_DATA_COMPLETED,
+    LOAD_DATA_FAILED,
+    UNLOAD_DATA,
+    UPDATE_DATA
 } from './data-loader-actions'
 
 const defaultState: LoaderState<any> = {
     data: { hasData: false },
     status: LoaderStatus.Idle,
-    lastAction: { type: 'none', success: true },
+    lastAction: { type: 'none', success: true }
 }
 
 const currentDataOrDefault = (
-    meta: ResourceLoadInfo<any, any>, state: DataLoaderState,
+    meta: ResourceLoadInfo<any, any>,
+    state: DataLoaderState
 ): LoaderState<any> => {
     const resourceTypeData = state.data[meta.resourceType]
-    if (!resourceTypeData) { return defaultState }
+    if (!resourceTypeData) {
+        return defaultState
+    }
 
     const keyData = resourceTypeData[meta.resourceId]
-    if (!keyData) { return defaultState }
+    if (!keyData) {
+        return defaultState
+    }
 
     return keyData
 }
@@ -27,20 +41,23 @@ const statusMap: { [key: string]: FailedAction['type'] } = {
     [LoaderStatus.Paging]: 'page',
     [LoaderStatus.Refreshing]: 'refresh',
     [LoaderStatus.Updating]: 'update',
-    [LoaderStatus.Fetching]: 'initial-fetch',
+    [LoaderStatus.Fetching]: 'initial-fetch'
 }
 
-export default (state: DataLoaderState = {
-    data: {},
-    loadingCount: 0,
-}, action: Actions): DataLoaderState => {
+export default (
+    state: DataLoaderState = {
+        data: {},
+        loadingCount: 0
+    },
+    action: Actions
+): DataLoaderState => {
     switch (action.type) {
         case LOAD_DATA: {
             const currentOrDefault = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Fetching,
                 lastAction: currentOrDefault.lastAction, // TODO Should we always go back to idle?
-                data: currentOrDefault.data,
+                data: currentOrDefault.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -48,9 +65,9 @@ export default (state: DataLoaderState = {
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading,
-                    } as DataKeyMap,
-                },
+                        [action.meta.resourceId]: loading
+                    }
+                }
             }
         }
         // tslint:disable-next-line:no-switch-case-fall-through
@@ -59,7 +76,7 @@ export default (state: DataLoaderState = {
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Paging,
                 lastAction: { type: 'none', success: true },
-                data: currentState.data,
+                data: currentState.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -67,9 +84,9 @@ export default (state: DataLoaderState = {
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading,
-                    } as DataKeyMap,
-                },
+                        [action.meta.resourceId]: loading
+                    }
+                }
             }
         }
         // tslint:disable-next-line:no-switch-case-fall-through
@@ -78,7 +95,7 @@ export default (state: DataLoaderState = {
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Updating,
                 lastAction: { type: 'none', success: true },
-                data: currentState.data,
+                data: currentState.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -86,9 +103,9 @@ export default (state: DataLoaderState = {
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading,
-                    } as DataKeyMap,
-                },
+                        [action.meta.resourceId]: loading
+                    }
+                }
             }
         }
         // tslint:disable-next-line:no-switch-case-fall-through
@@ -97,7 +114,7 @@ export default (state: DataLoaderState = {
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Refreshing,
                 lastAction: { type: 'none', success: true },
-                data: currentState.data,
+                data: currentState.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -105,9 +122,9 @@ export default (state: DataLoaderState = {
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading,
-                    } as DataKeyMap,
-                },
+                        [action.meta.resourceId]: loading
+                    }
+                }
             }
         }
         // tslint:disable-next-line:no-switch-case-fall-through
@@ -121,8 +138,8 @@ export default (state: DataLoaderState = {
                 data: {
                     hasData: true,
                     data: action.payload.data,
-                    dataFromServerSideRender: action.payload.dataFromServerSideRender,
-                },
+                    dataFromServerSideRender: action.payload.dataFromServerSideRender
+                }
             }
             return {
                 loadingCount: state.loadingCount - 1,
@@ -130,9 +147,9 @@ export default (state: DataLoaderState = {
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: completed,
-                    } as DataKeyMap,
-                },
+                        [action.meta.resourceId]: completed
+                    }
+                }
             }
         }
         // tslint:disable-next-line:no-switch-case-fall-through
@@ -143,7 +160,7 @@ export default (state: DataLoaderState = {
             const failed: LoaderState<any> = {
                 status: LoaderStatus.Idle,
                 lastAction: { type: lastAction, success: false, error: action.payload },
-                data: currentState.data,
+                data: currentState.data
             }
             return {
                 // this should always occur alongside a LOAD_DATA_COMPLETED so we decrement loadingCount there
@@ -152,9 +169,9 @@ export default (state: DataLoaderState = {
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: failed,
-                    } as DataKeyMap,
-                },
+                        [action.meta.resourceId]: failed
+                    }
+                }
             }
         }
         // tslint:disable-next-line:no-switch-case-fall-through

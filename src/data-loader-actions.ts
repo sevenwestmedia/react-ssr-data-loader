@@ -1,12 +1,12 @@
 export type SuccessAction = {
     type: 'none' | 'initial-fetch' | 'refresh' | 'page' | 'update'
-    success: true,
+    success: true
 }
 
 export type FailedAction = {
     type: 'initial-fetch' | 'refresh' | 'page' | 'update'
     success: false
-    error: string,
+    error: string
 }
 
 export enum LoaderStatus { // The loader is ________ (the data/resource)
@@ -43,12 +43,12 @@ export type LoaderState<TData> = {
      * Some kind of sentinel value so that the object doesn't become top heavy ???
      */
 
-    data: Data<TData>,
+    data: Data<TData>
 }
 
 // @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
 export type Data<TData> =
-    | { hasData: true, data: TData, dataFromServerSideRender: boolean }
+    | { hasData: true; data: TData; dataFromServerSideRender: boolean }
     | { hasData: false }
 
 export interface DataKeyMap {
@@ -109,7 +109,7 @@ export interface LOAD_DATA_COMPLETED {
     meta: ResourceLoadInfo<any, any>
     payload: {
         data: any
-        dataFromServerSideRender: boolean,
+        dataFromServerSideRender: boolean
     }
 }
 
@@ -128,7 +128,12 @@ export interface UNLOAD_DATA {
     meta: ResourceLoadInfo<any, any>
 }
 
-export type Actions = LOAD_DATA | LOAD_DATA_COMPLETED
-    | LOAD_DATA_FAILED | UNLOAD_DATA
-    | REFRESH_DATA | NEXT_PAGE | INIT
+export type Actions =
+    | LOAD_DATA
+    | LOAD_DATA_COMPLETED
+    | LOAD_DATA_FAILED
+    | UNLOAD_DATA
+    | REFRESH_DATA
+    | NEXT_PAGE
+    | INIT
     | UPDATE_DATA

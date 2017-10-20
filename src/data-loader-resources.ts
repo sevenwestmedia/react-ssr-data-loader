@@ -26,10 +26,11 @@ export interface Paging {
     /**
      * If true, new page data gets appended to existing data
      * if false, only the current page will be kept
-     * Defaults to true */
+     * Defaults to true
+     */
     keepPreviousPagesData?: boolean
 }
-export type PageComponentProps =  { paging: Paging }
+export type PageComponentProps = { paging: Paging }
 type PageState = { page: number }
 
 /** TAdditionalParameters is the type passed to `additionalLoaderProps` on the DataProvider */
@@ -49,16 +50,21 @@ export default class DataLoaderResources<TAdditionalParameters> {
         }
 
         type ActionsThis = ActionContext<TData, TResourceParameters, {}>
-        const typedDataLoader = createTypedDataLoader<TData, TResourceParameters, {}, RefreshAction>(
-            resourceType, 
+        const typedDataLoader = createTypedDataLoader<
+            TData,
+            TResourceParameters,
+            {},
+            RefreshAction
+        >(
+            resourceType,
             {},
             {
-                refresh: function(this: ActionsThis) {
+                refresh(this: ActionsThis) {
                     return this.context.dataLoader.refresh({
                         resourceType,
                         resourceId: this.props.resourceId,
                         resourceLoadParams: this.props,
-                        internalState: this.internalState,
+                        internalState: this.internalState
                     })
                 }
             }
@@ -78,11 +84,16 @@ export default class DataLoaderResources<TAdditionalParameters> {
         }
 
         type ActionsThis = ActionContext<TData, PageComponentProps, PageState>
-        const typedDataLoader = createTypedDataLoader<PagedData<TData>, PageComponentProps, PageState, PageActions>(
+        const typedDataLoader = createTypedDataLoader<
+            PagedData<TData>,
+            PageComponentProps,
+            PageState,
+            PageActions
+        >(
             resourceType,
             { page: 1 },
             {
-                refresh: function(this: ActionsThis) {
+                refresh(this: ActionsThis) {
                     return this.context.dataLoader.refresh({
                         resourceType,
                         resourceId: this.props.resourceId,
@@ -93,7 +104,7 @@ export default class DataLoaderResources<TAdditionalParameters> {
                     })
                 },
                 // Loads next page
-                nextPage: function(this: ActionsThis) {
+                nextPage(this: ActionsThis) {
                     return this.context.dataLoader.nextPage({
                         resourceType,
                         resourceId: this.props.resourceId,
@@ -125,7 +136,7 @@ export default class DataLoaderResources<TAdditionalParameters> {
 
             return {
                 pageNumber,
-                data,
+                data
             }
         }
 
