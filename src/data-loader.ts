@@ -4,8 +4,10 @@ import { DataLoaderContext } from './data-provider'
 import { DataUpdateCallback } from './subscriptions'
 import * as shallowCompare from 'react-addons-shallow-compare'
 
-export type RenderData<T, TActions> =
-    (loaderProps: LoaderState<T>, actions: TActions) => React.ReactElement<any> | null
+export type RenderData<T, TActions> = (
+    loaderProps: LoaderState<T>,
+    actions: TActions
+) => React.ReactElement<any> | null
 
 export interface Props<T, TActions> {
     /** The id of the resource */
@@ -20,8 +22,9 @@ type State<T, TInternalState extends object> = {
     internalState: TInternalState
 }
 
-export type Return<TResource, TActions, TDataLoaderParams> =
-    React.ComponentClass<Props<TResource, TActions> & TDataLoaderParams>
+export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClass<
+    Props<TResource, TActions> & TDataLoaderParams
+>
 export type Context = { dataLoader: DataLoaderContext }
 
 // The `createTypedDataLoader` function needs to exist because for each
@@ -30,17 +33,18 @@ export type Context = { dataLoader: DataLoaderContext }
 
 /**
  * TDataLoaderParams is the type of the arguments to load the resource
- * 
+ *
  * TActions is the type of additional actions provided by the renderData function
  * (in addition to the BuildInActions like refresh)
- * 
+ *
  * TInternalState allows a resource to track some sort of state without
  * exposing it to the end user. This is where the current page number
  * is stored for instance
  */
 export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
-    context: Context,
-    props: Readonly<{ children?: React.ReactNode }> & Readonly<Props<TResource, any> & TDataLoaderParams>,
+    context: Context
+    props: Readonly<{ children?: React.ReactNode }> &
+        Readonly<Props<TResource, any> & TDataLoaderParams>
     internalState: () => TInternalState
 }
 
@@ -51,21 +55,21 @@ export function createTypedDataLoader<
     TActions extends {
         // We bind this so we can reuse the same function so actions do not cause
         // PureComponent's to re-render
-        [actionName: string]: (this: ActionContext<TResource, TDataLoaderParams, TInternalState>) => void
+        [actionName: string]: (
+            this: ActionContext<TResource, TDataLoaderParams, TInternalState>
+        ) => void
     }
 >(
     resourceType: string,
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
-    actions: TActions,
+    actions: TActions
 ): Return<TResource, TActions, TDataLoaderParams> {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
-    class DataLoader
-        extends React.PureComponent<ComponentProps, ComponentState>
-        implements ActionContext<TResource, TDataLoaderParams, TInternalState>
-    {
+    class DataLoader extends React.PureComponent<ComponentProps, ComponentState>
+        implements ActionContext<TResource, TDataLoaderParams, TInternalState> {
         static contextTypes = {
             dataLoader: React.PropTypes.object
         }
@@ -73,7 +77,7 @@ export function createTypedDataLoader<
         actions: TActions
         context: Context
         state: ComponentState = {
-            internalState: initialInternalState,
+            internalState: initialInternalState
         }
         private _isMounted: boolean
 
@@ -115,7 +119,10 @@ export function createTypedDataLoader<
             ) {
                 if (this.props.resourceId !== nextProps.resourceId) {
                     this.unloadOrDetachData()
-                    this.context.dataLoader.loadData(this.actionMeta(nextProps), this.handleStateUpdate)
+                    this.context.dataLoader.loadData(
+                        this.actionMeta(nextProps),
+                        this.handleStateUpdate
+                    )
                     return
                 }
 
@@ -142,21 +149,23 @@ export function createTypedDataLoader<
         }
 
         render() {
-            if (!this.state.loaderState
-                || (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly)
+            if (
+                !this.state.loaderState ||
+                (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly)
             ) {
                 return null
             }
 
-            return this.props.renderData(
-                this.state.loaderState,
-                this.actions,
-            )
+            return this.props.renderData(this.state.loaderState, this.actions)
         }
 
         private actionMeta = (props: Props<TResource, TActions> = this.props) => {
             const {
-                resourceId, clientLoadOnly, renderData, unloadDataOnUnmount, ...resourceLoadParams,
+                resourceId,
+                clientLoadOnly,
+                renderData,
+                unloadDataOnUnmount,
+                ...resourceLoadParams
             } = props
 
             // TODO Add type safety here, am turning the remaing props into resourceLoadParams
@@ -166,26 +175,29 @@ export function createTypedDataLoader<
                 resourceType,
                 resourceId,
                 resourceLoadParams,
-                internalState: this.state.internalState,
+                internalState: this.state.internalState
             }
         }
 
         private handleStateUpdate: DataUpdateCallback = (
-            loadedState: LoaderState<TResource>, internalState: TInternalState
+            loadedState: LoaderState<TResource>,
+            internalState: TInternalState
         ): void => {
             // If we are not mounted yet we should just load the state in
             if (!this._isMounted) {
                 this.state = {
                     loaderState: loadedState,
-                    internalState,
+                    internalState
                 }
                 return
             }
             // Don't set state during SSR
-            if (this.context.dataLoader.isServerSideRender) { return }
+            if (this.context.dataLoader.isServerSideRender) {
+                return
+            }
             this.setState({
                 loaderState: loadedState,
-                internalState,
+                internalState
             })
         }
     }
