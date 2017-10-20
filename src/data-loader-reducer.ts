@@ -146,7 +146,8 @@ export default (state: DataLoaderState = {
                 data: currentState.data,
             }
             return {
-                loadingCount: state.loadingCount - 1,
+                // this should always occur alongside a LOAD_DATA_COMPLETED so we decrement loadingCount there
+                loadingCount: state.loadingCount,
                 data: {
                     ...state.data,
                     [action.meta.resourceType]: {
