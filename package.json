@@ -11,12 +11,14 @@
     "dependencies": {},
     "peerDependencies": {
         "@types/react-addons-shallow-compare": "^0.14.20",
-        "react": "^15.4.2",
-        "react-addons-shallow-compare": "^15.5.2"
+        "prop-types": "^15.6.0",
+        "react": "^15.6.0 | ^16.0",
+        "react-addons-shallow-compare": "^15.6.0"
     },
     "devDependencies": {
         "@types/enzyme": "^2.8.2",
         "@types/jest": "^16.0.4",
+        "@types/prop-types": "^15.5.2",
         "@types/react": "^15.0.38",
         "@types/react-addons-shallow-compare": "^0.14.20",
         "@types/react-dom": "^15.5.1",
@@ -25,10 +27,11 @@
         "enzyme": "^2.9.1",
         "jest": "^18.1.0",
         "prettier": "^1.7.4",
-        "react": "^15.4.2",
-        "react-addons-shallow-compare": "^15.5.2",
-        "react-addons-test-utils": "^15.4.2",
-        "react-dom": "^15.4.2",
+        "prop-types": "^15.6.0",
+        "react": "^15.6.0",
+        "react-addons-shallow-compare": "^15.6.0",
+        "react-addons-test-utils": "^15.6.0",
+        "react-dom": "^15.6.0",
         "react-redux": "^5.0.2",
         "redux": "^3.6.0",
         "source-map-loader": "^0.1.6",

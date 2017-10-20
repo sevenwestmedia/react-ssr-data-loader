@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { DataLoaderContext } from './data-provider'
 import { DataLoaderState } from './data-loader-actions'
+import * as PropTypes from 'prop-types'
 
 export interface LoadedState {
     isLoading: boolean
@@ -16,7 +17,7 @@ export default class IsLoading extends React.Component<Props, DataLoaderState> {
     context: { dataLoader: DataLoaderContext }
 
     static contextTypes = {
-        dataLoader: React.PropTypes.object
+        dataLoader: PropTypes.object
     }
 
     constructor(props: Props, context: { dataLoader: DataLoaderContext }) {
