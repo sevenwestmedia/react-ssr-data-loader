@@ -98,6 +98,9 @@ export function createTypedDataLoader<
             }
 
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
+        }
+
+        componentWillMount() {
             this._isMounted = true
         }
 
