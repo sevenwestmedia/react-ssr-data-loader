@@ -26,22 +26,29 @@ export default class ComponentFixture {
     lastRenderActions: RefreshAction
     lastExistingData: Data
 
-    constructor(initialState: DataLoaderState | undefined, resourceId: string, options: FixtureOptions) {
+    constructor(
+        initialState: DataLoaderState | undefined,
+        initialResourceId: string,
+        options: FixtureOptions
+    ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(resourceType, (_, __, existingData: Data) => {
-            this.lastExistingData = existingData
-            this.loadDataCount++
-            return this.testDataPromise.promise
-        })
+        const TestDataLoader = this.resources.registerResource(
+            resourceType,
+            (_, __, existingData: Data) => {
+                this.lastExistingData = existingData
+                this.loadDataCount++
+                return this.testDataPromise.promise
+            }
+        )
 
         const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={options.isServerSideRender}
                 resources={this.resources}
-                onEvent={(event) => {
+                onEvent={event => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
                     } else if (event.type === 'state-changed') {
@@ -65,7 +72,7 @@ export default class ComponentFixture {
             </DataProvider>
         )
 
-        this.root = mount(<TestComponent resourceId={resourceId} />)
+        this.root = mount(<TestComponent resourceId={initialResourceId} />)
 
         this.component = this.root.find(TestDataLoader)
     }
@@ -89,9 +96,9 @@ export default class ComponentFixture {
         this.testDataPromise = new PromiseCompletionSource<Data>()
     }
 
-    unmount = async() => {
+    unmount = async () => {
         this.root.unmount()
 
-        return new Promise((resolve) => setTimeout(resolve))
+        return new Promise(resolve => setTimeout(resolve))
     }
 }

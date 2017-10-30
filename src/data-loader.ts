@@ -92,14 +92,15 @@ export function createTypedDataLoader<
                 boundActions[key] = actions[key].bind(this)
             })
             this.actions = boundActions
-        }
 
-        componentWillMount() {
             if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
                 return
             }
 
             this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
+        }
+
+        componentWillMount() {
             this._isMounted = true
         }
 
