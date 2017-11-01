@@ -8,7 +8,9 @@
     },
     "repository": {},
     "license": "MIT",
-    "dependencies": {},
+    "dependencies": {
+        "react-test-renderer": "^15.6.0"
+    },
     "peerDependencies": {
         "@types/react-addons-shallow-compare": "^0.14.20",
         "prop-types": "^15.6.0",
@@ -30,7 +32,6 @@
         "prop-types": "^15.6.0",
         "react": "^15.6.0",
         "react-addons-shallow-compare": "^15.6.0",
-        "react-addons-test-utils": "^15.6.0",
         "react-dom": "^15.6.0",
         "react-redux": "^5.0.2",
         "redux": "^3.6.0",
@@ -43,8 +44,7 @@
     "scripts": {
         "build": "tsc -p . && tsc -p src/",
         "lint": "tslint 'src/**/*.ts' --type-check --project ./tsconfig.json -e '**/*.d.ts'",
-        "lint:prettier":
-            "prettier --single-quote=true --tab-width=4 --trailing-comma=none --use-tabs=false --print-width=100 --no-semi --write \"./src/**/*.ts\" \"./src/**/*.tsx\"",
+        "lint:prettier": "prettier --single-quote=true --tab-width=4 --trailing-comma=none --use-tabs=false --print-width=100 --no-semi --write \"./src/**/*.ts\" \"./src/**/*.tsx\"",
         "test": "jest",
         "test:watch": "jest --watch",
         "test:update-snapshots": "jest -u",
@@ -55,6 +55,10 @@
             ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
         },
         "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
-        "moduleFileExtensions": ["ts", "tsx", "js"]
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js"
+        ]
     }
 }
