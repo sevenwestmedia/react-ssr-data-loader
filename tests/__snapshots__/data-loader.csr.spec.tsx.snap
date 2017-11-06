@@ -82,7 +82,7 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "error": "Error when loading testDataType testKey: Boom!",
+      "error": "Boom!",
       "success": false,
       "type": "initial-fetch",
     },
