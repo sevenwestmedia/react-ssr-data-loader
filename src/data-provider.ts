@@ -332,15 +332,17 @@ export class DataLoaderContext {
                 `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
 
             let error: Error
+            let errorMessage: string
+
             if (err instanceof Error) {
                 error = err
-                error.message = createErrorMessage(error.message)
+                errorMessage = createErrorMessage(error.message)
             } else if (typeof err === 'string') {
-                error = new Error(createErrorMessage(err))
+                error = new Error(err)
+                errorMessage = createErrorMessage(err)
             } else {
-                error = new Error(
-                    createErrorMessage((err || 'Unknown performLoadData error').toString())
-                )
+                error = new Error((err || 'Unknown performLoadData error').toString())
+                errorMessage = error.message
             }
 
             this.onEvent({
@@ -348,6 +350,7 @@ export class DataLoaderContext {
 
                 data: {
                     error,
+                    errorMessage,
                     resourceType: metadata.resourceType,
                     resourceId: metadata.resourceId
                 }
