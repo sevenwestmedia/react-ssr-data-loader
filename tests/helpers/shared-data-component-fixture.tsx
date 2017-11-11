@@ -15,13 +15,18 @@ export default class ComponentFixture {
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ resourceId: string }, any>
-    component: ReactWrapper<Props<Data, {}>, any>
+    component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
     lastRenderProps: LoaderState<Data>
     lastRenderProps2: LoaderState<Data>
 
-    constructor(initialState: DataLoaderState | undefined, resourceId: string, isServerSideRender: boolean, clientLoadOnly = false) {
+    constructor(
+        initialState: DataLoaderState | undefined,
+        resourceId: string,
+        isServerSideRender: boolean,
+        clientLoadOnly = false
+    ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
@@ -30,12 +35,14 @@ export default class ComponentFixture {
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
+        const TestComponent: React.SFC<{ resourceId: string }> = ({
+            resourceId: testResourceId
+        }) => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
-                onEvent={(event) => {
+                onEvent={event => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
                     } else if (event.type === 'state-changed') {
@@ -47,18 +54,18 @@ export default class ComponentFixture {
             >
                 <div>
                     <TestDataLoader
-                        resourceId={resourceId}
+                        resourceId={testResourceId}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => {
+                        renderData={props => {
                             this.renderCount++
                             this.lastRenderProps = props
                             return null
                         }}
                     />
                     <TestDataLoader
-                        resourceId={resourceId}
+                        resourceId={testResourceId}
                         clientLoadOnly={clientLoadOnly}
-                        renderData={(props) => {
+                        renderData={props => {
                             this.renderCount2++
                             this.lastRenderProps2 = props
                             return null
@@ -88,9 +95,9 @@ export default class ComponentFixture {
         this.testDataPromise = new PromiseCompletionSource<Data>()
     }
 
-    unmount = async() => {
+    unmount = async () => {
         this.root.unmount()
 
-        return new Promise((resolve) => setTimeout(resolve))
+        return new Promise(resolve => setTimeout(resolve))
     }
 }

@@ -72,6 +72,6 @@
             "check-separator",
             "check-type"
         ],
-        "quotemark": [true, "single", "jsx-double"]
+        "quotemark": false
     }
 }

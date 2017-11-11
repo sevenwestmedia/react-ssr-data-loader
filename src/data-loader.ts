@@ -82,7 +82,7 @@ export function createTypedDataLoader<
         }
         private _isMounted: boolean
 
-        constructor(props: ComponentProps, context: Context) {
+        constructor(props?: ComponentProps, context?: Context) {
             super(props, context)
 
             // Bind each action to the instance of this data loader
@@ -93,6 +93,9 @@ export function createTypedDataLoader<
             })
             this.actions = boundActions
 
+            if (!this.context) {
+                return
+            }
             if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
                 return
             }
