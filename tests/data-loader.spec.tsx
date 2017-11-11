@@ -1,7 +1,10 @@
+import * as React from 'react'
 import ComponentFixture from './helpers/component-fixture'
 import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
+import DataProvider from '../src/data-provider'
 import { DataLoaderResources } from '../src/index'
+import { mount } from 'enzyme'
 
 describe('data-loader', () => {
     it('supports multiple loaders using the same key when data loading', async () => {
@@ -80,5 +83,33 @@ describe('data-loader', () => {
 
         resources.registerResource('test', () => Promise.resolve('test'))
         expect(() => resources.registerResource('test', () => Promise.resolve('test'))).toThrow()
+    })
+
+    it('resource can resolve synchronously', async () => {
+        const resources = new DataLoaderResources()
+
+        const LoadTest = resources.registerResource('test', () => 'Result!')
+        let loadCount = 0
+
+        const wrapper = mount(
+            <DataProvider resources={resources}>
+                <LoadTest
+                    resourceId="Test!"
+                    renderData={renderProps => {
+                        loadCount++
+                        if (renderProps.data.hasData) {
+                            return <div>{renderProps.data.data}</div>
+                        }
+
+                        return <div>No data!</div>
+                    }}
+                />
+            </DataProvider>
+        )
+
+        expect(wrapper.html()).toMatchSnapshot()
+        await new Promise(resolve => setTimeout(resolve))
+
+        expect(loadCount).toBe(1)
     })
 })

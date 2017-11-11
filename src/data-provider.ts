@@ -96,7 +96,7 @@ export class DataLoaderContext {
         private performLoad: (
             metadata: ResourceLoadInfo<any, any>,
             existingData: any
-        ) => Promise<any>,
+        ) => Promise<any> | any,
         public isServerSideRender: boolean
     ) {
         if (initialState) {
@@ -167,7 +167,7 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.performLoadData(metadata, existingData)
+        return this.handleLoadingPromise(metadata, this.performLoad(metadata, existingData))
     }
 
     /** Update is similar to refresh, but semantically different
@@ -192,7 +192,7 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.performLoadData(metadata, existingData)
+        return this.handleLoadingPromise(metadata, this.performLoad(metadata, existingData))
     }
 
     refresh<TAdditionalParameters, TInternalState>(
@@ -211,7 +211,12 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.performLoadData(metadata, undefined)
+        const existingData =
+            currentState && currentState.data.hasData ? currentState.data.data : undefined
+        return this.handleLoadingPromise(
+            metadata,
+            Promise.resolve(this.performLoad(metadata, existingData))
+        )
     }
 
     unloadData<TAdditionalParameters, TInternalState>(
@@ -247,6 +252,27 @@ export class DataLoaderContext {
         const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         const existingData =
             currentState && currentState.data.hasData ? currentState.data.data : undefined
+
+        const loadDataResult = this.performLoad(metadata, existingData)
+
+        // To check if result is a value, resolve it, if the same thing is returned
+        // it was already a promise. This is a fast path when the resource returns a value
+        // synchronously instead of asynchronously
+        if (Promise.resolve(loadDataResult) !== loadDataResult) {
+            this.dispatch<LOAD_DATA_COMPLETED>(
+                {
+                    type: LOAD_DATA_COMPLETED,
+                    meta: metadata,
+                    payload: {
+                        data: loadDataResult,
+                        dataFromServerSideRender: this.isServerSideRender
+                    }
+                },
+                metadata
+            )
+            return
+        }
+
         this.dispatch<LOAD_DATA>(
             {
                 type: LOAD_DATA,
@@ -255,7 +281,7 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.performLoadData(metadata, existingData)
+        return this.handleLoadingPromise(metadata, loadDataResult)
     }
 
     /** @returns true if this is the first data loader to attach to that type and id */
@@ -284,7 +310,10 @@ export class DataLoaderContext {
         return dataLookup[resourceId]
     }
 
-    private performLoadData = async (metadata: ResourceLoadInfo<any, any>, existingData: any) => {
+    private handleLoadingPromise = async (
+        metadata: ResourceLoadInfo<any, any>,
+        loadingPromise: Promise<any>
+    ) => {
         try {
             this.loadingCount++
             this.onEvent({
@@ -295,7 +324,7 @@ export class DataLoaderContext {
                     resourceId: metadata.resourceId
                 }
             })
-            const data = await this.performLoad(metadata, existingData)
+            const data = await loadingPromise
             // If we no longer have data loaders, they have been unmounted since we started loading
             if (
                 !this.subscriptions.hasRegisteredDataLoader(

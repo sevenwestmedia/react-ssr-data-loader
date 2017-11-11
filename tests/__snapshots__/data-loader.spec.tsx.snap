@@ -176,6 +176,8 @@ Object {
 }
 `;
 
+exports[`data-loader resource can resolve synchronously 1`] = `"<div>Result!</div>"`;
+
 exports[`data-loader supports multiple loaders using the same key when data loading 1`] = `
 Object {
   "loadAllCompletedCalled": 0,

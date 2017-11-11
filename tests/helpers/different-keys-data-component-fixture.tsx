@@ -57,7 +57,8 @@ export default class ComponentFixture {
                     } else if (event.type === 'state-changed') {
                         this.currentState = event.state
                     } else if (event.type === 'load-error') {
-                        console.error(event.data.error)
+                        // tslint:disable-next-line:no-console
+                        console.info(event.data.error)
                     }
                 }}
             >
