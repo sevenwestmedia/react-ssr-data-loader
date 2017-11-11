@@ -13,7 +13,7 @@ export default class ComponentFixture<T extends object> {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ resourceId: string } & T, any>
-    component: ReactWrapper<Props<Data, {}>, any>
+    component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     passedParams: T
     currentState: DataLoaderState | undefined
@@ -22,7 +22,8 @@ export default class ComponentFixture<T extends object> {
     existingData: Data
 
     constructor(
-        initialState: DataLoaderState | undefined, resourceId: string,
+        initialState: DataLoaderState | undefined,
+        resourceId: string,
         args: T,
         isServerSideRender: boolean,
         // For some reason the typescript compiler is not validating the JSX below properly
@@ -32,20 +33,23 @@ export default class ComponentFixture<T extends object> {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        
-        const TestDataLoader = this.resources.registerResource(resourceType, (_: string, params: T, existingData: Data) => {
-            this.loadDataCount++
-            this.passedParams = params
-            this.existingData = existingData
-            return this.testDataPromise.promise
-        })
 
-        const TestComponent: React.SFC<{ resourceId: string } & T> = (props) => (
+        const TestDataLoader = this.resources.registerResource(
+            resourceType,
+            (_: string, params: T, existingData: Data) => {
+                this.loadDataCount++
+                this.passedParams = params
+                this.existingData = existingData
+                return this.testDataPromise.promise
+            }
+        )
+
+        const TestComponent: React.SFC<{ resourceId: string } & T> = props => (
             <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
-                onEvent={(event) => {
+                onEvent={event => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
                     } else if (event.type === 'state-changed') {
@@ -58,9 +62,9 @@ export default class ComponentFixture<T extends object> {
                 <TestDataLoader
                     {...props as any}
                     clientLoadOnly={_clientLoadOnly}
-                    renderData={(props, actions) => {
+                    renderData={(renderProps, actions) => {
                         this.renderCount++
-                        this.lastRenderProps = props
+                        this.lastRenderProps = renderProps
                         this.lastRenderActions = actions
 
                         return null
@@ -91,9 +95,9 @@ export default class ComponentFixture<T extends object> {
 
     getState = () => this.currentState
 
-    unmount = async() => {
+    unmount = async () => {
         this.root.unmount()
 
-        return new Promise((resolve) => setTimeout(resolve))
+        return new Promise(resolve => setTimeout(resolve))
     }
 }

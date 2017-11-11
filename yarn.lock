@@ -27,11 +27,11 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-dom@^15.5.1":
-  version "15.5.1"
-  resolved "https://nexus.swmdigital.io/repository/js-combined/@types/react-dom/-/react-dom-15.5.1.tgz#f3c3e14c682785923c7d64583537df319442dec1"
+"@types/react-dom@^15.5.6":
+  version "15.5.6"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-15.5.6.tgz#7794ff7822882b59b899c30294e1b1e62e97757e"
   dependencies:
-    "@types/react" "*"
+    "@types/react" "^15"
 
 "@types/react-redux@^4.4.35":
   version "4.4.35"
@@ -40,9 +40,9 @@
     "@types/react" "*"
     redux "^3.6.0"
 
-"@types/react@*", "@types/react@^15.0.38":
-  version "15.0.38"
-  resolved "https://nexus.swmdigital.io/repository/js-combined/@types/react/-/react-15.0.38.tgz#6afea31a9fe66304af474106ba372ddaba449995"
+"@types/react@*", "@types/react@^15.6.6":
+  version "15.6.6"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.6.6.tgz#21c93d921d63e5c8478ad54b917f52c9abd547e2"
 
 "@types/redux@^3.6.0":
   version "3.6.0"
@@ -2815,9 +2815,9 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typescript@^2.4.1:
-  version "2.4.1"
-  resolved "https://nexus.swmdigital.io/repository/js-combined/typescript/-/typescript-2.4.1.tgz#c3ccb16ddaa0b2314de031e7e6fee89e5ba346bc"
+typescript@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.6.1.tgz#ef39cdea27abac0b500242d6726ab90e0c846631"
 
 ua-parser-js@^0.7.9:
   version "0.7.12"
