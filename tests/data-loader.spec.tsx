@@ -112,4 +112,21 @@ describe('data-loader', () => {
 
         expect(loadCount).toBe(1)
     })
+
+    it('resource can resolve synchronously when resource changes', async () => {
+        const sut = new ComponentFixture(undefined, 'testKey', {
+            isServerSideRender: false,
+            unloadDataOnUnmount: false,
+            syncResult: {
+                result: 'Result!'
+            }
+        })
+
+        sut.testDataResult = {
+            result: 'Result2!'
+        }
+        sut.root.setProps({ resourceId: 'newData' })
+
+        sut.assertState()
+    })
 })

@@ -7,16 +7,19 @@ import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
 
-export interface FixtureOptions {
+export interface FixtureOptions<T> {
     isServerSideRender: boolean
     clientLoadOnly?: boolean
     unloadDataOnUnmount?: boolean
+    syncResult?: T
 }
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
+    /** Used instead of the promise to trigger sync data load */
+    testDataResult?: Data
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<Data, any>, any>
@@ -29,9 +32,10 @@ export default class ComponentFixture {
     constructor(
         initialState: DataLoaderState | undefined,
         initialResourceId: string,
-        options: FixtureOptions
+        options: FixtureOptions<Data>
     ) {
         this.currentState = initialState
+        this.testDataResult = options.syncResult
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
         const TestDataLoader = this.resources.registerResource(
@@ -39,6 +43,9 @@ export default class ComponentFixture {
             (_, __, existingData: Data) => {
                 this.lastExistingData = existingData
                 this.loadDataCount++
+                if (this.testDataResult) {
+                    return this.testDataResult
+                }
                 return this.testDataPromise.promise
             }
         )
