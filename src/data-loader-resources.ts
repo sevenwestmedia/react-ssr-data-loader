@@ -5,7 +5,7 @@ export type LoadResource<TData, TResourceParameters> = (
     resourceId: string,
     resourceParameters: TResourceParameters,
     existingData: TData
-) => Promise<TData>
+) => Promise<TData> | TData
 
 interface Resources {
     [dataType: string]: LoadResource<any, any>

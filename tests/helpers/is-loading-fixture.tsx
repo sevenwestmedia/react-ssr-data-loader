@@ -25,26 +25,24 @@ export default class ComponentFixture {
         const TestDataLoader = this.resources.registerResource('dataType', () => {
             return this.testDataPromise.promise
         })
-        const TestComponent: React.SFC<any> = ({ }) => (
+        const TestComponent: React.SFC<any> = ({}) => (
             <DataProvider
                 initialState={undefined}
                 isServerSideRender={false}
                 resources={this.resources}
-                onEvent={(event) => {
+                onEvent={event => {
                     if (event.type === 'state-changed') {
                         this.currentState = event.state
                     } else if (event.type === 'load-error') {
-                        console.error(event.data.error)
+                        // tslint:disable-next-line:no-console
+                        console.info(event.data.error)
                     }
                 }}
             >
                 <div>
-                    <TestDataLoader
-                        resourceId='dataKey'
-                        renderData={() => (<div />)}
-                    />
+                    <TestDataLoader resourceId="dataKey" renderData={() => <div />} />
                     <IsLoading
-                        renderData={(props) => {
+                        renderData={props => {
                             this.lastRenderProps = props
                             ++this.renderCount
                             return null
@@ -62,7 +60,7 @@ export default class ComponentFixture {
     assertState() {
         expect({
             renderCount: this.renderCount,
-            renderProps: this.lastRenderProps,
+            renderProps: this.lastRenderProps
         }).toMatchSnapshot()
     }
 
@@ -70,9 +68,9 @@ export default class ComponentFixture {
         this.testDataPromise = new PromiseCompletionSource<Data>()
     }
 
-    unmount = async() => {
+    unmount = async () => {
         this.root.unmount()
 
-        return new Promise((resolve) => setTimeout(resolve))
+        return new Promise(resolve => setTimeout(resolve))
     }
 }
