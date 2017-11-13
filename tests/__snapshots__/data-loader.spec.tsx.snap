@@ -178,6 +178,31 @@ Object {
 
 exports[`data-loader resource can resolve synchronously 1`] = `"<div>Result!</div>"`;
 
+exports[`data-loader resource can resolve synchronously when resource changes 1`] = `
+Object {
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 2,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "result": "Result2!",
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": undefined,
+    },
+    "status": "Idle",
+  },
+}
+`;
+
 exports[`data-loader supports multiple loaders using the same key when data loading 1`] = `
 Object {
   "loadAllCompletedCalled": 0,

@@ -12,12 +12,12 @@ export default class PromiseCompletionSource<T> {
             this.completed = true
         }
         this.promise = new Promise((resolve, reject) => {
-            this.resolve = (result) => {
+            this.resolve = result => {
                 ensureNotComplete()
                 resolve(result)
                 return new Promise<void>(r => setTimeout(r))
             }
-            this.reject = (error) => {
+            this.reject = error => {
                 ensureNotComplete()
                 reject(error)
                 // We want to resolve this promise
