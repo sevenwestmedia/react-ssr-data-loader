@@ -1,4 +1,5 @@
 import * as React from 'react'
+import shallowEqual = require('shallowequal')
 import { Props, createTypedDataLoader, ActionContext } from './data-loader'
 
 export type LoadResource<TData, TResourceParameters> = (
@@ -50,25 +51,32 @@ export default class DataLoaderResources<TAdditionalParameters> {
         }
 
         type ActionsThis = ActionContext<TData, TResourceParameters, {}>
+        const actions = {
+            update(this: ActionsThis) {
+                const { renderData: _, ...others } = this.nextProps as any
+                const { renderData: __, ...prevOthers } = this.props as any
+
+                if (shallowEqual(others, prevOthers)) {
+                    return
+                }
+
+                // This is a double dispatch, so nextProps will never be undefined
+                this.context.dataLoader.update(this.actionMeta(this.nextProps as any))
+            },
+            refresh(this: ActionsThis) {
+                return this.context.dataLoader.refresh(this.actionMeta(this.props as any))
+            }
+        }
         const typedDataLoader = createTypedDataLoader<
             TData,
             TResourceParameters,
             {},
             RefreshAction
-        >(
+            >(
             resourceType,
             {},
-            {
-                refresh(this: ActionsThis) {
-                    return this.context.dataLoader.refresh({
-                        resourceType,
-                        resourceId: this.props.resourceId,
-                        resourceLoadParams: this.props,
-                        internalState: this.internalState
-                    })
-                }
-            }
-        )
+            actions
+            )
         this.resources[resourceType] = loadResource
 
         return typedDataLoader
@@ -84,38 +92,61 @@ export default class DataLoaderResources<TAdditionalParameters> {
         }
 
         type ActionsThis = ActionContext<TData, PageComponentProps, PageState>
+        const actions = {
+            update(this: ActionsThis) {
+                if (!this.nextProps) {
+                    throw new Error('Check the componentWillUpdate function of the data-loader, nextProps should not be undefined')
+                }
+
+                const { renderData: _, paging, ...others } = this.nextProps
+                const { renderData: __, paging: prevPaging, ...prevOthers } = this.props
+
+                if (shallowEqual(paging, prevPaging) && shallowEqual(others, prevOthers)) {
+                    console.log('Skipping update due to no changes')
+                    return
+                }
+
+                this.context.dataLoader.update({
+                    resourceType,
+                    resourceId: this.nextProps.resourceId,
+                    resourceLoadParams: {
+                        paging: { ...this.nextProps.paging, keepPreviousPagesData: false }
+                    },
+                    internalState: { page: 1 }
+                })
+            },
+            refresh(this: ActionsThis) {
+                return this.context.dataLoader.refresh({
+                    resourceType,
+                    resourceId: this.props.resourceId,
+                    resourceLoadParams: {
+                        paging: { ...this.props.paging, keepPreviousPagesData: false }
+                    },
+                    internalState: { page: 1 }
+                })
+            },
+            // Loads next page
+            nextPage(this: ActionsThis) {
+                return this.context.dataLoader.nextPage({
+                    resourceType,
+                    resourceId: this.props.resourceId,
+                    resourceLoadParams: {
+                        paging: { keepPreviousPagesData: true, ...this.props.paging }
+                    },
+                    internalState: { page: this.internalState().page + 1 }
+                })
+            }
+        }
         const typedDataLoader = createTypedDataLoader<
             PagedData<TData>,
             PageComponentProps,
             PageState,
             PageActions
-        >(
+            >(
             resourceType,
             { page: 1 },
-            {
-                refresh(this: ActionsThis) {
-                    return this.context.dataLoader.refresh({
-                        resourceType,
-                        resourceId: this.props.resourceId,
-                        resourceLoadParams: {
-                            paging: { ...this.props.paging, keepPreviousPagesData: false }
-                        },
-                        internalState: { page: 1 }
-                    })
-                },
-                // Loads next page
-                nextPage(this: ActionsThis) {
-                    return this.context.dataLoader.nextPage({
-                        resourceType,
-                        resourceId: this.props.resourceId,
-                        resourceLoadParams: {
-                            paging: { keepPreviousPagesData: true, ...this.props.paging }
-                        },
-                        internalState: { page: this.internalState().page + 1 }
-                    })
-                }
-            }
-        )
+            actions
+            )
 
         // This async function performs the loading of the paged data
         // it takes care of passing the correct params to the loadResource function
@@ -125,7 +156,17 @@ export default class DataLoaderResources<TAdditionalParameters> {
             pageInfo: PageComponentProps & { page: number },
             existingData: PagedData<TData>
         ): Promise<PagedData<TData>> => {
+            // const isUpdate = pageInfo.paging.keepPreviousPagesData === undefined && existingData
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
+            // If we have existing data and keepPreviousPages data is undefined, we have
+            // updated, so we should short cut loading the same pages data again and just return
+            // the existing data
+            // if (isUpdate) {
+            //     return {
+            //         pageNumber,
+            //         data: existingData.data
+            //     }
+            // }
             const data = await loadResource(dataKey, pageInfo.paging, pageNumber)
             if (existingData && existingData.data && pageInfo.paging.keepPreviousPagesData) {
                 return {
@@ -134,6 +175,7 @@ export default class DataLoaderResources<TAdditionalParameters> {
                 }
             }
 
+            console.log('data loss')
             return {
                 pageNumber,
                 data

@@ -430,7 +430,7 @@ export default class DataProvider extends React.Component<Props, {}> {
         super(props, context)
 
         this.dataLoader = new DataLoaderContext(
-            this.props.onEvent || (() => {}),
+            this.props.onEvent || (() => { }),
             this.props.initialState,
             this.loadData,
             this.props.isServerSideRender || false

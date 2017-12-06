@@ -2,8 +2,8 @@ import * as React from 'react'
 import { LoaderState } from './'
 import { DataLoaderContext } from './data-provider'
 import { DataUpdateCallback } from './subscriptions'
-import * as shallowCompare from 'react-addons-shallow-compare'
 import * as PropTypes from 'prop-types'
+import { ResourceLoadInfo } from './data-loader-actions';
 
 export type RenderData<T, TActions> = (
     loaderProps: LoaderState<T>,
@@ -25,7 +25,7 @@ type State<T, TInternalState extends object> = {
 
 export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClass<
     Props<TResource, TActions> & TDataLoaderParams
->
+    >
 export type Context = { dataLoader: DataLoaderContext }
 
 // The `createTypedDataLoader` function needs to exist because for each
@@ -44,9 +44,10 @@ export type Context = { dataLoader: DataLoaderContext }
  */
 export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
     context: Context
-    props: Readonly<{ children?: React.ReactNode }> &
-        Readonly<Props<TResource, any> & TDataLoaderParams>
+    nextProps: Props<TResource, any> & TDataLoaderParams | undefined
+    props: Readonly<{ children?: React.ReactNode }> & Readonly<Props<TResource, any> & TDataLoaderParams>
     internalState: () => TInternalState
+    actionMeta: (props: Props<TResource, any> & TDataLoaderParams) => ResourceLoadInfo<any, TInternalState>
 }
 
 export function createTypedDataLoader<
@@ -60,12 +61,12 @@ export function createTypedDataLoader<
             this: ActionContext<TResource, TDataLoaderParams, TInternalState>
         ) => void
     }
->(
+    >(
     resourceType: string,
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
     actions: TActions
-): Return<TResource, TActions, TDataLoaderParams> {
+    ): Return<TResource, TActions, TDataLoaderParams> {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
@@ -80,6 +81,7 @@ export function createTypedDataLoader<
         state: ComponentState = {
             internalState: initialInternalState
         }
+        nextProps: ComponentProps | undefined
         private _isMounted: boolean
 
         constructor(props?: ComponentProps, context?: Context) {
@@ -108,20 +110,13 @@ export function createTypedDataLoader<
         }
 
         componentWillReceiveProps(readOnlyNextProps: any) {
-            // The types are Readonly<P>, TypeScript limitations with unions, generics etc cause
-            // this to be required for TS > 2.4
-            const nextProps: ComponentProps = readOnlyNextProps
-            if (
-                // When the resource params has changed we need to update the resource data
-                // This happens when the loader is used on a page which can be
-                // routed to different content
-                // For example a blog entry, which navigates to another blog entry
+            this.nextProps = readOnlyNextProps as any
 
-                // We can use Reacts shallow compare because we force the params to be flattened
-                // onto the component, rather than having a params prop which contains everything
-                // We also always want to only take props into account, so this.state is intentially passed
-                shallowCompare(this, nextProps, this.state)
-            ) {
+            try {
+                // The types are Readonly<P>, TypeScript limitations with unions, generics etc cause
+                // this to be required for TS > 2.4
+                const nextProps: ComponentProps = readOnlyNextProps
+
                 if (this.props.resourceId !== nextProps.resourceId) {
                     this.unloadOrDetachData()
                     this.context.dataLoader.loadData(
@@ -131,7 +126,18 @@ export function createTypedDataLoader<
                     return
                 }
 
-                this.context.dataLoader.update(this.actionMeta(nextProps))
+                // When registering resource types, we register a hidden action
+                // which only performs the update if properties have changes
+                // it excludes things like renderData and paging info to make the check
+                // useful.
+                // Also paging has hooks to make update act like refresh
+                if (this.actions.update) {
+                    (this.actions as any).update()
+                } else {
+                    this.context.dataLoader.update(this.actionMeta(nextProps))
+                }
+            } finally {
+                this.nextProps = undefined
             }
         }
 
@@ -164,7 +170,7 @@ export function createTypedDataLoader<
             return this.props.renderData(this.state.loaderState, this.actions)
         }
 
-        private actionMeta = (props: Props<TResource, TActions> = this.props) => {
+        actionMeta = (props: Props<TResource, TActions> = this.props) => {
             const {
                 resourceId,
                 clientLoadOnly,
