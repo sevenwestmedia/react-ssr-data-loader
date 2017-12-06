@@ -102,7 +102,6 @@ export default class DataLoaderResources<TAdditionalParameters> {
                 const { renderData: __, paging: prevPaging, ...prevOthers } = this.props
 
                 if (shallowEqual(paging, prevPaging) && shallowEqual(others, prevOthers)) {
-                    console.log('Skipping update due to no changes')
                     return
                 }
 
@@ -156,17 +155,7 @@ export default class DataLoaderResources<TAdditionalParameters> {
             pageInfo: PageComponentProps & { page: number },
             existingData: PagedData<TData>
         ): Promise<PagedData<TData>> => {
-            // const isUpdate = pageInfo.paging.keepPreviousPagesData === undefined && existingData
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
-            // If we have existing data and keepPreviousPages data is undefined, we have
-            // updated, so we should short cut loading the same pages data again and just return
-            // the existing data
-            // if (isUpdate) {
-            //     return {
-            //         pageNumber,
-            //         data: existingData.data
-            //     }
-            // }
             const data = await loadResource(dataKey, pageInfo.paging, pageNumber)
             if (existingData && existingData.data && pageInfo.paging.keepPreviousPagesData) {
                 return {
@@ -175,7 +164,6 @@ export default class DataLoaderResources<TAdditionalParameters> {
                 }
             }
 
-            console.log('data loss')
             return {
                 pageNumber,
                 data
