@@ -74,6 +74,7 @@ Object {
   "loadDataCount": 1,
   "renderActions": Object {
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 2,
   "renderProps": Object {
@@ -99,6 +100,7 @@ Object {
   "loadDataCount": 0,
   "renderActions": Object {
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 1,
   "renderProps": Object {
@@ -124,6 +126,7 @@ Object {
   "loadDataCount": 1,
   "renderActions": Object {
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 1,
   "renderProps": Object {
@@ -184,6 +187,7 @@ Object {
   "loadDataCount": 2,
   "renderActions": Object {
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 2,
   "renderProps": Object {

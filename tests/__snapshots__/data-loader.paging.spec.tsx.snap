@@ -5,6 +5,7 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 3,
   "renderProps": Object {
@@ -27,6 +28,68 @@ Object {
 }
 `;
 
+exports[`data-loader paged component supports being re-rendered 1`] = `
+Object {
+  "loadAllCompletedCalled": 2,
+  "loadDataCount": 2,
+  "renderActions": Object {
+    "nextPage": [Function],
+    "refresh": [Function],
+    "update": [Function],
+  },
+  "renderCount": 5,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "data": Array [
+          "Test",
+          "Test2",
+        ],
+        "pageNumber": 2,
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "page",
+    },
+    "status": "Idle",
+  },
+}
+`;
+
+exports[`data-loader paged component supports being re-rendered 2`] = `
+Object {
+  "loadAllCompletedCalled": 2,
+  "loadDataCount": 2,
+  "renderActions": Object {
+    "nextPage": [Function],
+    "refresh": [Function],
+    "update": [Function],
+  },
+  "renderCount": 5,
+  "renderProps": Object {
+    "data": Object {
+      "data": Object {
+        "data": Array [
+          "Test",
+          "Test2",
+        ],
+        "pageNumber": 2,
+      },
+      "dataFromServerSideRender": false,
+      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "page",
+    },
+    "status": "Idle",
+  },
+}
+`;
+
 exports[`data-loader refresh causes page to go back to page 1 1`] = `
 Object {
   "loadAllCompletedCalled": 3,
@@ -34,6 +97,7 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 6,
   "renderProps": Object {
@@ -63,6 +127,7 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 2,
   "renderProps": Object {
@@ -92,6 +157,7 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 3,
   "renderProps": Object {
@@ -121,6 +187,7 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
+    "update": [Function],
   },
   "renderCount": 4,
   "renderProps": Object {

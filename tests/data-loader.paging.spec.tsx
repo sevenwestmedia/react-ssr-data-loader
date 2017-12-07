@@ -13,6 +13,20 @@ describe('data-loader', () => {
         sut.assertState()
     })
 
+    it('paged component supports being re-rendered', async () => {
+        const sut = new PagedComponentFixture(undefined, "testKey", false)
+
+        await sut.testDataPromise.resolve(['Test'])
+        sut.nextPage()
+        await sut.testDataPromise.resolve(['Test2'])
+
+        sut.root.setProps({ resourceId: 'testKey' })
+        sut.assertState()
+        await new Promise(resolve => setTimeout(resolve))
+
+        sut.assertState()
+    })
+
     it('calling nextPage when already loading a page ignores the action', async () => {
         const sut = new PagedComponentFixture(undefined, "testKey", false)
 
