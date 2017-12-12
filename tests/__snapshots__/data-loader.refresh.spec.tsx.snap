@@ -1,5 +1,6 @@
 exports[`data-loader calling refresh when already refreshing ignores the action 1`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 2,
   "renderActions": Object {
@@ -26,6 +27,7 @@ Object {
 
 exports[`data-loader can refresh data 1`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
   "renderActions": Object {
@@ -52,6 +54,7 @@ Object {
 
 exports[`data-loader can refresh data 2`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 2,
   "renderActions": Object {
@@ -78,6 +81,7 @@ Object {
 
 exports[`data-loader can refresh data 3`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
   "renderActions": Object {

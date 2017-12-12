@@ -91,6 +91,7 @@ export default class ComponentFixture {
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
+            existingData: this.lastExistingData,
             loadDataCount: this.loadDataCount
         }).toMatchSnapshot()
     }
