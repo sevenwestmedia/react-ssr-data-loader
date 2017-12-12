@@ -70,6 +70,7 @@ Object {
 
 exports[`data-loader can support preserving data on unmount 1`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
   "renderActions": Object {
@@ -96,6 +97,7 @@ Object {
 
 exports[`data-loader can support preserving data on unmount 2`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
   "renderActions": Object {
@@ -122,6 +124,7 @@ Object {
 
 exports[`data-loader ignores completion if unmounted first 1`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
   "renderActions": Object {
