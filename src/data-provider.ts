@@ -211,11 +211,9 @@ export class DataLoaderContext {
             metadata
         )
 
-        const existingData =
-            currentState && currentState.data.hasData ? currentState.data.data : undefined
         return this.handleLoadingPromise(
             metadata,
-            Promise.resolve(this.performLoad(metadata, existingData))
+            Promise.resolve(this.performLoad(metadata, undefined))
         )
     }
 
@@ -430,7 +428,7 @@ export default class DataProvider extends React.Component<Props, {}> {
         super(props, context)
 
         this.dataLoader = new DataLoaderContext(
-            this.props.onEvent || (() => { }),
+            this.props.onEvent || (() => {}),
             this.props.initialState,
             this.loadData,
             this.props.isServerSideRender || false

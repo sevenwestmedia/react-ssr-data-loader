@@ -186,6 +186,7 @@ exports[`data-loader resource can resolve synchronously 1`] = `"<div>Result!</di
 
 exports[`data-loader resource can resolve synchronously when resource changes 1`] = `
 Object {
+  "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 2,
   "renderActions": Object {
