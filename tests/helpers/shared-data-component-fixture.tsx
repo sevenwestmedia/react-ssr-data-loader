@@ -1,4 +1,5 @@
 import * as React from 'react'
+// tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
@@ -14,7 +15,14 @@ export default class ComponentFixture {
     renderCount2 = 0
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ resourceId: string }, any>
+    root: ReactWrapper<
+        {
+            resourceId: string
+            unmountLastDataLoader: boolean
+            renderAdditionalDataLoader: boolean
+        },
+        any
+    >
     component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
@@ -25,7 +33,8 @@ export default class ComponentFixture {
         initialState: DataLoaderState | undefined,
         resourceId: string,
         isServerSideRender: boolean,
-        clientLoadOnly = false
+        clientLoadOnly = false,
+        additionalDataLoader = false
     ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
@@ -35,48 +44,74 @@ export default class ComponentFixture {
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ resourceId: string }> = ({
-            resourceId: testResourceId
-        }) => (
-            <DataProvider
-                initialState={initialState}
-                isServerSideRender={isServerSideRender}
-                resources={this.resources}
-                onEvent={event => {
-                    if (event.type === 'data-load-completed') {
-                        this.loadAllCompletedCalled++
-                    } else if (event.type === 'state-changed') {
-                        this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
-                    }
-                }}
-            >
-                <div>
-                    <TestDataLoader
-                        resourceId={testResourceId}
-                        clientLoadOnly={clientLoadOnly}
-                        renderData={props => {
-                            this.renderCount++
-                            this.lastRenderProps = props
-                            return null
-                        }}
-                    />
-                    <TestDataLoader
-                        resourceId={testResourceId}
-                        clientLoadOnly={clientLoadOnly}
-                        renderData={props => {
-                            this.renderCount2++
-                            this.lastRenderProps2 = props
-                            return null
-                        }}
-                    />
-                </div>
-            </DataProvider>
-        )
+        const TestComponent: React.SFC<{
+            resourceId: string
+            renderAdditionalDataLoader: boolean
+            unmountLastDataLoader: boolean
+        }> = ({
+            resourceId: testResourceId,
+            renderAdditionalDataLoader,
+            unmountLastDataLoader
+        }) => {
+            return (
+                <DataProvider
+                    initialState={initialState}
+                    isServerSideRender={isServerSideRender}
+                    resources={this.resources}
+                    onEvent={event => {
+                        if (event.type === 'data-load-completed') {
+                            this.loadAllCompletedCalled++
+                        } else if (event.type === 'state-changed') {
+                            this.currentState = event.state
+                        } else if (event.type === 'load-error') {
+                            // tslint:disable-next-line:no-console
+                            console.info(event.data.error)
+                        }
+                    }}
+                >
+                    <div>
+                        <TestDataLoader
+                            resourceId={testResourceId}
+                            clientLoadOnly={clientLoadOnly}
+                            renderData={props => {
+                                this.renderCount++
+                                this.lastRenderProps = props
+                                return null
+                            }}
+                        />
 
-        this.root = mount(<TestComponent resourceId={resourceId} />)
+                        {renderAdditionalDataLoader && (
+                            <TestDataLoader
+                                resourceId={testResourceId}
+                                clientLoadOnly={clientLoadOnly}
+                                renderData={() => {
+                                    return null
+                                }}
+                            />
+                        )}
+                        {!unmountLastDataLoader && (
+                            <TestDataLoader
+                                resourceId={testResourceId}
+                                clientLoadOnly={clientLoadOnly}
+                                renderData={props => {
+                                    this.renderCount2++
+                                    this.lastRenderProps2 = props
+                                    return null
+                                }}
+                            />
+                        )}
+                    </div>
+                </DataProvider>
+            )
+        }
+
+        this.root = mount(
+            <TestComponent
+                resourceId={resourceId}
+                unmountLastDataLoader={false}
+                renderAdditionalDataLoader={additionalDataLoader}
+            />
+        )
 
         this.component = this.root.find(TestDataLoader)
     }
