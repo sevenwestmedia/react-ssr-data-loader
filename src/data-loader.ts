@@ -87,7 +87,7 @@ export function createTypedDataLoader<
         nextProps: ComponentProps | undefined
         private _isMounted: boolean
 
-        constructor(props?: ComponentProps, context?: Context) {
+        constructor(props: ComponentProps, context?: Context) {
             super(props, context)
 
             // Bind each action to the instance of this data loader
