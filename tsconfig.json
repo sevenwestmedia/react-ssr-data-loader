@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "sourceMap": false,
+        "sourceMap": true,
         "target": "ES5",
         "module": "commonjs",
         "moduleResolution": "node",
@@ -11,8 +11,8 @@
         "noImplicitThis": true,
         "removeComments": true,
         "strict": true,
-        "inlineSourceMap": true,
-        "inlineSources": true,
+        "inlineSourceMap": false,
+        "inlineSources": false,
         "sourceRoot": "/",
         "noEmit": true,
         "jsx": "react",
@@ -22,7 +22,13 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true,
         "declaration": true,
-        "lib": ["dom", "es5", "es2015.promise"]
+        "lib": [
+            "dom",
+            "es5",
+            "es2015.promise"
+        ]
     },
-    "exclude": ["node_modules"]
+    "exclude": [
+        "node_modules"
+    ]
 }
