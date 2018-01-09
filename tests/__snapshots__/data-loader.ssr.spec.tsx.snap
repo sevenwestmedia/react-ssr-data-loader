@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`server side render can have two components in the same render tree 1`] = `
 Object {
   "loadAllCompletedCalled": 0,

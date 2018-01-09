@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`data-loader calling nextPage when already loading a page ignores the action 1`] = `
 Object {
   "loadAllCompletedCalled": 1,

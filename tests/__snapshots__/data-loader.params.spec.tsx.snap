@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`data-loader can specify arguments for data loader 1`] = `
 Object {
   "loadAllCompletedCalled": 1,

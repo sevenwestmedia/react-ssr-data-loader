@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`Is loading component should be loading if any data loaders are loading 1`] = `
 Object {
   "renderCount": 1,

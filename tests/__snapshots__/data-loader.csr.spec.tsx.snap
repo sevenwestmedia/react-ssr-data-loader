@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`Client side render client render after SSR with data should not fetch data 1`] = `
 Object {
   "existingData": undefined,
