@@ -57,9 +57,9 @@ export class Subscriptions {
         }
 
         const subscriptionIndex = subscriptions.indexOf(update)
-        const without = subscriptions.splice(subscriptionIndex, 1)
-        this.subscriptions[resourceType][resourceId] = without
-        return without.length
+        subscriptions.splice(subscriptionIndex, 1)
+        this.subscriptions[resourceType][resourceId] = subscriptions
+        return subscriptions.length
     }
 
     notifyStateSubscribersAndDataLoaders = (

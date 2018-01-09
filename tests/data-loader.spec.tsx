@@ -4,6 +4,7 @@ import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
 import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
 import DataProvider from '../src/data-provider'
 import { DataLoaderResources } from '../src/index'
+// tslint:disable-next-line:no-implicit-dependencies
 import { mount } from 'enzyme'
 
 describe('data-loader', () => {
@@ -34,6 +35,16 @@ describe('data-loader', () => {
         sut.resetPromise()
         sut.root.setProps({ resourceId: 'newData' })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
+
+        sut.assertState()
+    })
+
+    it('data is not unloaded until the last attached data-loader is unmounted', async () => {
+        const sut = new SharedDataComponentFixture(undefined, 'testKey', false, false, true)
+
+        await sut.testDataPromise.resolve({ result: 'Success!' })
+        sut.root.unmount()
+        await new Promise(resolve => setTimeout(resolve))
 
         sut.assertState()
     })
