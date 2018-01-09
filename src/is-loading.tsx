@@ -6,19 +6,17 @@ import * as PropTypes from 'prop-types'
 export interface LoadedState {
     isLoading: boolean
 }
-export interface RenderLoading {
-    (loaderProps: LoadedState): React.ReactElement<any> | null
-}
+export type RenderLoading = (loaderProps: LoadedState) => React.ReactElement<any> | null
 export interface Props {
     renderData: RenderLoading
 }
 
 export default class IsLoading extends React.Component<Props, DataLoaderState> {
-    context: { dataLoader: DataLoaderContext }
-
     static contextTypes = {
         dataLoader: PropTypes.object
     }
+
+    context: { dataLoader: DataLoaderContext }
 
     constructor(props: Props, context: { dataLoader: DataLoaderContext }) {
         super(props, context)

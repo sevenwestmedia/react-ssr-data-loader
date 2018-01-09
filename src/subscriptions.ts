@@ -33,7 +33,6 @@ export class Subscriptions {
         resourceId: string,
         update: DataUpdateCallback
     ): number => {
-        console.log('register')
         const subscriptions = this.getSubscription(resourceType, resourceId)
 
         subscriptions.push(update)

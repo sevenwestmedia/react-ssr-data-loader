@@ -3,7 +3,7 @@ import { LoaderState } from './'
 import { DataLoaderContext } from './data-provider'
 import { DataUpdateCallback } from './subscriptions'
 import * as PropTypes from 'prop-types'
-import { ResourceLoadInfo } from './data-loader-actions';
+import { ResourceLoadInfo } from './data-loader-actions'
 
 export type RenderData<T, TActions> = (
     loaderProps: LoaderState<T>,
@@ -25,7 +25,7 @@ type State<T, TInternalState extends object> = {
 
 export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClass<
     Props<TResource, TActions> & TDataLoaderParams
-    >
+>
 export type Context = { dataLoader: DataLoaderContext }
 
 // The `createTypedDataLoader` function needs to exist because for each
@@ -45,9 +45,12 @@ export type Context = { dataLoader: DataLoaderContext }
 export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
     context: Context
     nextProps: Props<TResource, any> & TDataLoaderParams | undefined
-    props: Readonly<{ children?: React.ReactNode }> & Readonly<Props<TResource, any> & TDataLoaderParams>
+    props: Readonly<{ children?: React.ReactNode }> &
+        Readonly<Props<TResource, any> & TDataLoaderParams>
     internalState: () => TInternalState
-    actionMeta: (props: Props<TResource, any> & TDataLoaderParams) => ResourceLoadInfo<any, TInternalState>
+    actionMeta: (
+        props: Props<TResource, any> & TDataLoaderParams
+    ) => ResourceLoadInfo<any, TInternalState>
 }
 
 export function createTypedDataLoader<
@@ -61,12 +64,12 @@ export function createTypedDataLoader<
             this: ActionContext<TResource, TDataLoaderParams, TInternalState>
         ) => void
     }
-    >(
+>(
     resourceType: string,
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
     actions: TActions
-    ): Return<TResource, TActions, TDataLoaderParams> {
+): Return<TResource, TActions, TDataLoaderParams> {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
@@ -132,7 +135,7 @@ export function createTypedDataLoader<
                 // useful.
                 // Also paging has hooks to make update act like refresh
                 if (this.actions.update) {
-                    (this.actions as any).update()
+                    ;(this.actions as any).update()
                 } else {
                     this.context.dataLoader.update(this.actionMeta(nextProps))
                 }
