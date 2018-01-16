@@ -128,7 +128,7 @@ exports[`data-loader data is not unloaded until the last attached data-loader is
 Object {
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
-  "renderCount": 3,
+  "renderCount": 2,
   "renderCount2": 2,
   "renderProps1": Object {
     "data": Object {

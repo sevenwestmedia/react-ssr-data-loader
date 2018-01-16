@@ -92,7 +92,7 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "error": "Boom!",
+      "error": [Error: Boom!],
       "success": false,
       "type": "initial-fetch",
     },
