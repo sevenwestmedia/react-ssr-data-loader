@@ -108,8 +108,8 @@ describe('data-loader', () => {
                     resourceId="Test!"
                     renderData={renderProps => {
                         loadCount++
-                        if (renderProps.result.hasData) {
-                            return <div>{renderProps.result.data}</div>
+                        if (renderProps.data.hasData) {
+                            return <div>{renderProps.data.result}</div>
                         }
 
                         return <div>No data!</div>

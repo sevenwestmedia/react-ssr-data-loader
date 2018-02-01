@@ -15,7 +15,7 @@ import {
 } from './data-loader-actions'
 
 const defaultState: LoaderState<any> = {
-    result: { hasData: false },
+    data: { hasData: false },
     status: LoaderStatus.Idle,
     lastAction: { type: 'none', success: true }
 }
@@ -57,7 +57,7 @@ export default (
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Fetching,
                 lastAction: currentOrDefault.lastAction, // TODO Should we always go back to idle?
-                result: currentOrDefault.result
+                data: currentOrDefault.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -76,7 +76,7 @@ export default (
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Paging,
                 lastAction: { type: 'none', success: true },
-                result: currentState.result
+                data: currentState.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -95,7 +95,7 @@ export default (
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Updating,
                 lastAction: { type: 'none', success: true },
-                result: currentState.result
+                data: currentState.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -114,7 +114,7 @@ export default (
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Refreshing,
                 lastAction: { type: 'none', success: true },
-                result: currentState.result
+                data: currentState.data
             }
             return {
                 loadingCount: state.loadingCount + 1,
@@ -135,9 +135,9 @@ export default (
             const completed: LoaderState<any> = {
                 status: LoaderStatus.Idle,
                 lastAction: { type: lastAction, success: true },
-                result: {
+                data: {
                     hasData: true,
-                    data: action.payload.data,
+                    result: action.payload.data,
                     dataFromServerSideRender: action.payload.dataFromServerSideRender
                 }
             }
@@ -160,7 +160,7 @@ export default (
             const failed: LoaderState<any> = {
                 status: LoaderStatus.Idle,
                 lastAction: { type: lastAction, success: false, error: action.payload },
-                result: currentState.result
+                data: currentState.data
             }
             return {
                 // this should always occur alongside a LOAD_DATA_COMPLETED so we decrement loadingCount there

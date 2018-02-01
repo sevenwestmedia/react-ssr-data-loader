@@ -76,7 +76,7 @@ export interface Props {
 export type State = DataLoaderState
 
 const ssrNeedsData = (state: LoaderState<any> | undefined) =>
-    !state || (!state.result.hasData && state.lastAction.success)
+    !state || (!state.data.hasData && state.lastAction.success)
 
 export class DataLoaderContext {
     // We need to track this in two places, one with immediate effect,
@@ -136,8 +136,8 @@ export class DataLoaderContext {
 
         if (!this.isServerSideRender && firstAttached) {
             // Data is left from a previous session
-            if (loadedState && loadedState.result.hasData) {
-                if (loadedState.result.dataFromServerSideRender) {
+            if (loadedState && loadedState.data.hasData) {
+                if (loadedState.data.dataFromServerSideRender) {
                     // TODO Need to flag data as cached
                 }
             } else {
@@ -156,7 +156,7 @@ export class DataLoaderContext {
         }
 
         const existingData =
-            currentState && currentState.result.hasData ? currentState.result.data : undefined
+            currentState && currentState.data.hasData ? currentState.data.result : undefined
 
         this.dispatch<NEXT_PAGE>(
             {
@@ -182,7 +182,7 @@ export class DataLoaderContext {
             return
         }
         const existingData =
-            currentState && currentState.result.hasData ? currentState.result.data : undefined
+            currentState && currentState.data.hasData ? currentState.data.result : undefined
 
         this.dispatch<UPDATE_DATA>(
             {
@@ -249,7 +249,7 @@ export class DataLoaderContext {
     private _loadData = (metadata: ResourceLoadInfo<any, any>) => {
         const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         const existingData =
-            currentState && currentState.result.hasData ? currentState.result.data : undefined
+            currentState && currentState.data.hasData ? currentState.data.result : undefined
 
         const loadDataResult = this.performLoad(metadata, existingData)
 
