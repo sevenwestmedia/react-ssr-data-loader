@@ -11,19 +11,19 @@ Object {
   },
   "renderCount": 3,
   "renderProps": Object {
-    "lastAction": Object {
-      "success": true,
-      "type": "none",
-    },
-    "result": Object {
-      "data": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
     },
     "status": "Paging",
   },
@@ -41,20 +41,20 @@ Object {
   },
   "renderCount": 5,
   "renderProps": Object {
-    "lastAction": Object {
-      "success": true,
-      "type": "page",
-    },
-    "result": Object {
-      "data": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
           "Test2",
         ],
         "pageNumber": 2,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "page",
     },
     "status": "Idle",
   },
@@ -72,20 +72,20 @@ Object {
   },
   "renderCount": 5,
   "renderProps": Object {
-    "lastAction": Object {
-      "success": true,
-      "type": "page",
-    },
-    "result": Object {
-      "data": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
           "Test2",
         ],
         "pageNumber": 2,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "page",
     },
     "status": "Idle",
   },
@@ -103,19 +103,19 @@ Object {
   },
   "renderCount": 6,
   "renderProps": Object {
-    "lastAction": Object {
-      "success": true,
-      "type": "refresh",
-    },
-    "result": Object {
-      "data": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "refresh",
     },
     "status": "Idle",
   },
@@ -133,19 +133,19 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
-    "lastAction": Object {
-      "success": true,
-      "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
     },
     "status": "Idle",
   },
@@ -163,19 +163,19 @@ Object {
   },
   "renderCount": 3,
   "renderProps": Object {
-    "lastAction": Object {
-      "success": true,
-      "type": "none",
-    },
-    "result": Object {
-      "data": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
     },
     "status": "Paging",
   },
@@ -193,20 +193,20 @@ Object {
   },
   "renderCount": 4,
   "renderProps": Object {
-    "lastAction": Object {
-      "success": true,
-      "type": "page",
-    },
-    "result": Object {
-      "data": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
           "Test2",
         ],
         "pageNumber": 2,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "page",
     },
     "status": "Idle",
   },

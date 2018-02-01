@@ -11,16 +11,16 @@ Object {
   },
   "renderCount": 3,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "none",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Refreshing",
   },
@@ -38,16 +38,16 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
@@ -65,16 +65,16 @@ Object {
   },
   "renderCount": 3,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "none",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Refreshing",
   },
@@ -92,16 +92,16 @@ Object {
   },
   "renderCount": 4,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test2",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "refresh",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test2",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },

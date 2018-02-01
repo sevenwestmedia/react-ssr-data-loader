@@ -7,26 +7,26 @@ Object {
   "loadDataCount2": 1,
   "renderCount": 2,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
     },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
-    },
     "status": "Idle",
   },
   "renderProps2": Object {
+    "data": Object {
+      "hasData": false,
+    },
     "lastAction": Object {
       "success": true,
       "type": "none",
-    },
-    "result": Object {
-      "hasData": false,
     },
     "status": "Fetching",
   },
@@ -40,30 +40,30 @@ Object {
   "renderCount": 2,
   "renderCount2": 2,
   "renderProps1": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
   "renderProps2": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
@@ -81,16 +81,16 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
@@ -108,16 +108,16 @@ Object {
   },
   "renderCount": 1,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Test",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
@@ -131,30 +131,30 @@ Object {
   "renderCount": 2,
   "renderCount2": 2,
   "renderProps1": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Success!",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
   "renderProps2": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Success!",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
@@ -172,12 +172,12 @@ Object {
   },
   "renderCount": 1,
   "renderProps": Object {
+    "data": Object {
+      "hasData": false,
+    },
     "lastAction": Object {
       "success": true,
       "type": "none",
-    },
-    "result": Object {
-      "hasData": false,
     },
     "status": "Fetching",
   },
@@ -191,30 +191,30 @@ Object {
   "renderCount": 4,
   "renderCount2": 4,
   "renderProps1": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Success2!",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Success2!",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
   "renderProps2": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Success2!",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": "initial-fetch",
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Success2!",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
@@ -234,16 +234,16 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Result2!",
+      },
+    },
     "lastAction": Object {
       "success": true,
       "type": undefined,
-    },
-    "result": Object {
-      "data": Object {
-        "result": "Result2!",
-      },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "status": "Idle",
   },
@@ -257,22 +257,22 @@ Object {
   "renderCount": 1,
   "renderCount2": 1,
   "renderProps1": Object {
+    "data": Object {
+      "hasData": false,
+    },
     "lastAction": Object {
       "success": true,
       "type": "none",
-    },
-    "result": Object {
-      "hasData": false,
     },
     "status": "Fetching",
   },
   "renderProps2": Object {
+    "data": Object {
+      "hasData": false,
+    },
     "lastAction": Object {
       "success": true,
       "type": "none",
-    },
-    "result": Object {
-      "hasData": false,
     },
     "status": "Fetching",
   },
