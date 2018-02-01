@@ -43,7 +43,7 @@ export type LoaderState<TData> = {
      * Some kind of sentinel value so that the object doesn't become top heavy ???
      */
 
-    data: Data<TData>
+    result: Data<TData>
 }
 
 // @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
