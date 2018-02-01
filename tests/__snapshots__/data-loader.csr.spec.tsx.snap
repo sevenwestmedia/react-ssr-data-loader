@@ -11,16 +11,16 @@ Object {
   },
   "renderCount": 1,
   "renderProps": Object {
-    "data": Object {
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "result": Object {
       "data": Object {
         "result": "Success!",
       },
       "dataFromServerSideRender": true,
       "hasData": true,
-    },
-    "lastAction": Object {
-      "success": true,
-      "type": "initial-fetch",
     },
     "status": "Idle",
   },
@@ -38,16 +38,16 @@ Object {
   },
   "renderCount": 4,
   "renderProps": Object {
-    "data": Object {
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "result": Object {
       "data": Object {
         "result": "Success2!",
       },
       "dataFromServerSideRender": false,
       "hasData": true,
-    },
-    "lastAction": Object {
-      "success": true,
-      "type": "initial-fetch",
     },
     "status": "Idle",
   },
@@ -65,12 +65,12 @@ Object {
   },
   "renderCount": 1,
   "renderProps": Object {
-    "data": Object {
-      "hasData": false,
-    },
     "lastAction": Object {
       "success": true,
       "type": "none",
+    },
+    "result": Object {
+      "hasData": false,
     },
     "status": "Fetching",
   },
@@ -88,13 +88,13 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
-    "data": Object {
-      "hasData": false,
-    },
     "lastAction": Object {
-      "error": [Error: Boom!],
+      "error": "Error: Boom!",
       "success": false,
       "type": "initial-fetch",
+    },
+    "result": Object {
+      "hasData": false,
     },
     "status": "Idle",
   },
@@ -112,16 +112,16 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
-    "data": Object {
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "result": Object {
       "data": Object {
         "result": "Success!",
       },
       "dataFromServerSideRender": false,
       "hasData": true,
-    },
-    "lastAction": Object {
-      "success": true,
-      "type": "initial-fetch",
     },
     "status": "Idle",
   },
@@ -139,16 +139,16 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
-    "data": Object {
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "result": Object {
       "data": Object {
         "result": "Success!",
       },
       "dataFromServerSideRender": false,
       "hasData": true,
-    },
-    "lastAction": Object {
-      "success": true,
-      "type": "initial-fetch",
     },
     "status": "Idle",
   },
@@ -166,12 +166,12 @@ Object {
   },
   "renderCount": 1,
   "renderProps": Object {
-    "data": Object {
-      "hasData": false,
-    },
     "lastAction": Object {
       "success": true,
       "type": "none",
+    },
+    "result": Object {
+      "hasData": false,
     },
     "status": "Fetching",
   },

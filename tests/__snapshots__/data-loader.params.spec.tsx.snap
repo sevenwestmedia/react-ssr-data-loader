@@ -13,16 +13,16 @@ Object {
   },
   "renderCount": 2,
   "renderProps": Object {
-    "data": Object {
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "result": Object {
       "data": Object {
         "result": "Test",
       },
       "dataFromServerSideRender": false,
       "hasData": true,
-    },
-    "lastAction": Object {
-      "success": true,
-      "type": "initial-fetch",
     },
     "status": "Idle",
   },
@@ -48,16 +48,16 @@ Object {
   },
   "renderCount": 4,
   "renderProps": Object {
-    "data": Object {
+    "lastAction": Object {
+      "success": true,
+      "type": "update",
+    },
+    "result": Object {
       "data": Object {
         "result": "Test2",
       },
       "dataFromServerSideRender": false,
       "hasData": true,
-    },
-    "lastAction": Object {
-      "success": true,
-      "type": "update",
     },
     "status": "Idle",
   },
