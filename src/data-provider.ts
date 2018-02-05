@@ -389,7 +389,7 @@ export class DataLoaderContext {
                 {
                     type: LOAD_DATA_FAILED,
                     meta: metadata,
-                    payload: error.toString()
+                    payload: error.message
                 },
                 metadata
             )
