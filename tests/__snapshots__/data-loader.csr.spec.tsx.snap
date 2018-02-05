@@ -12,11 +12,11 @@ Object {
   "renderCount": 1,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
       "dataFromServerSideRender": true,
       "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -39,11 +39,11 @@ Object {
   "renderCount": 4,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success2!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Success2!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -92,7 +92,7 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "error": [Error: Boom!],
+      "error": "Error: Boom!",
       "success": false,
       "type": "initial-fetch",
     },
@@ -113,11 +113,11 @@ Object {
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -140,11 +140,11 @@ Object {
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
     },
     "lastAction": Object {
       "success": true,

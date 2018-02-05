@@ -137,7 +137,7 @@ export default (
                 lastAction: { type: lastAction, success: true },
                 data: {
                     hasData: true,
-                    data: action.payload.data,
+                    result: action.payload.data,
                     dataFromServerSideRender: action.payload.dataFromServerSideRender
                 }
             }

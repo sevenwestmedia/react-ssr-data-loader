@@ -109,7 +109,7 @@ describe('data-loader', () => {
                     renderData={renderProps => {
                         loadCount++
                         if (renderProps.data.hasData) {
-                            return <div>{renderProps.data.data}</div>
+                            return <div>{renderProps.data.result}</div>
                         }
 
                         return <div>No data!</div>

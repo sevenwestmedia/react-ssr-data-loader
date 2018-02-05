@@ -12,14 +12,14 @@ Object {
   "renderCount": 3,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "lastAction": Object {
       "success": true,
@@ -42,15 +42,15 @@ Object {
   "renderCount": 5,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
           "Test2",
         ],
         "pageNumber": 2,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "lastAction": Object {
       "success": true,
@@ -73,15 +73,15 @@ Object {
   "renderCount": 5,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
           "Test2",
         ],
         "pageNumber": 2,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "lastAction": Object {
       "success": true,
@@ -104,14 +104,14 @@ Object {
   "renderCount": 6,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "lastAction": Object {
       "success": true,
@@ -134,14 +134,14 @@ Object {
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "lastAction": Object {
       "success": true,
@@ -164,14 +164,14 @@ Object {
   "renderCount": 3,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
         ],
         "pageNumber": 1,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "lastAction": Object {
       "success": true,
@@ -194,15 +194,15 @@ Object {
   "renderCount": 4,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
         "data": Array [
           "Test",
           "Test2",
         ],
         "pageNumber": 2,
       },
-      "dataFromServerSideRender": false,
-      "hasData": true,
     },
     "lastAction": Object {
       "success": true,

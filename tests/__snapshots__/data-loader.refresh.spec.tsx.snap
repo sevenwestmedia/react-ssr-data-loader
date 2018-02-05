@@ -12,11 +12,11 @@ Object {
   "renderCount": 3,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -39,11 +39,11 @@ Object {
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -66,11 +66,11 @@ Object {
   "renderCount": 3,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -93,11 +93,11 @@ Object {
   "renderCount": 4,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test2",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test2",
+      },
     },
     "lastAction": Object {
       "success": true,

@@ -48,11 +48,11 @@ Object {
   "renderCount2": 1,
   "renderProps1": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
       "dataFromServerSideRender": true,
       "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -62,11 +62,11 @@ Object {
   },
   "renderProps2": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
       "dataFromServerSideRender": true,
       "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
     },
     "lastAction": Object {
       "success": true,

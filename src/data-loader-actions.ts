@@ -48,7 +48,7 @@ export type LoaderState<TData> = {
 
 // @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
 export type Data<TData> =
-    | { hasData: true; data: TData; dataFromServerSideRender: boolean }
+    | { hasData: true; result: TData; dataFromServerSideRender: boolean }
     | { hasData: false }
 
 export interface DataKeyMap {

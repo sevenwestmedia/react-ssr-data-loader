@@ -8,11 +8,11 @@ Object {
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -41,11 +41,11 @@ Object {
   "renderCount2": 2,
   "renderProps1": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -55,11 +55,11 @@ Object {
   },
   "renderProps2": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -82,11 +82,11 @@ Object {
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -109,11 +109,11 @@ Object {
   "renderCount": 1,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Test",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -132,11 +132,11 @@ Object {
   "renderCount2": 2,
   "renderProps1": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -146,11 +146,11 @@ Object {
   },
   "renderProps2": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Success!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -192,11 +192,11 @@ Object {
   "renderCount2": 4,
   "renderProps1": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success2!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Success2!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -206,11 +206,11 @@ Object {
   },
   "renderProps2": Object {
     "data": Object {
-      "data": Object {
-        "result": "Success2!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Success2!",
+      },
     },
     "lastAction": Object {
       "success": true,
@@ -235,11 +235,11 @@ Object {
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
-      "data": Object {
-        "result": "Result2!",
-      },
       "dataFromServerSideRender": false,
       "hasData": true,
+      "result": Object {
+        "result": "Result2!",
+      },
     },
     "lastAction": Object {
       "success": true,

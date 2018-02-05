@@ -128,7 +128,7 @@ export class DataLoaderContext {
         const loadedState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
 
         if (this.isServerSideRender && ssrNeedsData(loadedState) && firstAttached) {
-            return await this._loadData(metadata)
+            return this._loadData(metadata)
         } else if (loadedState) {
             // Give the data-loader it's state, if it has any
             update(loadedState, metadata.internalState)
@@ -141,7 +141,7 @@ export class DataLoaderContext {
                     // TODO Need to flag data as cached
                 }
             } else {
-                return await this._loadData(metadata)
+                return this._loadData(metadata)
             }
         }
     }
@@ -156,7 +156,7 @@ export class DataLoaderContext {
         }
 
         const existingData =
-            currentState && currentState.data.hasData ? currentState.data.data : undefined
+            currentState && currentState.data.hasData ? currentState.data.result : undefined
 
         this.dispatch<NEXT_PAGE>(
             {
@@ -170,7 +170,7 @@ export class DataLoaderContext {
         return this.handleLoadingPromise(metadata, this.performLoad(metadata, existingData))
     }
 
-    /** Update is similar to refresh, but semantically different
+    /* Update is similar to refresh, but semantically different
      * Updating is used when the id or params have changed and the data
      * needs to be updated
      */
@@ -182,7 +182,7 @@ export class DataLoaderContext {
             return
         }
         const existingData =
-            currentState && currentState.data.hasData ? currentState.data.data : undefined
+            currentState && currentState.data.hasData ? currentState.data.result : undefined
 
         this.dispatch<UPDATE_DATA>(
             {
@@ -249,7 +249,7 @@ export class DataLoaderContext {
     private _loadData = (metadata: ResourceLoadInfo<any, any>) => {
         const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         const existingData =
-            currentState && currentState.data.hasData ? currentState.data.data : undefined
+            currentState && currentState.data.hasData ? currentState.data.result : undefined
 
         const loadDataResult = this.performLoad(metadata, existingData)
 
