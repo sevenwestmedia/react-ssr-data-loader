@@ -128,8 +128,7 @@ export class DataLoaderContext {
         const loadedState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
 
         if (this.isServerSideRender && ssrNeedsData(loadedState) && firstAttached) {
-            // tslint:disable-next-line:no-return-await
-            return await this._loadData(metadata)
+            return this._loadData(metadata)
         } else if (loadedState) {
             // Give the data-loader it's state, if it has any
             update(loadedState, metadata.internalState)
@@ -142,8 +141,7 @@ export class DataLoaderContext {
                     // TODO Need to flag data as cached
                 }
             } else {
-                // tslint:disable-next-line:no-return-await
-                return await this._loadData(metadata)
+                return this._loadData(metadata)
             }
         }
     }
