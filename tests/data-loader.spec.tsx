@@ -49,6 +49,18 @@ describe('data-loader', () => {
         sut.assertState()
     })
 
+    it('handles onEvent throwing gracefully', async () => {
+        const sut = new ComponentFixture(undefined, 'testKey', {
+            isServerSideRender: false,
+            onEvent: () => {
+                throw new Error('Boom')
+            }
+        })
+        await sut.testDataPromise.resolve({ result: 'Test' })
+
+        sut.assertState()
+    })
+
     it('ignores completion if unmounted first', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
         await sut.unmount()

@@ -86,12 +86,13 @@ export class DataLoaderContext {
     private subscriptions = new Subscriptions()
 
     // tslint:disable:member-ordering
+    onEvent: (event: DataProviderEvents) => void
     subscribe = this.subscriptions.subscribeToStateChanges
     unsubscribe = this.subscriptions.unsubscribeFromStateChanges
     // tslint:enable:member-ordering
 
     constructor(
-        private onEvent: (event: DataProviderEvents) => void,
+        onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
         private performLoad: (
             metadata: ResourceLoadInfo<any, any>,
@@ -99,11 +100,23 @@ export class DataLoaderContext {
         ) => Promise<any> | any,
         public isServerSideRender: boolean
     ) {
+        this.onEvent = event => {
+            try {
+                const result = onEvent(event)
+                if (result && result.catch) {
+                    result.catch(err => {
+                        console.error('onEvent handler returned a rejected promise', err)
+                    })
+                }
+            } catch (err) {
+                console.error('onEvent handler threw', err)
+            }
+        }
         if (initialState) {
             this.state = initialState
         } else {
             this.state = reducer(undefined, { type: INIT })
-            onEvent({
+            this.onEvent({
                 type: 'state-changed',
                 state: this.state
             })

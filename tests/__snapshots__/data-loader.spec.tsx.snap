@@ -161,6 +161,33 @@ Object {
 }
 `;
 
+exports[`data-loader handles onEvent throwing gracefully 1`] = `
+Object {
+  "existingData": undefined,
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+    "update": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": "Idle",
+  },
+}
+`;
+
 exports[`data-loader ignores completion if unmounted first 1`] = `
 Object {
   "existingData": undefined,
