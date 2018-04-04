@@ -205,7 +205,11 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.handleLoadingPromise(metadata, this.performLoad(metadata, existingData))
+        try {
+            return this.handleLoadingPromise(metadata, this.performLoad(metadata, existingData))
+        } catch (err) {
+            return this.handleLoadSynchronousThrow(err, metadata)
+        }
     }
 
     refresh<TAdditionalParameters, TInternalState>(
@@ -224,10 +228,14 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.handleLoadingPromise(
-            metadata,
-            Promise.resolve(this.performLoad(metadata, undefined))
-        )
+        try {
+            return this.handleLoadingPromise(
+                metadata,
+                Promise.resolve(this.performLoad(metadata, undefined))
+            )
+        } catch (err) {
+            return this.handleLoadSynchronousThrow(err, metadata)
+        }
     }
 
     unloadData<TAdditionalParameters, TInternalState>(
@@ -264,35 +272,39 @@ export class DataLoaderContext {
         const existingData =
             currentState && currentState.data.hasData ? currentState.data.result : undefined
 
-        const loadDataResult = this.performLoad(metadata, existingData)
+        try {
+            const loadDataResult = this.performLoad(metadata, existingData)
 
-        // To check if result is a value, resolve it, if the same thing is returned
-        // it was already a promise. This is a fast path when the resource returns a value
-        // synchronously instead of asynchronously
-        if (Promise.resolve(loadDataResult) !== loadDataResult) {
-            this.dispatch<LOAD_DATA_COMPLETED>(
+            // To check if result is a value, resolve it, if the same thing is returned
+            // it was already a promise. This is a fast path when the resource returns a value
+            // synchronously instead of asynchronously
+            if (Promise.resolve(loadDataResult) !== loadDataResult) {
+                this.dispatch<LOAD_DATA_COMPLETED>(
+                    {
+                        type: LOAD_DATA_COMPLETED,
+                        meta: metadata,
+                        payload: {
+                            data: loadDataResult,
+                            dataFromServerSideRender: this.isServerSideRender
+                        }
+                    },
+                    metadata
+                )
+                return
+            }
+
+            this.dispatch<LOAD_DATA>(
                 {
-                    type: LOAD_DATA_COMPLETED,
-                    meta: metadata,
-                    payload: {
-                        data: loadDataResult,
-                        dataFromServerSideRender: this.isServerSideRender
-                    }
+                    type: LOAD_DATA,
+                    meta: metadata
                 },
                 metadata
             )
-            return
+
+            return this.handleLoadingPromise(metadata, loadDataResult)
+        } catch (err) {
+            return this.handleLoadSynchronousThrow(err, metadata)
         }
-
-        this.dispatch<LOAD_DATA>(
-            {
-                type: LOAD_DATA,
-                meta: metadata
-            },
-            metadata
-        )
-
-        return this.handleLoadingPromise(metadata, loadDataResult)
     }
 
     /** @returns true if this is the first data loader to attach to that type and id */
@@ -320,6 +332,47 @@ export class DataLoaderContext {
 
         return dataLookup[resourceId]
     }
+
+    private handleLoadSynchronousThrow<TAdditionalParameters, TInternalState>(
+        err: any,
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
+    ) {
+        let error: Error
+        let errorMessage: string
+
+        if (err instanceof Error) {
+            error = err
+            errorMessage = this.createErrorMessage(metadata, error.message)
+        } else if (typeof err === 'string') {
+            error = new Error(err)
+            errorMessage = this.createErrorMessage(metadata, err)
+        } else {
+            error = new Error((err || 'Unknown performLoadData error').toString())
+            errorMessage = error.message
+        }
+
+        this.onEvent({
+            type: 'load-error',
+            data: {
+                error,
+                errorMessage,
+                resourceType: metadata.resourceType,
+                resourceId: metadata.resourceId
+            }
+        })
+        this.dispatch<LOAD_DATA_FAILED>(
+            {
+                type: LOAD_DATA_FAILED,
+                meta: metadata,
+                payload: 'Failed to load data'
+            },
+            metadata
+        )
+        return Promise.resolve()
+    }
+
+    private createErrorMessage = (metadata: ResourceLoadInfo<any, any>, msg: string) =>
+        `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
 
     private handleLoadingPromise = async (
         metadata: ResourceLoadInfo<any, any>,
@@ -368,18 +421,15 @@ export class DataLoaderContext {
                 return
             }
 
-            const createErrorMessage = (msg: string) =>
-                `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
-
             let error: Error
             let errorMessage: string
 
             if (err instanceof Error) {
                 error = err
-                errorMessage = createErrorMessage(error.message)
+                errorMessage = this.createErrorMessage(metadata, error.message)
             } else if (typeof err === 'string') {
                 error = new Error(err)
-                errorMessage = createErrorMessage(err)
+                errorMessage = this.createErrorMessage(metadata, err)
             } else {
                 error = new Error((err || 'Unknown performLoadData error').toString())
                 errorMessage = error.message

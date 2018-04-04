@@ -50,6 +50,10 @@ describe('data-loader', () => {
     })
 
     it('handles onEvent throwing gracefully', async () => {
+        const errors: string[] = []
+        console.error = jest.fn((...err: any[]) => {
+            errors.push(JSON.stringify(err))
+        })
         const sut = new ComponentFixture(undefined, 'testKey', {
             isServerSideRender: false,
             onEvent: () => {
@@ -59,6 +63,7 @@ describe('data-loader', () => {
         await sut.testDataPromise.resolve({ result: 'Test' })
 
         sut.assertState()
+        expect(errors).toMatchSnapshot()
     })
 
     it('ignores completion if unmounted first', async () => {
@@ -120,6 +125,39 @@ describe('data-loader', () => {
                     resourceId="Test!"
                     renderData={renderProps => {
                         loadCount++
+                        if (renderProps.data.hasData) {
+                            return <div>{renderProps.data.result}</div>
+                        }
+
+                        return <div>No data!</div>
+                    }}
+                />
+            </DataProvider>
+        )
+
+        expect(wrapper.html()).toMatchSnapshot()
+        await new Promise(resolve => setTimeout(resolve))
+
+        expect(loadCount).toBe(1)
+    })
+
+    it('data loader handles synchronous throw', async () => {
+        const resources = new DataLoaderResources()
+
+        const LoadTest = resources.registerResource('test', () => {
+            throw new Error('Synchronous fail')
+        })
+        let loadCount = 0
+
+        const wrapper = mount(
+            <DataProvider resources={resources}>
+                <LoadTest
+                    resourceId="Test!"
+                    renderData={renderProps => {
+                        loadCount++
+                        if (!renderProps.lastAction.success) {
+                            return <div>{renderProps.lastAction.error}</div>
+                        }
                         if (renderProps.data.hasData) {
                             return <div>{renderProps.data.result}</div>
                         }

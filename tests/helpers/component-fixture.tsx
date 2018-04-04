@@ -31,6 +31,7 @@ export default class ComponentFixture {
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction
     lastExistingData: Data
+    events: any[] = []
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -59,6 +60,7 @@ export default class ComponentFixture {
                 isServerSideRender={options.isServerSideRender}
                 resources={this.resources}
                 onEvent={event => {
+                    this.events.push(event)
                     if (options.onEvent) {
                         options.onEvent(event)
                     }
@@ -66,9 +68,6 @@ export default class ComponentFixture {
                         this.loadAllCompletedCalled++
                     } else if (event.type === 'state-changed') {
                         this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
                     }
                 }}
             >
@@ -98,7 +97,8 @@ export default class ComponentFixture {
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
             existingData: this.lastExistingData,
-            loadDataCount: this.loadDataCount
+            loadDataCount: this.loadDataCount,
+            events: this.events
         }).toMatchSnapshot()
     }
 

@@ -31,6 +31,15 @@ Object {
 
 exports[`server side render does not render on the server if clientLoadOnlySet 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
@@ -79,6 +88,89 @@ Object {
 
 exports[`server side render should pass failure when data load fails 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "data": Object {
+        "error": [Error: Boom!],
+        "errorMessage": "Error when loading testDataType testKey: Boom!",
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "load-error",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "error": "Boom!",
+                "success": false,
+                "type": "initial-fetch",
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -102,6 +194,83 @@ Object {
 
 exports[`server side render should pass loaded data once promise resolves 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "dataFromServerSideRender": true,
+                "hasData": true,
+                "result": Object {
+                  "result": "Success!",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "initial-fetch",
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -125,6 +294,43 @@ Object {
 
 exports[`server side render should start loading data if not loaded 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 1,
