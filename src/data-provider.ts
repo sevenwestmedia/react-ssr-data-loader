@@ -67,7 +67,7 @@ export type DataProviderEvents =
 
 export interface Props {
     initialState?: DataLoaderState
-    onEvent?: (event: DataProviderEvents) => void
+    onEvent?: (event: DataProviderEvents) => void | Promise<any>
     isServerSideRender?: boolean
     resources: DataLoaderResources<any>
     additionalLoaderProps?: object
@@ -86,13 +86,12 @@ export class DataLoaderContext {
     private subscriptions = new Subscriptions()
 
     // tslint:disable:member-ordering
-    onEvent: (event: DataProviderEvents) => void
     subscribe = this.subscriptions.subscribeToStateChanges
     unsubscribe = this.subscriptions.unsubscribeFromStateChanges
     // tslint:enable:member-ordering
 
     constructor(
-        onEvent: (event: DataProviderEvents) => void | Promise<any>,
+        private onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
         private performLoad: (
             metadata: ResourceLoadInfo<any, any>,
@@ -100,23 +99,11 @@ export class DataLoaderContext {
         ) => Promise<any> | any,
         public isServerSideRender: boolean
     ) {
-        this.onEvent = event => {
-            try {
-                const result = onEvent(event)
-                if (result && result.catch) {
-                    result.catch(err => {
-                        console.error('onEvent handler returned a rejected promise', err)
-                    })
-                }
-            } catch (err) {
-                console.error('onEvent handler threw', err)
-            }
-        }
         if (initialState) {
             this.state = initialState
         } else {
             this.state = reducer(undefined, { type: INIT })
-            this.onEvent({
+            this.raiseEvent({
                 type: 'state-changed',
                 state: this.state
             })
@@ -126,7 +113,7 @@ export class DataLoaderContext {
     dispatch = <T extends Actions>(action: T, metadata: ResourceLoadInfo<any, any>): void => {
         this.state = reducer(this.state, action)
         this.subscriptions.notifyStateSubscribersAndDataLoaders(this.state, metadata)
-        this.onEvent({
+        this.raiseEvent({
             type: 'state-changed',
             state: this.state
         })
@@ -267,6 +254,19 @@ export class DataLoaderContext {
         return remainingSubscribers === 0
     }
 
+    private raiseEvent(event: DataProviderEvents) {
+        try {
+            const result = this.onEvent(event)
+            if (result && result.catch) {
+                result.catch(err => {
+                    console.error('onEvent handler returned a rejected promise', err)
+                })
+            }
+        } catch (err) {
+            console.error('onEvent handler threw', err)
+        }
+    }
+
     private _loadData = (metadata: ResourceLoadInfo<any, any>) => {
         const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         const existingData =
@@ -342,16 +342,16 @@ export class DataLoaderContext {
 
         if (err instanceof Error) {
             error = err
-            errorMessage = this.createErrorMessage(metadata, error.message)
+            errorMessage = createErrorMessage(metadata, error.message)
         } else if (typeof err === 'string') {
             error = new Error(err)
-            errorMessage = this.createErrorMessage(metadata, err)
+            errorMessage = createErrorMessage(metadata, err)
         } else {
             error = new Error((err || 'Unknown performLoadData error').toString())
             errorMessage = error.message
         }
 
-        this.onEvent({
+        this.raiseEvent({
             type: 'load-error',
             data: {
                 error,
@@ -371,16 +371,13 @@ export class DataLoaderContext {
         return Promise.resolve()
     }
 
-    private createErrorMessage = (metadata: ResourceLoadInfo<any, any>, msg: string) =>
-        `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
-
     private handleLoadingPromise = async (
         metadata: ResourceLoadInfo<any, any>,
         loadingPromise: Promise<any>
     ) => {
         try {
             this.loadingCount++
-            this.onEvent({
+            this.raiseEvent({
                 type: 'begin-loading-event',
                 data: {
                     numberLoading: this.loadingCount,
@@ -426,16 +423,16 @@ export class DataLoaderContext {
 
             if (err instanceof Error) {
                 error = err
-                errorMessage = this.createErrorMessage(metadata, error.message)
+                errorMessage = createErrorMessage(metadata, error.message)
             } else if (typeof err === 'string') {
                 error = new Error(err)
-                errorMessage = this.createErrorMessage(metadata, err)
+                errorMessage = createErrorMessage(metadata, err)
             } else {
                 error = new Error((err || 'Unknown performLoadData error').toString())
                 errorMessage = error.message
             }
 
-            this.onEvent({
+            this.raiseEvent({
                 type: 'load-error',
 
                 data: {
@@ -455,7 +452,7 @@ export class DataLoaderContext {
                 metadata
             )
         } finally {
-            this.onEvent({
+            this.raiseEvent({
                 type: 'end-loading-event',
 
                 data: {
@@ -465,7 +462,7 @@ export class DataLoaderContext {
                 }
             })
             if (--this.loadingCount === 0) {
-                this.onEvent({
+                this.raiseEvent({
                     type: 'data-load-completed',
                     data: {
                         numberLoading: this.loadingCount,
@@ -520,4 +517,8 @@ export default class DataProvider extends React.Component<Props, {}> {
             existingData
         )
     }
+}
+
+function createErrorMessage(metadata: ResourceLoadInfo<any, any>, msg: string) {
+    return `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
 }
