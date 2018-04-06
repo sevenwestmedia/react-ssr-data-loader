@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources, {
@@ -7,8 +6,11 @@ import DataLoaderResources, {
     PagedData,
     PageComponentProps
 } from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
 import PromiseCompletionSource from './promise-completion-source'
+
+// tslint:disable-next-line:no-implicit-dependencies
+import { mount, ReactWrapper } from 'enzyme'
 
 export type DataResource = {}
 

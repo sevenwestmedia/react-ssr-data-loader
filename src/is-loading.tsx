@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { DataLoaderContext } from './data-provider'
-import { DataLoaderState } from './data-loader-actions'
+import { DataLoaderContext } from './data-loader-context'
+import { DataLoaderState } from './data-loader-state'
 import * as PropTypes from 'prop-types'
 
 export interface LoadedState {

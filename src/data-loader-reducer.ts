@@ -3,16 +3,9 @@ import {
     LoaderStatus,
     ResourceLoadInfo,
     DataLoaderState,
-    FailedAction,
-    Actions,
-    LOAD_DATA,
-    NEXT_PAGE,
-    REFRESH_DATA,
-    LOAD_DATA_COMPLETED,
-    LOAD_DATA_FAILED,
-    UNLOAD_DATA,
-    UPDATE_DATA
-} from './data-loader-actions'
+    FailedAction
+} from './data-loader-state'
+import * as Actions from './data-loader-actions'
 
 const defaultState: LoaderState<any> = {
     data: { hasData: false },
@@ -49,10 +42,10 @@ export default (
         data: {},
         loadingCount: 0
     },
-    action: Actions
+    action: Actions.Actions
 ): DataLoaderState => {
     switch (action.type) {
-        case LOAD_DATA: {
+        case Actions.LOAD_DATA: {
             const currentOrDefault = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Fetching,
@@ -70,8 +63,7 @@ export default (
                 }
             }
         }
-        // tslint:disable-next-line:no-switch-case-fall-through
-        case NEXT_PAGE: {
+        case Actions.NEXT_PAGE: {
             const currentState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Paging,
@@ -89,8 +81,7 @@ export default (
                 }
             }
         }
-        // tslint:disable-next-line:no-switch-case-fall-through
-        case UPDATE_DATA: {
+        case Actions.UPDATE_DATA: {
             const currentState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Updating,
@@ -108,8 +99,7 @@ export default (
                 }
             }
         }
-        // tslint:disable-next-line:no-switch-case-fall-through
-        case REFRESH_DATA: {
+        case Actions.REFRESH_DATA: {
             const currentState = currentDataOrDefault(action.meta, state)
             const loading: LoaderState<any> = {
                 status: LoaderStatus.Refreshing,
@@ -127,8 +117,7 @@ export default (
                 }
             }
         }
-        // tslint:disable-next-line:no-switch-case-fall-through
-        case LOAD_DATA_COMPLETED: {
+        case Actions.LOAD_DATA_COMPLETED: {
             const currentState = currentDataOrDefault(action.meta, state)
             const lastAction = statusMap[currentState.status]
 
@@ -152,8 +141,7 @@ export default (
                 }
             }
         }
-        // tslint:disable-next-line:no-switch-case-fall-through
-        case LOAD_DATA_FAILED: {
+        case Actions.LOAD_DATA_FAILED: {
             const currentState = currentDataOrDefault(action.meta, state)
             const lastAction = statusMap[currentState.status]
 
@@ -174,8 +162,7 @@ export default (
                 }
             }
         }
-        // tslint:disable-next-line:no-switch-case-fall-through
-        case UNLOAD_DATA: {
+        case Actions.UNLOAD_DATA: {
             const newState = { loadingCount: state.loadingCount, data: { ...state.data } }
             const dataType = newState.data[action.meta.resourceType]
             delete dataType[action.meta.resourceId]
@@ -189,7 +176,6 @@ export default (
             return newState
         }
 
-        // tslint:disable-next-line:no-switch-case-fall-through
         default:
             return state
     }

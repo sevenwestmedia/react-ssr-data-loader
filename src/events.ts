@@ -1,4 +1,4 @@
-import { DataLoaderState } from './data-loader-actions'
+import { DataLoaderState } from './data-loader-state'
 
 export interface BeginLoadingEvent {
     type: 'begin-loading-event'

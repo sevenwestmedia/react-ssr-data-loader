@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { LoaderState } from './'
-import { DataLoaderContext } from './data-provider'
-import { DataUpdateCallback } from './subscriptions'
 import * as PropTypes from 'prop-types'
-import { ResourceLoadInfo } from './data-loader-actions'
+import { DataLoaderContext } from './data-loader-context'
+import { DataUpdateCallback } from './subscriptions'
+import { ResourceLoadInfo, LoaderState } from './data-loader-state'
 
 export type RenderData<T, TActions> = (
     loaderProps: LoaderState<T>,
