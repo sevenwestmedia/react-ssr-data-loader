@@ -77,6 +77,8 @@ export function createTypedDataLoader<
         static contextTypes = {
             dataLoader: PropTypes.object
         }
+        static displayName = `DataLoader(${resourceType})`
+
         // Need to capture actions, otherwise instances will share bound actions
         actions: TActions
         context: Context
