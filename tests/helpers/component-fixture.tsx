@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Props } from '../../src/data-loader'
-import DataProvider, { DataProviderEvents } from '../../src/data-provider'
+import DataProvider from '../../src/data-provider'
 import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
+import { DataProviderEvents } from '../../src/events'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
 
