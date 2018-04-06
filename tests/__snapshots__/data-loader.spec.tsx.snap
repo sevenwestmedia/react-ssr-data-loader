@@ -72,6 +72,83 @@ Object {
 
 exports[`data-loader can support preserving data on unmount 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "dataFromServerSideRender": false,
+                "hasData": true,
+                "result": Object {
+                  "result": "Test",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "initial-fetch",
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -99,6 +176,7 @@ Object {
 
 exports[`data-loader can support preserving data on unmount 2`] = `
 Object {
+  "events": Array [],
   "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
@@ -161,8 +239,174 @@ Object {
 }
 `;
 
+exports[`data-loader data loader handles synchronous throw 1`] = `"<div>Failed to load data</div>"`;
+
+exports[`data-loader handles onEvent throwing gracefully 1`] = `
+Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "dataFromServerSideRender": false,
+                "hasData": true,
+                "result": Object {
+                  "result": "Test",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "initial-fetch",
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
+  "existingData": undefined,
+  "loadAllCompletedCalled": 0,
+  "loadDataCount": 1,
+  "renderActions": Object {
+    "refresh": [Function],
+    "update": [Function],
+  },
+  "renderCount": 2,
+  "renderProps": Object {
+    "data": Object {
+      "dataFromServerSideRender": false,
+      "hasData": true,
+      "result": Object {
+        "result": "Test",
+      },
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "initial-fetch",
+    },
+    "status": "Idle",
+  },
+}
+`;
+
+exports[`data-loader handles onEvent throwing gracefully 2`] = `
+Array [
+  "[\\"onEvent handler threw\\",{}]",
+  "[\\"onEvent handler threw\\",{}]",
+  "[\\"onEvent handler threw\\",{}]",
+  "[\\"onEvent handler threw\\",{}]",
+  "[\\"onEvent handler threw\\",{}]",
+  "[\\"onEvent handler threw\\",{}]",
+]
+`;
+
 exports[`data-loader ignores completion if unmounted first 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {},
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -225,6 +469,77 @@ exports[`data-loader resource can resolve synchronously 1`] = `"<div>Result!</di
 
 exports[`data-loader resource can resolve synchronously when resource changes 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "dataFromServerSideRender": false,
+                "hasData": true,
+                "result": Object {
+                  "result": "Result!",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": undefined,
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": -1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "newData": Object {
+              "data": Object {
+                "dataFromServerSideRender": false,
+                "hasData": true,
+                "result": Object {
+                  "result": "Result2!",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": undefined,
+              },
+              "status": "Idle",
+            },
+            "testKey": Object {
+              "data": Object {
+                "dataFromServerSideRender": false,
+                "hasData": true,
+                "result": Object {
+                  "result": "Result!",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": undefined,
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": -2,
+      },
+      "type": "state-changed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 2,

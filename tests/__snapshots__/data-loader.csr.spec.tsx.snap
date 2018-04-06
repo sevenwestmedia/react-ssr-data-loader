@@ -2,6 +2,7 @@
 
 exports[`Client side render client render after SSR with data should not fetch data 1`] = `
 Object {
+  "events": Array [],
   "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
@@ -29,6 +30,143 @@ Object {
 
 exports[`Client side render loads data when props change 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {},
+        },
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "newData": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "newData",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "newData": Object {
+              "data": Object {
+                "dataFromServerSideRender": false,
+                "hasData": true,
+                "result": Object {
+                  "result": "Success2!",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "initial-fetch",
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "newData",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "newData",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
@@ -56,6 +194,55 @@ Object {
 
 exports[`Client side render should ignore completion once component is unmounted 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {},
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -79,6 +266,89 @@ Object {
 
 exports[`Client side render should pass failure when data load fails 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "data": Object {
+        "error": [Error: Boom!],
+        "errorMessage": "Error when loading testDataType testKey: Boom!",
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "load-error",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "error": "Boom!",
+                "success": false,
+                "type": "initial-fetch",
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -103,6 +373,83 @@ Object {
 
 exports[`Client side render should pass loaded data once promise resolves 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "dataFromServerSideRender": false,
+                "hasData": true,
+                "result": Object {
+                  "result": "Success!",
+                },
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "initial-fetch",
+              },
+              "status": "Idle",
+            },
+          },
+        },
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -130,6 +477,75 @@ Object {
 
 exports[`Client side render should remove data from redux when unmounted 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {},
+        },
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "end-loading-event",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 0,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "data-load-completed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
@@ -157,6 +573,43 @@ Object {
 
 exports[`Client side render should start loading data if not loaded 1`] = `
 Object {
+  "events": Array [
+    Object {
+      "state": Object {
+        "data": Object {},
+        "loadingCount": 0,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "state": Object {
+        "data": Object {
+          "testDataType": Object {
+            "testKey": Object {
+              "data": Object {
+                "hasData": false,
+              },
+              "lastAction": Object {
+                "success": true,
+                "type": "none",
+              },
+              "status": "Fetching",
+            },
+          },
+        },
+        "loadingCount": 1,
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "numberLoading": 1,
+        "resourceId": "testKey",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+  ],
   "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 1,

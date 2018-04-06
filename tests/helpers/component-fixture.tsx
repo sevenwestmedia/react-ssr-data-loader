@@ -1,17 +1,20 @@
 import * as React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
-import DataProvider from '../../src/data-provider'
+import DataProvider, { DataProviderEvents } from '../../src/data-provider'
 import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
+
+// tslint:disable-next-line:no-implicit-dependencies
+import { mount, ReactWrapper } from 'enzyme'
 
 export interface FixtureOptions<T> {
     isServerSideRender: boolean
     clientLoadOnly?: boolean
     unloadDataOnUnmount?: boolean
     syncResult?: T
+    onEvent?: (event: DataProviderEvents) => void
 }
 
 export default class ComponentFixture {
@@ -28,6 +31,7 @@ export default class ComponentFixture {
     lastRenderProps: LoaderState<Data>
     lastRenderActions: RefreshAction
     lastExistingData: Data
+    events: any[] = []
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -56,13 +60,14 @@ export default class ComponentFixture {
                 isServerSideRender={options.isServerSideRender}
                 resources={this.resources}
                 onEvent={event => {
+                    this.events.push(event)
+                    if (options.onEvent) {
+                        options.onEvent(event)
+                    }
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
                     } else if (event.type === 'state-changed') {
                         this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
                     }
                 }}
             >
@@ -92,7 +97,8 @@ export default class ComponentFixture {
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
             existingData: this.lastExistingData,
-            loadDataCount: this.loadDataCount
+            loadDataCount: this.loadDataCount,
+            events: this.events
         }).toMatchSnapshot()
     }
 

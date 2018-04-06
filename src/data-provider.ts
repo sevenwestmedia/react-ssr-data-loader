@@ -67,7 +67,7 @@ export type DataProviderEvents =
 
 export interface Props {
     initialState?: DataLoaderState
-    onEvent?: (event: DataProviderEvents) => void
+    onEvent?: (event: DataProviderEvents) => void | Promise<any>
     isServerSideRender?: boolean
     resources: DataLoaderResources<any>
     additionalLoaderProps?: object
@@ -91,7 +91,7 @@ export class DataLoaderContext {
     // tslint:enable:member-ordering
 
     constructor(
-        private onEvent: (event: DataProviderEvents) => void,
+        private onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
         private performLoad: (
             metadata: ResourceLoadInfo<any, any>,
@@ -103,7 +103,7 @@ export class DataLoaderContext {
             this.state = initialState
         } else {
             this.state = reducer(undefined, { type: INIT })
-            onEvent({
+            this.raiseEvent({
                 type: 'state-changed',
                 state: this.state
             })
@@ -113,7 +113,7 @@ export class DataLoaderContext {
     dispatch = <T extends Actions>(action: T, metadata: ResourceLoadInfo<any, any>): void => {
         this.state = reducer(this.state, action)
         this.subscriptions.notifyStateSubscribersAndDataLoaders(this.state, metadata)
-        this.onEvent({
+        this.raiseEvent({
             type: 'state-changed',
             state: this.state
         })
@@ -192,7 +192,13 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.handleLoadingPromise(metadata, this.performLoad(metadata, existingData))
+        try {
+            // performLoad may throw asynchrnously (handled by handleLoadingPromise)
+            // or synchronously (handled by handleLoadSynchronousThrow)
+            return this.handleLoadingPromise(metadata, this.performLoad(metadata, existingData))
+        } catch (err) {
+            return this.handleLoadSynchronousThrow(err, metadata)
+        }
     }
 
     refresh<TAdditionalParameters, TInternalState>(
@@ -211,10 +217,16 @@ export class DataLoaderContext {
             metadata
         )
 
-        return this.handleLoadingPromise(
-            metadata,
-            Promise.resolve(this.performLoad(metadata, undefined))
-        )
+        try {
+            // performLoad may throw asynchrnously (handled by handleLoadingPromise)
+            // or synchronously (handled by handleLoadSynchronousThrow)
+            return this.handleLoadingPromise(
+                metadata,
+                Promise.resolve(this.performLoad(metadata, undefined))
+            )
+        } catch (err) {
+            return this.handleLoadSynchronousThrow(err, metadata)
+        }
     }
 
     unloadData<TAdditionalParameters, TInternalState>(
@@ -246,40 +258,61 @@ export class DataLoaderContext {
         return remainingSubscribers === 0
     }
 
+    private raiseEvent(event: DataProviderEvents) {
+        try {
+            const result = this.onEvent(event)
+            // If on event handler returns a promise, add a catch handler to handle/log the error
+            if (result && result.catch) {
+                result.catch(err => {
+                    console.error('onEvent handler returned a rejected promise', err)
+                })
+            }
+        } catch (err) {
+            console.error('onEvent handler threw', err)
+        }
+    }
+
+    // This function will never throw
     private _loadData = (metadata: ResourceLoadInfo<any, any>) => {
         const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         const existingData =
             currentState && currentState.data.hasData ? currentState.data.result : undefined
 
-        const loadDataResult = this.performLoad(metadata, existingData)
+        try {
+            // performLoad may throw asynchrnously (handled by handleLoadingPromise)
+            // or synchronously (handled by handleLoadSynchronousThrow)
+            const loadDataResult = this.performLoad(metadata, existingData)
 
-        // To check if result is a value, resolve it, if the same thing is returned
-        // it was already a promise. This is a fast path when the resource returns a value
-        // synchronously instead of asynchronously
-        if (Promise.resolve(loadDataResult) !== loadDataResult) {
-            this.dispatch<LOAD_DATA_COMPLETED>(
+            // To check if result is a value, resolve it, if the same thing is returned
+            // it was already a promise. This is a fast path when the resource returns a value
+            // synchronously instead of asynchronously
+            if (!isPromise(loadDataResult)) {
+                this.dispatch<LOAD_DATA_COMPLETED>(
+                    {
+                        type: LOAD_DATA_COMPLETED,
+                        meta: metadata,
+                        payload: {
+                            data: loadDataResult,
+                            dataFromServerSideRender: this.isServerSideRender
+                        }
+                    },
+                    metadata
+                )
+                return
+            }
+
+            this.dispatch<LOAD_DATA>(
                 {
-                    type: LOAD_DATA_COMPLETED,
-                    meta: metadata,
-                    payload: {
-                        data: loadDataResult,
-                        dataFromServerSideRender: this.isServerSideRender
-                    }
+                    type: LOAD_DATA,
+                    meta: metadata
                 },
                 metadata
             )
-            return
+
+            return this.handleLoadingPromise(metadata, loadDataResult)
+        } catch (err) {
+            return this.handleLoadSynchronousThrow(err, metadata)
         }
-
-        this.dispatch<LOAD_DATA>(
-            {
-                type: LOAD_DATA,
-                meta: metadata
-            },
-            metadata
-        )
-
-        return this.handleLoadingPromise(metadata, loadDataResult)
     }
 
     /** @returns true if this is the first data loader to attach to that type and id */
@@ -308,13 +341,38 @@ export class DataLoaderContext {
         return dataLookup[resourceId]
     }
 
+    private handleLoadSynchronousThrow<TAdditionalParameters, TInternalState>(
+        err: any,
+        metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
+    ) {
+        const errorDetails = getErrorDetails(metadata, err, 'Unknown performLoadData error')
+        this.raiseEvent({
+            type: 'load-error',
+            data: {
+                error: errorDetails.error,
+                errorMessage: errorDetails.message,
+                resourceType: metadata.resourceType,
+                resourceId: metadata.resourceId
+            }
+        })
+        this.dispatch<LOAD_DATA_FAILED>(
+            {
+                type: LOAD_DATA_FAILED,
+                meta: metadata,
+                payload: 'Failed to load data'
+            },
+            metadata
+        )
+        return Promise.resolve()
+    }
+
     private handleLoadingPromise = async (
         metadata: ResourceLoadInfo<any, any>,
         loadingPromise: Promise<any>
     ) => {
         try {
             this.loadingCount++
-            this.onEvent({
+            this.raiseEvent({
                 type: 'begin-loading-event',
                 data: {
                     numberLoading: this.loadingCount,
@@ -355,29 +413,12 @@ export class DataLoaderContext {
                 return
             }
 
-            const createErrorMessage = (msg: string) =>
-                `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
-
-            let error: Error
-            let errorMessage: string
-
-            if (err instanceof Error) {
-                error = err
-                errorMessage = createErrorMessage(error.message)
-            } else if (typeof err === 'string') {
-                error = new Error(err)
-                errorMessage = createErrorMessage(err)
-            } else {
-                error = new Error((err || 'Unknown performLoadData error').toString())
-                errorMessage = error.message
-            }
-
-            this.onEvent({
+            const errorDetails = getErrorDetails(metadata, err, 'Unknown performLoadData error')
+            this.raiseEvent({
                 type: 'load-error',
-
                 data: {
-                    error,
-                    errorMessage,
+                    error: errorDetails.error,
+                    errorMessage: errorDetails.message,
                     resourceType: metadata.resourceType,
                     resourceId: metadata.resourceId
                 }
@@ -387,12 +428,12 @@ export class DataLoaderContext {
                 {
                     type: LOAD_DATA_FAILED,
                     meta: metadata,
-                    payload: error.message
+                    payload: errorDetails.message
                 },
                 metadata
             )
         } finally {
-            this.onEvent({
+            this.raiseEvent({
                 type: 'end-loading-event',
 
                 data: {
@@ -402,7 +443,7 @@ export class DataLoaderContext {
                 }
             })
             if (--this.loadingCount === 0) {
-                this.onEvent({
+                this.raiseEvent({
                     type: 'data-load-completed',
                     data: {
                         numberLoading: this.loadingCount,
@@ -456,5 +497,37 @@ export default class DataProvider extends React.Component<Props, {}> {
             },
             existingData
         )
+    }
+}
+
+function createErrorMessage(metadata: ResourceLoadInfo<any, any>, msg: string) {
+    return `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
+}
+
+function isPromise(value: any): value is Promise<any> {
+    return Promise.resolve(value) === value
+}
+
+function getErrorDetails(
+    metadata: ResourceLoadInfo<any, any>,
+    err: any,
+    fallbackMsg?: string
+): { error: Error; message: string } {
+    if (err instanceof Error) {
+        return {
+            error: err,
+            message: createErrorMessage(metadata, err.message)
+        }
+    }
+    if (typeof err === 'string') {
+        return {
+            error: new Error(err),
+            message: createErrorMessage(metadata, err)
+        }
+    }
+
+    return {
+        error: new Error((err || fallbackMsg).toString()),
+        message: err.message
     }
 }
