@@ -1,12 +1,13 @@
 import * as React from 'react'
-// tslint:disable-next-line:no-implicit-dependencies
-import { mount, ReactWrapper } from 'enzyme'
 import { Props } from '../../src/data-loader'
 import DataProvider from '../../src/data-provider'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-actions'
+import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
 import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
+
+// tslint:disable-next-line:no-implicit-dependencies
+import { mount, ReactWrapper } from 'enzyme'
 
 export default class ComponentFixture {
     loadAllCompletedCalled = 0

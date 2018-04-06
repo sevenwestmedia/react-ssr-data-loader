@@ -1,10 +1,12 @@
 import * as React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
 import { LoadedState, default as IsLoading } from '../../src/is-loading'
 import PromiseCompletionSource from './promise-completion-source'
 import DataLoaderResources from '../../src/data-loader-resources'
-import { DataLoaderState } from '../../src/data-loader-actions'
+import { DataLoaderState } from '../../src/data-loader-state'
 import DataProvider from '../../src/data-provider'
+
+// tslint:disable-next-line:no-implicit-dependencies
+import { mount, ReactWrapper } from 'enzyme'
 
 export interface Data {
     result: string

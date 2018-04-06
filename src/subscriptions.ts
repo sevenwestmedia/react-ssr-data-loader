@@ -1,4 +1,4 @@
-import { DataLoaderState, LoaderState, ResourceLoadInfo } from './data-loader-actions'
+import { DataLoaderState, LoaderState, ResourceLoadInfo } from './data-loader-state'
 
 export type DataUpdateCallback = (newState: LoaderState<any>, internalState: any) => void
 export type StateSubscription = (state: DataLoaderState) => void
