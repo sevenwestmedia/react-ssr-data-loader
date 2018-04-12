@@ -6,7 +6,7 @@ export type SuccessAction = {
 export type FailedAction = {
     type: 'initial-fetch' | 'refresh' | 'page' | 'update'
     success: false
-    error: Error
+    error: Error & { dataLoadContext?: string }
 }
 
 export enum LoaderStatus { // The loader is ________ (the data/resource)
