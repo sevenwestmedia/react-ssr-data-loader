@@ -45,7 +45,7 @@ export const LOAD_DATA_FAILED = 'resource-data-loader/LOAD_DATA_FAILED'
 export interface LOAD_DATA_FAILED {
     type: typeof LOAD_DATA_FAILED
     meta: ResourceLoadInfo<any, any>
-    payload: string
+    payload: Error
 }
 
 export const UNLOAD_DATA = 'resource-data-loader/UNLOAD_DATA'

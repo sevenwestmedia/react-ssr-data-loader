@@ -156,7 +156,7 @@ describe('data-loader', () => {
                     renderData={renderProps => {
                         loadCount++
                         if (!renderProps.lastAction.success) {
-                            return <div>{renderProps.lastAction.error}</div>
+                            return <div>{renderProps.lastAction.error.message}</div>
                         }
                         if (renderProps.data.hasData) {
                             return <div>{renderProps.data.result}</div>

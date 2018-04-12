@@ -320,7 +320,7 @@ Object {
                 "hasData": false,
               },
               "lastAction": Object {
-                "error": "Error when loading testDataType testKey: Boom!",
+                "error": [Error: Error when loading testDataType testKey: Boom!],
                 "success": false,
                 "type": "initial-fetch",
               },
@@ -362,7 +362,7 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "error": "Error when loading testDataType testKey: Boom!",
+      "error": [Error: Error when loading testDataType testKey: Boom!],
       "success": false,
       "type": "initial-fetch",
     },

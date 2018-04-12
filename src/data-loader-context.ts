@@ -288,7 +288,7 @@ export class DataLoaderContext {
             {
                 type: Actions.LOAD_DATA_FAILED,
                 meta: metadata,
-                payload: 'Failed to load data'
+                payload: new Error('Failed to load data')
             },
             metadata
         )
@@ -357,7 +357,7 @@ export class DataLoaderContext {
                 {
                     type: Actions.LOAD_DATA_FAILED,
                     meta: metadata,
-                    payload: errorDetails.message
+                    payload: new Error(errorDetails.message)
                 },
                 metadata
             )
