@@ -127,7 +127,7 @@ Object {
     Object {
       "data": Object {
         "error": [Error: Boom!],
-        "errorMessage": "Error when loading testDataType testKey: Boom!",
+        "errorMessage": "Boom!",
         "resourceId": "testKey",
         "resourceType": "testDataType",
       },
@@ -142,7 +142,7 @@ Object {
                 "hasData": false,
               },
               "lastAction": Object {
-                "error": "Error when loading testDataType testKey: Boom!",
+                "error": [Error: Boom!],
                 "success": false,
                 "type": "initial-fetch",
               },

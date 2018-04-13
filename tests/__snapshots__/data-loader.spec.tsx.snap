@@ -239,7 +239,7 @@ Object {
 }
 `;
 
-exports[`data-loader data loader handles synchronous throw 1`] = `"<div>Failed to load data</div>"`;
+exports[`data-loader data loader handles synchronous throw 1`] = `"<div>Synchronous fail</div>"`;
 
 exports[`data-loader handles onEvent throwing gracefully 1`] = `
 Object {

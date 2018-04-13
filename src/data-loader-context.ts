@@ -274,12 +274,11 @@ export class DataLoaderContext {
         err: any,
         metadata: ResourceLoadInfo<TAdditionalParameters, TInternalState>
     ) {
-        const errorDetails = getErrorDetails(metadata, err, 'Unknown performLoadData error')
+        const error = getError(metadata, err, 'Unknown performLoadData error')
         this.raiseEvent({
             type: 'load-error',
             data: {
-                error: errorDetails.error,
-                errorMessage: errorDetails.message,
+                error,
                 resourceType: metadata.resourceType,
                 resourceId: metadata.resourceId
             }
@@ -288,7 +287,7 @@ export class DataLoaderContext {
             {
                 type: Actions.LOAD_DATA_FAILED,
                 meta: metadata,
-                payload: 'Failed to load data'
+                payload: error
             },
             metadata
         )
@@ -342,12 +341,12 @@ export class DataLoaderContext {
                 return
             }
 
-            const errorDetails = getErrorDetails(metadata, err, 'Unknown performLoadData error')
+            const error = getError(metadata, err, 'Unknown performLoadData error')
             this.raiseEvent({
                 type: 'load-error',
                 data: {
-                    error: errorDetails.error,
-                    errorMessage: errorDetails.message,
+                    error,
+                    errorMessage: error.message,
                     resourceType: metadata.resourceType,
                     resourceId: metadata.resourceId
                 }
@@ -357,7 +356,7 @@ export class DataLoaderContext {
                 {
                     type: Actions.LOAD_DATA_FAILED,
                     meta: metadata,
-                    payload: errorDetails.message
+                    payload: error
                 },
                 metadata
             )
@@ -393,30 +392,19 @@ function isPromise(value: any): value is Promise<any> {
     return Promise.resolve(value) === value
 }
 
-function createErrorMessage(metadata: ResourceLoadInfo<any, any>, msg: string) {
-    return `Error when loading ${metadata.resourceType} ${metadata.resourceId}: ${msg}`
-}
-
-function getErrorDetails(
-    metadata: ResourceLoadInfo<any, any>,
-    err: any,
-    fallbackMsg?: string
-): { error: Error; message: string } {
+function getError(metadata: ResourceLoadInfo<any, any>, err: any, fallbackMsg?: string): Error {
     if (err instanceof Error) {
-        return {
-            error: err,
-            message: createErrorMessage(metadata, err.message)
-        }
+        ;(err as any).dataLoadContext = `${metadata.resourceType} ${metadata.resourceId}`
+
+        return err
     }
     if (typeof err === 'string') {
-        return {
-            error: new Error(err),
-            message: createErrorMessage(metadata, err)
-        }
+        const error = new Error(err)
+        ;(error as any).dataLoadContext = `${metadata.resourceType} ${metadata.resourceId}`
+        return error
     }
 
-    return {
-        error: new Error((err || fallbackMsg).toString()),
-        message: err.message
-    }
+    const fallbackEror = new Error((err || fallbackMsg).toString())
+    ;(fallbackEror as any).dataLoadContext = `${metadata.resourceType} ${metadata.resourceId}`
+    return fallbackEror
 }
