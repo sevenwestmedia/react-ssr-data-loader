@@ -1,25 +1,25 @@
 import * as React from 'react'
-import { LoadedState, default as IsLoading } from '../../src/is-loading'
-import PromiseCompletionSource from './promise-completion-source'
-import DataLoaderResources from '../../src/data-loader-resources'
+import { LoadedState, IsLoading } from '../../src/is-loading'
+import { DataLoaderResources } from '../../src/data-loader-resources'
 import { DataLoaderState } from '../../src/data-loader-state'
-import DataProvider from '../../src/data-provider'
+import { DataProvider } from '../../src/data-provider'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
+import { PromiseCompletionSource } from '../../src/promise-completion-source'
 
 export interface Data {
     result: string
 }
 
-export default class ComponentFixture {
+export class IsLoadingFixture {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<any, any>
     component: ReactWrapper<any, any>
     resources: DataLoaderResources<any>
-    currentState: DataLoaderState
-    lastRenderProps: LoadedState
+    currentState!: DataLoaderState
+    lastRenderProps!: LoadedState
 
     constructor() {
         this.testDataPromise = new PromiseCompletionSource<Data>()
@@ -32,6 +32,7 @@ export default class ComponentFixture {
                 initialState={undefined}
                 isServerSideRender={false}
                 resources={this.resources}
+                // tslint:disable-next-line:jsx-no-lambda
                 onEvent={event => {
                     if (event.type === 'state-changed') {
                         this.currentState = event.state
@@ -42,8 +43,10 @@ export default class ComponentFixture {
                 }}
             >
                 <div>
+                    {/* tslint:disable-next-line:jsx-no-lambda */}
                     <TestDataLoader resourceId="dataKey" renderData={() => <div />} />
                     <IsLoading
+                        // tslint:disable-next-line:jsx-no-lambda
                         renderData={props => {
                             this.lastRenderProps = props
                             ++this.renderCount

@@ -1,5 +1,5 @@
-import ComponentFixture from './helpers/component-fixture'
-import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
+import { ComponentFixture } from './helpers/component-fixture'
+import { SharedDataComponentFixture } from './helpers/shared-data-component-fixture'
 
 describe('server side render', () => {
     it('should start loading data if not loaded', () => {

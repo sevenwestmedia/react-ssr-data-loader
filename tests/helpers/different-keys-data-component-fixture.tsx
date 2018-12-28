@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Props } from '../../src/data-loader'
-import DataProvider from '../../src/data-provider'
-import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
+import { DataProvider } from '../../src/data-provider'
+import { DataLoaderResources, RefreshAction } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
-import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
+import { PromiseCompletionSource } from '../../src/promise-completion-source'
 
-export default class ComponentFixture {
+export class DifferentKeysDataComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount1 = 0
     loadDataCount2 = 0
@@ -20,10 +20,10 @@ export default class ComponentFixture {
     component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps: LoaderState<Data>
-    lastRenderProps2: LoaderState<Data>
-    lastRenderActions1: RefreshAction
-    lastRenderActions2: RefreshAction
+    lastRenderProps!: LoaderState<Data>
+    lastRenderProps2!: LoaderState<Data>
+    lastRenderActions1!: RefreshAction
+    lastRenderActions2!: RefreshAction
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -53,6 +53,7 @@ export default class ComponentFixture {
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
+                // tslint:disable-next-line:jsx-no-lambda
                 onEvent={event => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
@@ -68,6 +69,7 @@ export default class ComponentFixture {
                     <TestDataLoader
                         resourceId={testProp.resourceId}
                         clientLoadOnly={clientLoadOnly}
+                        // tslint:disable-next-line:jsx-no-lambda
                         renderData={(props, actions) => {
                             this.renderCount++
                             this.lastRenderProps = props
@@ -78,6 +80,7 @@ export default class ComponentFixture {
                     <TestDataLoader
                         resourceId={testProp.resourceId2}
                         clientLoadOnly={clientLoadOnly}
+                        // tslint:disable-next-line:jsx-no-lambda
                         renderData={(props, actions) => {
                             this.lastRenderProps2 = props
                             this.lastRenderActions2 = actions

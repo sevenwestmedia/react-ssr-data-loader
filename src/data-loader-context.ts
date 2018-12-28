@@ -11,10 +11,8 @@ export class DataLoaderContext {
     private state: DataLoaderState
     private subscriptions = new Subscriptions()
 
-    // tslint:disable:member-ordering
     subscribe = this.subscriptions.subscribeToStateChanges
     unsubscribe = this.subscriptions.unsubscribeFromStateChanges
-    // tslint:enable:member-ordering
 
     constructor(
         private onEvent: (event: DataProviderEvents) => void | Promise<any>,
@@ -193,15 +191,18 @@ export class DataLoaderContext {
             // If on event handler returns a promise, add a catch handler to handle/log the error
             if (result && result.catch) {
                 result.catch(err => {
+                    // tslint:disable-next-line:no-console
                     console.error('onEvent handler returned a rejected promise', err)
                 })
             }
         } catch (err) {
+            // tslint:disable-next-line:no-console
             console.error('onEvent handler threw', err)
         }
     }
 
     // This function will never throw
+    // tslint:disable-next-line:variable-name
     private _loadData = (metadata: ResourceLoadInfo<any, any>) => {
         const currentState = this.getLoadedState(metadata.resourceType, metadata.resourceId)
         const existingData =
@@ -346,7 +347,7 @@ export class DataLoaderContext {
                 type: 'load-error',
                 data: {
                     error,
-                    errorMessage: error.message,
+
                     resourceType: metadata.resourceType,
                     resourceId: metadata.resourceId
                 }

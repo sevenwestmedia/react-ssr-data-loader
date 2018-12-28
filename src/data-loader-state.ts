@@ -1,9 +1,9 @@
-export type SuccessAction = {
+export interface SuccessAction {
     type: 'none' | 'initial-fetch' | 'refresh' | 'page' | 'update'
     success: true
 }
 
-export type FailedAction = {
+export interface FailedAction {
     type: 'initial-fetch' | 'refresh' | 'page' | 'update'
     success: false
     error: Error & { dataLoadContext?: string }
@@ -36,7 +36,7 @@ export enum LoaderStatus { // The loader is ________ (the data/resource)
     Updating = 'Updating'
 }
 
-export type LoaderState<TData> = {
+export interface LoaderState<TData> {
     status: LoaderStatus
     lastAction: SuccessAction | FailedAction
     /**

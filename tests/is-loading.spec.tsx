@@ -1,5 +1,5 @@
-import IsLoadingFixture from './helpers/is-loading-fixture'
-import IsLoadingWithMultipleLoadersFixture from './helpers/is-loading-with-multiple-loaders-fixture'
+import { IsLoadingFixture } from './helpers/is-loading-fixture'
+import { IsLoadingWithMultipleLoadersFixture } from './helpers/is-loading-with-multiple-loaders-fixture'
 
 describe('Is loading component', () => {
     it('should be loading if any data loaders are loading', () => {

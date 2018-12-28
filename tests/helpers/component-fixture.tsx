@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { Props } from '../../src/data-loader'
-import DataProvider from '../../src/data-provider'
-import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
+import { DataProvider } from '../../src/data-provider'
+import { DataLoaderResources, RefreshAction } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
 import { DataProviderEvents } from '../../src/events'
-import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
+import { PromiseCompletionSource } from '../../src/promise-completion-source'
 
 export interface FixtureOptions<T> {
     isServerSideRender: boolean
@@ -18,7 +18,7 @@ export interface FixtureOptions<T> {
     onEvent?: (event: DataProviderEvents) => void
 }
 
-export default class ComponentFixture {
+export class ComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
@@ -29,9 +29,9 @@ export default class ComponentFixture {
     component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps: LoaderState<Data>
-    lastRenderActions: RefreshAction
-    lastExistingData: Data
+    lastRenderProps!: LoaderState<Data>
+    lastRenderActions!: RefreshAction
+    lastExistingData!: Data
     events: any[] = []
 
     constructor(
@@ -60,6 +60,7 @@ export default class ComponentFixture {
                 initialState={initialState}
                 isServerSideRender={options.isServerSideRender}
                 resources={this.resources}
+                // tslint:disable-next-line:jsx-no-lambda
                 onEvent={event => {
                     this.events.push(event)
                     if (options.onEvent) {
@@ -76,6 +77,7 @@ export default class ComponentFixture {
                     resourceId={resourceId}
                     clientLoadOnly={options.clientLoadOnly}
                     unloadDataOnUnmount={options.unloadDataOnUnmount}
+                    // tslint:disable-next-line:jsx-no-lambda
                     renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props
