@@ -6,7 +6,7 @@ when the site is page based and redux is being used to transfer data for server 
 This component is a child as function component which takes care of correctly loading data, including:
 
 * Ensuring data is not loaded again directly after server side rendering
-* Removing the data from Redux once the component is unmounted
+* Removing the data from memory once the component is unmounted (optionally)
 * Track loading states so you can focus on rendering based on the status
 * Refreshing data
 * Paging data
