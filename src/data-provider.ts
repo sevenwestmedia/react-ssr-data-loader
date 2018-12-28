@@ -37,7 +37,9 @@ export class DataProvider extends React.Component<Props, {}> {
         )
     }
 
-    getChildContext = (): { dataLoader: DataLoaderContext } => ({ dataLoader: this.dataLoader })
+    getChildContext = (): { dataLoader: DataLoaderContext } => ({
+        dataLoader: this.dataLoader
+    })
 
     render() {
         return React.Children.only(this.props.children)

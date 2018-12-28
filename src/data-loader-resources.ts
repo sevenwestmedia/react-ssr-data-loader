@@ -114,7 +114,10 @@ export class DataLoaderResources<TAdditionalParameters> {
                     resourceType,
                     resourceId: this.nextProps.resourceId,
                     resourceLoadParams: {
-                        paging: { ...this.nextProps.paging, keepPreviousPagesData: false }
+                        paging: {
+                            ...this.nextProps.paging,
+                            keepPreviousPagesData: false
+                        }
                     },
                     internalState: { page: 1 }
                 })
@@ -124,7 +127,10 @@ export class DataLoaderResources<TAdditionalParameters> {
                     resourceType,
                     resourceId: this.props.resourceId,
                     resourceLoadParams: {
-                        paging: { ...this.props.paging, keepPreviousPagesData: false }
+                        paging: {
+                            ...this.props.paging,
+                            keepPreviousPagesData: false
+                        }
                     },
                     internalState: { page: 1 }
                 })
@@ -135,7 +141,10 @@ export class DataLoaderResources<TAdditionalParameters> {
                     resourceType,
                     resourceId: this.props.resourceId,
                     resourceLoadParams: {
-                        paging: { keepPreviousPagesData: true, ...this.props.paging }
+                        paging: {
+                            keepPreviousPagesData: true,
+                            ...this.props.paging
+                        }
                     },
                     internalState: { page: this.internalState().page + 1 }
                 })
