@@ -88,8 +88,11 @@ export function createTypedDataLoader<
         // tslint:disable-next-line:variable-name
         private _isMounted: boolean = false
 
-        constructor(props: ComponentProps) {
-            super(props)
+        constructor(
+            props: ComponentProps,
+            context: React.ContextType<typeof DataLoaderContextComponent>
+        ) {
+            super(props, context)
 
             // Bind each action to the instance of this data loader
             // so the actions can access current state/props when they need to
@@ -99,26 +102,22 @@ export function createTypedDataLoader<
             })
             this.actions = boundActions
 
-            const context = ensureContext(this.context)
-            if (context.isServerSideRender && this.props.clientLoadOnly) {
+            const checkedContext = ensureContext(this.context)
+            if (checkedContext.isServerSideRender && this.props.clientLoadOnly) {
                 return
             }
 
-            context.loadData(this.actionMeta(), this.handleStateUpdate)
+            checkedContext.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
         componentDidMount() {
             this._isMounted = true
         }
 
-        componentWillReceiveProps(readOnlyNextProps: any) {
-            this.nextProps = readOnlyNextProps as any
+        UNSAFE_componentWillReceiveProps(nextProps: ComponentProps) {
+            this.nextProps = nextProps
 
             try {
-                // The types are Readonly<P>, TypeScript limitations with unions, generics etc cause
-                // this to be required for TS > 2.4
-                const nextProps: ComponentProps = readOnlyNextProps
-
                 if (this.props.resourceId !== nextProps.resourceId) {
                     this.unloadOrDetachData()
                     ensureContext(this.context).loadData(

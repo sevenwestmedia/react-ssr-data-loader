@@ -1,5 +1,8 @@
 import { PagedComponentFixture } from './helpers/paged-component-fixture'
+import Adapter from 'enzyme-adapter-react-16'
+import { configure } from 'enzyme'
 
+configure({ adapter: new Adapter() })
 describe('data-loader', () => {
     it('supports paged data', async () => {
         const sut = new PagedComponentFixture(undefined, 'testKey', false)

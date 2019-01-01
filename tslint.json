@@ -5,6 +5,7 @@
         "member-ordering": false,
         "object-literal-sort-keys": false,
         "member-access": false,
-        "interface-name": false
+        "interface-name": false,
+        "no-implicit-dependencies": false
     }
 }

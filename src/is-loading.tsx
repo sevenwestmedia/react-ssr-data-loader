@@ -14,9 +14,9 @@ export class IsLoading extends React.Component<Props, DataLoaderState> {
     static contextType = DataLoaderContextComponent
     context!: React.ContextType<typeof DataLoaderContextComponent>
 
-    constructor(props: Props) {
-        super(props)
-        this.state = ensureContext(this.context).getDataLoaderState()
+    constructor(props: Props, context: React.ContextType<typeof DataLoaderContextComponent>) {
+        super(props, context)
+        this.state = ensureContext(context).getDataLoaderState()
     }
 
     componentDidMount() {

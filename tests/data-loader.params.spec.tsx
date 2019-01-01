@@ -1,4 +1,8 @@
 import { ComponentWithArgsFixture } from './helpers/component-with-args-fixture'
+import Adapter from 'enzyme-adapter-react-16'
+import { configure } from 'enzyme'
+
+configure({ adapter: new Adapter() })
 
 describe('data-loader', () => {
     it('can specify arguments for data loader', async () => {

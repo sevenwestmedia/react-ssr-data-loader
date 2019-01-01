@@ -33,35 +33,37 @@ export class IsLoadingWithMultipleLoadersFixture {
             return this.testDataPromise2.promise
         })
         const TestComponent: React.SFC<any> = ({}) => (
-            <DataLoaderProvider
-                initialState={undefined}
-                isServerSideRender={false}
-                resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
-                    if (event.type === 'state-changed') {
-                        this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
-                    }
-                }}
-            >
-                <div>
-                    {/* tslint:disable-next-line:jsx-no-lambda */}
-                    <TestDataLoader resourceId="dataKey" renderData={() => <div />} />
-                    {/* tslint:disable-next-line:jsx-no-lambda */}
-                    <TestDataLoader2 resourceId="dataKey" renderData={() => <div />} />
-                    <IsLoading
-                        // tslint:disable-next-line:jsx-no-lambda
-                        renderData={props => {
-                            this.renderCount++
-                            this.lastRenderProps = props
-                            return null
-                        }}
-                    />
-                </div>
-            </DataLoaderProvider>
+            <React.StrictMode>
+                <DataLoaderProvider
+                    initialState={undefined}
+                    isServerSideRender={false}
+                    resources={this.resources}
+                    // tslint:disable-next-line:jsx-no-lambda
+                    onEvent={event => {
+                        if (event.type === 'state-changed') {
+                            this.currentState = event.state
+                        } else if (event.type === 'load-error') {
+                            // tslint:disable-next-line:no-console
+                            console.info(event.data.error)
+                        }
+                    }}
+                >
+                    <div>
+                        {/* tslint:disable-next-line:jsx-no-lambda */}
+                        <TestDataLoader resourceId="dataKey" renderData={() => <div />} />
+                        {/* tslint:disable-next-line:jsx-no-lambda */}
+                        <TestDataLoader2 resourceId="dataKey" renderData={() => <div />} />
+                        <IsLoading
+                            // tslint:disable-next-line:jsx-no-lambda
+                            renderData={props => {
+                                this.renderCount++
+                                this.lastRenderProps = props
+                                return null
+                            }}
+                        />
+                    </div>
+                </DataLoaderProvider>
+            </React.StrictMode>
         )
 
         this.root = mount(<TestComponent />)

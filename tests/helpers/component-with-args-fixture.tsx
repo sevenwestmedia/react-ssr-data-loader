@@ -48,35 +48,37 @@ export class ComponentWithArgsFixture<T extends object> {
         )
 
         const TestComponent: React.SFC<{ resourceId: string } & T> = props => (
-            <DataLoaderProvider
-                initialState={initialState}
-                isServerSideRender={isServerSideRender}
-                resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
-                    if (event.type === 'data-load-completed') {
-                        this.loadAllCompletedCalled++
-                    } else if (event.type === 'state-changed') {
-                        this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
-                    }
-                }}
-            >
-                <TestDataLoader
-                    {...props as any}
-                    clientLoadOnly={_clientLoadOnly}
+            <React.StrictMode>
+                <DataLoaderProvider
+                    initialState={initialState}
+                    isServerSideRender={isServerSideRender}
+                    resources={this.resources}
                     // tslint:disable-next-line:jsx-no-lambda
-                    renderData={(renderProps, actions) => {
-                        this.renderCount++
-                        this.lastRenderProps = renderProps
-                        this.lastRenderActions = actions
-
-                        return null
+                    onEvent={event => {
+                        if (event.type === 'data-load-completed') {
+                            this.loadAllCompletedCalled++
+                        } else if (event.type === 'state-changed') {
+                            this.currentState = event.state
+                        } else if (event.type === 'load-error') {
+                            // tslint:disable-next-line:no-console
+                            console.info(event.data.error)
+                        }
                     }}
-                />
-            </DataLoaderProvider>
+                >
+                    <TestDataLoader
+                        {...props as any}
+                        clientLoadOnly={_clientLoadOnly}
+                        // tslint:disable-next-line:jsx-no-lambda
+                        renderData={(renderProps, actions) => {
+                            this.renderCount++
+                            this.lastRenderProps = renderProps
+                            this.lastRenderActions = actions
+
+                            return null
+                        }}
+                    />
+                </DataLoaderProvider>
+            </React.StrictMode>
         )
 
         this.root = mount(<TestComponent resourceId={resourceId} {...args as any} />)

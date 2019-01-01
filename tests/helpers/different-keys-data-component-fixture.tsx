@@ -49,46 +49,48 @@ export class DifferentKeysDataComponentFixture {
         })
 
         const TestComponent: React.SFC<{ resourceId: string; resourceId2: string }> = testProp => (
-            <DataLoaderProvider
-                initialState={initialState}
-                isServerSideRender={isServerSideRender}
-                resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
-                    if (event.type === 'data-load-completed') {
-                        this.loadAllCompletedCalled++
-                    } else if (event.type === 'state-changed') {
-                        this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
-                    }
-                }}
-            >
-                <div>
-                    <TestDataLoader
-                        resourceId={testProp.resourceId}
-                        clientLoadOnly={clientLoadOnly}
-                        // tslint:disable-next-line:jsx-no-lambda
-                        renderData={(props, actions) => {
-                            this.renderCount++
-                            this.lastRenderProps = props
-                            this.lastRenderActions1 = actions
-                            return null
-                        }}
-                    />
-                    <TestDataLoader
-                        resourceId={testProp.resourceId2}
-                        clientLoadOnly={clientLoadOnly}
-                        // tslint:disable-next-line:jsx-no-lambda
-                        renderData={(props, actions) => {
-                            this.lastRenderProps2 = props
-                            this.lastRenderActions2 = actions
-                            return null
-                        }}
-                    />
-                </div>
-            </DataLoaderProvider>
+            <React.StrictMode>
+                <DataLoaderProvider
+                    initialState={initialState}
+                    isServerSideRender={isServerSideRender}
+                    resources={this.resources}
+                    // tslint:disable-next-line:jsx-no-lambda
+                    onEvent={event => {
+                        if (event.type === 'data-load-completed') {
+                            this.loadAllCompletedCalled++
+                        } else if (event.type === 'state-changed') {
+                            this.currentState = event.state
+                        } else if (event.type === 'load-error') {
+                            // tslint:disable-next-line:no-console
+                            console.info(event.data.error)
+                        }
+                    }}
+                >
+                    <div>
+                        <TestDataLoader
+                            resourceId={testProp.resourceId}
+                            clientLoadOnly={clientLoadOnly}
+                            // tslint:disable-next-line:jsx-no-lambda
+                            renderData={(props, actions) => {
+                                this.renderCount++
+                                this.lastRenderProps = props
+                                this.lastRenderActions1 = actions
+                                return null
+                            }}
+                        />
+                        <TestDataLoader
+                            resourceId={testProp.resourceId2}
+                            clientLoadOnly={clientLoadOnly}
+                            // tslint:disable-next-line:jsx-no-lambda
+                            renderData={(props, actions) => {
+                                this.lastRenderProps2 = props
+                                this.lastRenderActions2 = actions
+                                return null
+                            }}
+                        />
+                    </div>
+                </DataLoaderProvider>
+            </React.StrictMode>
         )
 
         this.root = mount(<TestComponent resourceId={resourceId} resourceId2={resourceId2} />)

@@ -46,35 +46,37 @@ export class PagedComponentFixture {
         )
 
         const TestComponent: React.SFC<{ resourceId: string }> = testComponentProps => (
-            <DataLoaderProvider
-                initialState={initialState}
-                isServerSideRender={isServerSideRender}
-                resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
-                    if (event.type === 'data-load-completed') {
-                        this.loadAllCompletedCalled++
-                    } else if (event.type === 'state-changed') {
-                        this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
-                    }
-                }}
-            >
-                <TestDataLoader
-                    resourceId={testComponentProps.resourceId}
-                    paging={{ pageSize: 10 }}
-                    clientLoadOnly={clientLoadOnly}
+            <React.StrictMode>
+                <DataLoaderProvider
+                    initialState={initialState}
+                    isServerSideRender={isServerSideRender}
+                    resources={this.resources}
                     // tslint:disable-next-line:jsx-no-lambda
-                    renderData={(props, actions) => {
-                        this.renderCount++
-                        this.lastRenderProps = props
-                        this.lastRenderActions = actions
-                        return null
+                    onEvent={event => {
+                        if (event.type === 'data-load-completed') {
+                            this.loadAllCompletedCalled++
+                        } else if (event.type === 'state-changed') {
+                            this.currentState = event.state
+                        } else if (event.type === 'load-error') {
+                            // tslint:disable-next-line:no-console
+                            console.info(event.data.error)
+                        }
                     }}
-                />
-            </DataLoaderProvider>
+                >
+                    <TestDataLoader
+                        resourceId={testComponentProps.resourceId}
+                        paging={{ pageSize: 10 }}
+                        clientLoadOnly={clientLoadOnly}
+                        // tslint:disable-next-line:jsx-no-lambda
+                        renderData={(props, actions) => {
+                            this.renderCount++
+                            this.lastRenderProps = props
+                            this.lastRenderActions = actions
+                            return null
+                        }}
+                    />
+                </DataLoaderProvider>
+            </React.StrictMode>
         )
 
         this.root = mount(<TestComponent resourceId={resourceId} />)

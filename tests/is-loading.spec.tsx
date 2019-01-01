@@ -1,5 +1,9 @@
 import { IsLoadingFixture } from './helpers/is-loading-fixture'
 import { IsLoadingWithMultipleLoadersFixture } from './helpers/is-loading-with-multiple-loaders-fixture'
+import Adapter from 'enzyme-adapter-react-16'
+import { configure } from 'enzyme'
+
+configure({ adapter: new Adapter() })
 
 describe('Is loading component', () => {
     it('should be loading if any data loaders are loading', () => {

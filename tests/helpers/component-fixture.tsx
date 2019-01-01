@@ -56,36 +56,38 @@ export class ComponentFixture {
         )
 
         const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
-            <DataLoaderProvider
-                initialState={initialState}
-                isServerSideRender={options.isServerSideRender}
-                resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
-                    this.events.push(event)
-                    if (options.onEvent) {
-                        options.onEvent(event)
-                    }
-                    if (event.type === 'data-load-completed') {
-                        this.loadAllCompletedCalled++
-                    } else if (event.type === 'state-changed') {
-                        this.currentState = event.state
-                    }
-                }}
-            >
-                <TestDataLoader
-                    resourceId={resourceId}
-                    clientLoadOnly={options.clientLoadOnly}
-                    unloadDataOnUnmount={options.unloadDataOnUnmount}
+            <React.StrictMode>
+                <DataLoaderProvider
+                    initialState={initialState}
+                    isServerSideRender={options.isServerSideRender}
+                    resources={this.resources}
                     // tslint:disable-next-line:jsx-no-lambda
-                    renderData={(props, actions) => {
-                        this.renderCount++
-                        this.lastRenderProps = props
-                        this.lastRenderActions = actions
-                        return null
+                    onEvent={event => {
+                        this.events.push(event)
+                        if (options.onEvent) {
+                            options.onEvent(event)
+                        }
+                        if (event.type === 'data-load-completed') {
+                            this.loadAllCompletedCalled++
+                        } else if (event.type === 'state-changed') {
+                            this.currentState = event.state
+                        }
                     }}
-                />
-            </DataLoaderProvider>
+                >
+                    <TestDataLoader
+                        resourceId={resourceId}
+                        clientLoadOnly={options.clientLoadOnly}
+                        unloadDataOnUnmount={options.unloadDataOnUnmount}
+                        // tslint:disable-next-line:jsx-no-lambda
+                        renderData={(props, actions) => {
+                            this.renderCount++
+                            this.lastRenderProps = props
+                            this.lastRenderActions = actions
+                            return null
+                        }}
+                    />
+                </DataLoaderProvider>
+            </React.StrictMode>
         )
 
         this.root = mount(<TestComponent resourceId={initialResourceId} />)
