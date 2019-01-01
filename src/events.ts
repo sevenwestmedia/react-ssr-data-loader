@@ -35,6 +35,7 @@ export interface LoadErrorEvent {
 
     data: {
         error: Error
+        errorMessage: string
         resourceType: string
         resourceId: string
     }

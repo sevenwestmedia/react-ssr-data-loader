@@ -72,7 +72,7 @@ export function createTypedDataLoader<
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
     type ComponentState = State<TResource, TInternalState>
 
-    class DataLoader extends React.PureComponent<ComponentProps, ComponentState>
+    class DataLoader extends React.Component<ComponentProps, ComponentState>
         implements ActionContext<TResource, TDataLoaderParams, TInternalState> {
         static contextType = DataLoaderContextComponent
         static displayName = `DataLoader(${resourceType})`
@@ -114,7 +114,7 @@ export function createTypedDataLoader<
             this._isMounted = true
         }
 
-        UNSAFE_componentWillReceiveProps(nextProps: ComponentProps) {
+        shouldComponentUpdate(nextProps: ComponentProps, nextState: ComponentState) {
             this.nextProps = nextProps
 
             try {
@@ -124,7 +124,9 @@ export function createTypedDataLoader<
                         this.actionMeta(nextProps),
                         this.handleStateUpdate
                     )
-                    return
+
+                    // Don't bother re-rendering yet, we will get called back with a setState
+                    return false
                 }
 
                 // When registering resource types, we register a hidden action
@@ -132,14 +134,20 @@ export function createTypedDataLoader<
                 // it excludes things like renderData and paging info to make the check
                 // useful.
                 // Also paging has hooks to make update act like refresh
-                if (this.actions.update) {
-                    ;(this.actions as any).update()
+                const update = this.actions.update
+                if (update) {
+                    update.call(this)
                 } else {
                     ensureContext(this.context).update(this.actionMeta(nextProps))
                 }
             } finally {
                 this.nextProps = undefined
             }
+
+            return (
+                this.state.internalState !== nextState.internalState ||
+                this.state.loaderState !== nextState.loaderState
+            )
         }
 
         componentWillUnmount() {

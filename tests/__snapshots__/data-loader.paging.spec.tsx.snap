@@ -39,7 +39,7 @@ Object {
     "refresh": [Function],
     "update": [Function],
   },
-  "renderCount": 5,
+  "renderCount": 4,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
@@ -70,7 +70,7 @@ Object {
     "refresh": [Function],
     "update": [Function],
   },
-  "renderCount": 5,
+  "renderCount": 4,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,

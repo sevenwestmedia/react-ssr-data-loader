@@ -61,18 +61,24 @@ export class DataLoaderResources<TAdditionalParameters> {
         type ActionsThis = ActionContext<TData, TResourceParameters, {}>
         const actions = {
             update(this: ActionsThis) {
-                const { renderData: _, ...others } = this.nextProps as any
-                const { renderData: __, ...prevOthers } = this.props as any
+                if (!this.nextProps) {
+                    throw new Error(
+                        'Check the componentWillUpdate function of the data-loader, nextProps should not be undefined'
+                    )
+                }
+
+                const { renderData: _, ...others } = this.nextProps
+                const { renderData: __, ...prevOthers } = this.props
 
                 if (shallowEqual(others, prevOthers)) {
                     return
                 }
 
                 // This is a double dispatch, so nextProps will never be undefined
-                ensureContext(this.context).update(this.actionMeta(this.nextProps as any))
+                ensureContext(this.context).update(this.actionMeta(this.nextProps))
             },
             refresh(this: ActionsThis) {
-                return ensureContext(this.context).refresh(this.actionMeta(this.props as any))
+                return ensureContext(this.context).refresh(this.actionMeta(this.props))
             }
         }
         const typedDataLoader = createTypedDataLoader<

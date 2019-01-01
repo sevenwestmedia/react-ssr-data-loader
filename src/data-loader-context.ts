@@ -295,6 +295,7 @@ export class DataLoaderContext {
             type: 'load-error',
             data: {
                 error,
+                errorMessage: error.message,
                 resourceType: metadata.resourceType,
                 resourceId: metadata.resourceId
             }
@@ -362,7 +363,7 @@ export class DataLoaderContext {
                 type: 'load-error',
                 data: {
                     error,
-
+                    errorMessage: error.message,
                     resourceType: metadata.resourceType,
                     resourceId: metadata.resourceId
                 }
