@@ -55,60 +55,58 @@ export class SharedDataComponentFixture {
             unmountLastDataLoader
         }) => {
             return (
-                <React.StrictMode>
-                    <DataLoaderProvider
-                        initialState={initialState}
-                        isServerSideRender={isServerSideRender}
-                        resources={this.resources}
-                        // tslint:disable-next-line:jsx-no-lambda
-                        onEvent={event => {
-                            if (event.type === 'data-load-completed') {
-                                this.loadAllCompletedCalled++
-                            } else if (event.type === 'state-changed') {
-                                this.currentState = event.state
-                            } else if (event.type === 'load-error') {
-                                // tslint:disable-next-line:no-console
-                                console.info(event.data.error)
-                            }
-                        }}
-                    >
-                        <div>
+                <DataLoaderProvider
+                    initialState={initialState}
+                    isServerSideRender={isServerSideRender}
+                    resources={this.resources}
+                    // tslint:disable-next-line:jsx-no-lambda
+                    onEvent={event => {
+                        if (event.type === 'data-load-completed') {
+                            this.loadAllCompletedCalled++
+                        } else if (event.type === 'state-changed') {
+                            this.currentState = event.state
+                        } else if (event.type === 'load-error') {
+                            // tslint:disable-next-line:no-console
+                            console.info(event.data.error)
+                        }
+                    }}
+                >
+                    <div>
+                        <TestDataLoader
+                            resourceId={testResourceId}
+                            clientLoadOnly={clientLoadOnly}
+                            // tslint:disable-next-line:jsx-no-lambda
+                            renderData={props => {
+                                this.renderCount++
+                                this.lastRenderProps = props
+                                return null
+                            }}
+                        />
+
+                        {renderAdditionalDataLoader && (
+                            <TestDataLoader
+                                resourceId={testResourceId}
+                                clientLoadOnly={clientLoadOnly}
+                                // tslint:disable-next-line:jsx-no-lambda
+                                renderData={() => {
+                                    return null
+                                }}
+                            />
+                        )}
+                        {!unmountLastDataLoader && (
                             <TestDataLoader
                                 resourceId={testResourceId}
                                 clientLoadOnly={clientLoadOnly}
                                 // tslint:disable-next-line:jsx-no-lambda
                                 renderData={props => {
-                                    this.renderCount++
-                                    this.lastRenderProps = props
+                                    this.renderCount2++
+                                    this.lastRenderProps2 = props
                                     return null
                                 }}
                             />
-
-                            {renderAdditionalDataLoader && (
-                                <TestDataLoader
-                                    resourceId={testResourceId}
-                                    clientLoadOnly={clientLoadOnly}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    renderData={() => {
-                                        return null
-                                    }}
-                                />
-                            )}
-                            {!unmountLastDataLoader && (
-                                <TestDataLoader
-                                    resourceId={testResourceId}
-                                    clientLoadOnly={clientLoadOnly}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    renderData={props => {
-                                        this.renderCount2++
-                                        this.lastRenderProps2 = props
-                                        return null
-                                    }}
-                                />
-                            )}
-                        </div>
-                    </DataLoaderProvider>
-                </React.StrictMode>
+                        )}
+                    </div>
+                </DataLoaderProvider>
             )
         }
 
