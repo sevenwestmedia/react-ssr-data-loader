@@ -1,13 +1,13 @@
-import * as React from 'react'
+import React from 'react'
 import { Props } from '../../src/data-loader'
-import { DataProvider } from '../../src/data-provider'
+import { DataLoaderProvider } from '../../src/data-provider'
 import { DataLoaderResources, RefreshAction } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
-import { PromiseCompletionSource } from '../../src/promise-completion-source'
+import { PromiseCompletionSource } from 'promise-completion-source'
 
 export class DifferentKeysDataComponentFixture {
     loadAllCompletedCalled = 0
@@ -49,7 +49,7 @@ export class DifferentKeysDataComponentFixture {
         })
 
         const TestComponent: React.SFC<{ resourceId: string; resourceId2: string }> = testProp => (
-            <DataProvider
+            <DataLoaderProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
@@ -88,7 +88,7 @@ export class DifferentKeysDataComponentFixture {
                         }}
                     />
                 </div>
-            </DataProvider>
+            </DataLoaderProvider>
         )
 
         this.root = mount(<TestComponent resourceId={resourceId} resourceId2={resourceId2} />)

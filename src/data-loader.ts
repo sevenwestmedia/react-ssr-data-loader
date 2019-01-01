@@ -1,6 +1,5 @@
-import * as React from 'react'
-import * as PropTypes from 'prop-types'
-import { DataLoaderContext } from './data-loader-context'
+import React from 'react'
+import { DataLoaderContext, DataLoaderContextComponent, ensureContext } from './data-loader-context'
 import { DataUpdateCallback } from './subscriptions'
 import { ResourceLoadInfo, LoaderState } from './data-loader-state'
 
@@ -25,9 +24,6 @@ interface State<T, TInternalState extends object> {
 export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClass<
     Props<TResource, TActions> & TDataLoaderParams
 >
-export interface Context {
-    dataLoader: DataLoaderContext
-}
 
 // The `createTypedDataLoader` function needs to exist because for each
 // resource we need a new react component
@@ -44,7 +40,7 @@ export interface Context {
  * is stored for instance
  */
 export interface ActionContext<TResource, TDataLoaderParams, TInternalState> {
-    context: Context
+    context: DataLoaderContext | undefined
     nextProps: Props<TResource, any> & TDataLoaderParams | undefined
     props: Readonly<{ children?: React.ReactNode }> &
         Readonly<Props<TResource, any> & TDataLoaderParams>
@@ -78,14 +74,12 @@ export function createTypedDataLoader<
 
     class DataLoader extends React.PureComponent<ComponentProps, ComponentState>
         implements ActionContext<TResource, TDataLoaderParams, TInternalState> {
-        static contextTypes = {
-            dataLoader: PropTypes.object
-        }
+        static contextType = DataLoaderContextComponent
         static displayName = `DataLoader(${resourceType})`
 
+        context!: React.ContextType<typeof DataLoaderContextComponent>
         // Need to capture actions, otherwise instances will share bound actions
         actions: TActions
-        context!: Context
         state: ComponentState = {
             internalState: initialInternalState
         }
@@ -94,8 +88,8 @@ export function createTypedDataLoader<
         // tslint:disable-next-line:variable-name
         private _isMounted: boolean = false
 
-        constructor(props: ComponentProps, context?: Context) {
-            super(props, context)
+        constructor(props: ComponentProps) {
+            super(props)
 
             // Bind each action to the instance of this data loader
             // so the actions can access current state/props when they need to
@@ -105,14 +99,12 @@ export function createTypedDataLoader<
             })
             this.actions = boundActions
 
-            if (!this.context) {
-                return
-            }
-            if (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly) {
+            const context = ensureContext(this.context)
+            if (context.isServerSideRender && this.props.clientLoadOnly) {
                 return
             }
 
-            this.context.dataLoader.loadData(this.actionMeta(), this.handleStateUpdate)
+            context.loadData(this.actionMeta(), this.handleStateUpdate)
         }
 
         componentDidMount() {
@@ -129,7 +121,7 @@ export function createTypedDataLoader<
 
                 if (this.props.resourceId !== nextProps.resourceId) {
                     this.unloadOrDetachData()
-                    this.context.dataLoader.loadData(
+                    ensureContext(this.context).loadData(
                         this.actionMeta(nextProps),
                         this.handleStateUpdate
                     )
@@ -144,7 +136,7 @@ export function createTypedDataLoader<
                 if (this.actions.update) {
                     ;(this.actions as any).update()
                 } else {
-                    this.context.dataLoader.update(this.actionMeta(nextProps))
+                    ensureContext(this.context).update(this.actionMeta(nextProps))
                 }
             } finally {
                 this.nextProps = undefined
@@ -159,9 +151,9 @@ export function createTypedDataLoader<
 
         unloadOrDetachData() {
             if (this.props.unloadDataOnUnmount === false) {
-                this.context.dataLoader.detach(this.actionMeta(), this.handleStateUpdate)
+                ensureContext(this.context).detach(this.actionMeta(), this.handleStateUpdate)
             } else {
-                this.context.dataLoader.unloadData(this.actionMeta(), this.handleStateUpdate)
+                ensureContext(this.context).unloadData(this.actionMeta(), this.handleStateUpdate)
             }
         }
 
@@ -172,7 +164,7 @@ export function createTypedDataLoader<
         render() {
             if (
                 !this.state.loaderState ||
-                (this.context.dataLoader.isServerSideRender && this.props.clientLoadOnly)
+                (ensureContext(this.context).isServerSideRender && this.props.clientLoadOnly)
             ) {
                 return null
             }
@@ -213,7 +205,7 @@ export function createTypedDataLoader<
                 return
             }
             // Don't set state during SSR
-            if (this.context.dataLoader.isServerSideRender) {
+            if (ensureContext(this.context).isServerSideRender) {
                 return
             }
             this.setState({

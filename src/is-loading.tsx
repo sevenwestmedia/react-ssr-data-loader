@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { DataLoaderContext } from './data-loader-context'
+import React from 'react'
+import { DataLoaderContextComponent, ensureContext } from './data-loader-context'
 import { DataLoaderState } from './data-loader-state'
-import * as PropTypes from 'prop-types'
 
 export interface LoadedState {
     isLoading: boolean
@@ -12,23 +11,20 @@ export interface Props {
 }
 
 export class IsLoading extends React.Component<Props, DataLoaderState> {
-    static contextTypes = {
-        dataLoader: PropTypes.object
-    }
+    static contextType = DataLoaderContextComponent
+    context!: React.ContextType<typeof DataLoaderContextComponent>
 
-    context!: { dataLoader: DataLoaderContext }
-
-    constructor(props: Props, context: { dataLoader: DataLoaderContext }) {
-        super(props, context)
-        this.state = context.dataLoader.getDataLoaderState()
+    constructor(props: Props) {
+        super(props)
+        this.state = ensureContext(this.context).getDataLoaderState()
     }
 
     componentDidMount() {
-        this.context.dataLoader.subscribe(this.stateChanged)
+        ensureContext(this.context).subscribe(this.stateChanged)
     }
 
     componentWillUnmount() {
-        this.context.dataLoader.unsubscribe(this.stateChanged)
+        ensureContext(this.context).unsubscribe(this.stateChanged)
     }
 
     stateChanged = (state: DataLoaderState) => {

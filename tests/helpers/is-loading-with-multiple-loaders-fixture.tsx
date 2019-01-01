@@ -1,12 +1,12 @@
-import * as React from 'react'
+import React from 'react'
 import { LoadedState, IsLoading } from '../../src/is-loading'
 import { DataLoaderResources } from '../../src/data-loader-resources'
 import { DataLoaderState } from '../../src/data-loader-state'
-import { DataProvider } from '../../src/data-provider'
+import { DataLoaderProvider } from '../../src/data-provider'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
-import { PromiseCompletionSource } from '../../src/promise-completion-source'
+import { PromiseCompletionSource } from 'promise-completion-source'
 
 export interface Data {
     result: string
@@ -33,7 +33,7 @@ export class IsLoadingWithMultipleLoadersFixture {
             return this.testDataPromise2.promise
         })
         const TestComponent: React.SFC<any> = ({}) => (
-            <DataProvider
+            <DataLoaderProvider
                 initialState={undefined}
                 isServerSideRender={false}
                 resources={this.resources}
@@ -61,7 +61,7 @@ export class IsLoadingWithMultipleLoadersFixture {
                         }}
                     />
                 </div>
-            </DataProvider>
+            </DataLoaderProvider>
         )
 
         this.root = mount(<TestComponent />)

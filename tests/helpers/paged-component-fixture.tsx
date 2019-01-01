@@ -1,6 +1,6 @@
-import * as React from 'react'
+import React from 'react'
 import { Props } from '../../src/data-loader'
-import { DataProvider } from '../../src/data-provider'
+import { DataLoaderProvider } from '../../src/data-provider'
 import {
     DataLoaderResources,
     PageActions,
@@ -11,7 +11,7 @@ import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
-import { PromiseCompletionSource } from '../../src/promise-completion-source'
+import { PromiseCompletionSource } from 'promise-completion-source'
 
 // tslint:disable-next-line:no-empty-interface
 export interface DataResource {}
@@ -46,7 +46,7 @@ export class PagedComponentFixture {
         )
 
         const TestComponent: React.SFC<{ resourceId: string }> = testComponentProps => (
-            <DataProvider
+            <DataLoaderProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
@@ -74,7 +74,7 @@ export class PagedComponentFixture {
                         return null
                     }}
                 />
-            </DataProvider>
+            </DataLoaderProvider>
         )
 
         this.root = mount(<TestComponent resourceId={resourceId} />)

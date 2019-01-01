@@ -4,6 +4,7 @@
         "target": "ES5",
         "module": "commonjs",
         "moduleResolution": "node",
+        "esModuleInterop": true,
         "noEmitOnError": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -11,24 +12,13 @@
         "noImplicitThis": true,
         "removeComments": true,
         "strict": true,
-        "inlineSourceMap": false,
-        "inlineSources": false,
         "sourceRoot": "/",
         "noEmit": true,
         "jsx": "react",
-        "emitDecoratorMetadata": false,
-        "experimentalDecorators": false,
-        "allowSyntheticDefaultImports": false,
         "noUnusedParameters": true,
         "noUnusedLocals": true,
         "declaration": true,
-        "lib": [
-            "dom",
-            "es5",
-            "es2015.promise"
-        ]
+        "lib": ["dom", "es5", "es2015.promise"]
     },
-    "exclude": [
-        "node_modules"
-    ]
+    "exclude": ["node_modules"]
 }

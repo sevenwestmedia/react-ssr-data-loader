@@ -1,6 +1,7 @@
-import * as React from 'react'
-import shallowEqual = require('shallowequal')
+import React from 'react'
+import shallowEqual from 'shallowequal'
 import { Props, createTypedDataLoader, ActionContext, DataLoaderAction } from './data-loader'
+import { ensureContext } from './data-loader-context'
 
 export type LoadResource<TData, TResourceParameters> = (
     resourceId: string,
@@ -68,10 +69,10 @@ export class DataLoaderResources<TAdditionalParameters> {
                 }
 
                 // This is a double dispatch, so nextProps will never be undefined
-                this.context.dataLoader.update(this.actionMeta(this.nextProps as any))
+                ensureContext(this.context).update(this.actionMeta(this.nextProps as any))
             },
             refresh(this: ActionsThis) {
-                return this.context.dataLoader.refresh(this.actionMeta(this.props as any))
+                return ensureContext(this.context).refresh(this.actionMeta(this.props as any))
             }
         }
         const typedDataLoader = createTypedDataLoader<
@@ -110,7 +111,7 @@ export class DataLoaderResources<TAdditionalParameters> {
                     return
                 }
 
-                this.context.dataLoader.update({
+                ensureContext(this.context).update({
                     resourceType,
                     resourceId: this.nextProps.resourceId,
                     resourceLoadParams: {
@@ -123,7 +124,7 @@ export class DataLoaderResources<TAdditionalParameters> {
                 })
             },
             refresh(this: ActionsThis) {
-                return this.context.dataLoader.refresh({
+                return ensureContext(this.context).refresh({
                     resourceType,
                     resourceId: this.props.resourceId,
                     resourceLoadParams: {
@@ -137,7 +138,7 @@ export class DataLoaderResources<TAdditionalParameters> {
             },
             // Loads next page
             nextPage(this: ActionsThis) {
-                return this.context.dataLoader.nextPage({
+                return ensureContext(this.context).nextPage({
                     resourceType,
                     resourceId: this.props.resourceId,
                     resourceLoadParams: {
