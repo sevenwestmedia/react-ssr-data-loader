@@ -8,29 +8,30 @@
     },
     "repository": {},
     "license": "MIT",
-    "dependencies": {},
+    "dependencies": {
+        "promise-completion-source": "^1.0.0",
+        "typescript-log": "^1.0.0"
+    },
     "peerDependencies": {
-        "prop-types": "^15.6.0",
-        "react": "^15.6.0 || ^16.7",
-        "shallowequal": "^1.0.2"
+        "react": "^16.6.0",
+        "shallowequal": "^1.1.0"
     },
     "devDependencies": {
-        "@types/enzyme": "^3.1.6",
-        "@types/jest": "^23.3.10",
-        "@types/prop-types": "^15.5.8",
+        "@types/enzyme": "^3.1.15",
+        "@types/enzyme-adapter-react-16": "^1.0.3",
+        "@types/jest": "^23.3.11",
         "@types/react": "^16.7.18",
         "@types/react-dom": "^16.0.11",
-        "@types/shallowequal": "^0.2.3",
-        "enzyme": "^2.9.1",
+        "@types/shallowequal": "^1.1.0",
+        "enzyme": "^3.8.0",
+        "enzyme-adapter-react-16": "^1.7.1",
         "jest": "^23.6.0",
         "license-checker": "^24.1.0",
         "prettier": "^1.15.3",
-        "prop-types": "^15.6.0",
-        "react": "^15.6.0",
-        "react-dom": "^15.6.0",
-        "react-test-renderer": "^15.6.0",
-        "shallowequal": "^1.0.2",
-        "source-map-loader": "^0.1.6",
+        "react": "^16.7.0",
+        "react-dom": "^16.7.0",
+        "shallowequal": "^1.1.0",
+        "source-map-loader": "^0.2.4",
         "ts-jest": "^23.10.5",
         "tslint": "^5.12.0",
         "tslint-config-prettier": "^1.17.0",
@@ -39,7 +40,7 @@
         "typescript": "^3.2.2"
     },
     "scripts": {
-        "build": "tsc -p . && tsc -p src/",
+        "build": "tsc -p tsconfig.build.json",
         "lint": "tslint 'src/**/*.ts' --project ./tsconfig.json -e '**/*.d.ts'",
         "lint:prettier": "prettier --write \"./src/**/*.ts\" \"./src/**/*.tsx\"",
         "test": "jest",
@@ -49,7 +50,7 @@
     },
     "jest": {
         "transform": {
-            ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+            ".(ts|tsx)": "ts-jest"
         },
         "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
         "moduleFileExtensions": [

@@ -1,11 +1,14 @@
-import * as React from 'react'
+import React from 'react'
 import { ComponentFixture } from './helpers/component-fixture'
 import { SharedDataComponentFixture } from './helpers/shared-data-component-fixture'
 import { DifferentKeysDataComponentFixture } from './helpers/different-keys-data-component-fixture'
-import { DataProvider } from '../src/data-provider'
+import { DataLoaderProvider } from '../src/data-provider'
 import { DataLoaderResources } from '../src/index'
 // tslint:disable-next-line:no-implicit-dependencies
-import { mount } from 'enzyme'
+import { mount, configure } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+
+configure({ adapter: new Adapter() })
 
 describe('data-loader', () => {
     it('supports multiple loaders using the same key when data loading', async () => {
@@ -121,7 +124,7 @@ describe('data-loader', () => {
         let loadCount = 0
 
         const wrapper = mount(
-            <DataProvider resources={resources}>
+            <DataLoaderProvider resources={resources}>
                 <LoadTest
                     resourceId="Test!"
                     // tslint:disable-next-line:jsx-no-lambda
@@ -134,7 +137,7 @@ describe('data-loader', () => {
                         return <div>No data!</div>
                     }}
                 />
-            </DataProvider>
+            </DataLoaderProvider>
         )
 
         expect(wrapper.html()).toMatchSnapshot()
@@ -152,7 +155,7 @@ describe('data-loader', () => {
         let loadCount = 0
 
         const wrapper = mount(
-            <DataProvider resources={resources}>
+            <DataLoaderProvider resources={resources}>
                 <LoadTest
                     resourceId="Test!"
                     // tslint:disable-next-line:jsx-no-lambda
@@ -168,7 +171,7 @@ describe('data-loader', () => {
                         return <div>No data!</div>
                     }}
                 />
-            </DataProvider>
+            </DataLoaderProvider>
         )
 
         expect(wrapper.html()).toMatchSnapshot()

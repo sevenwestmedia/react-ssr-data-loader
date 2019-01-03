@@ -1,8 +1,23 @@
 import reducer from './data-loader-reducer'
+import React from 'react'
 import * as Actions from './data-loader-actions'
 import { Subscriptions, DataUpdateCallback } from './subscriptions'
 import { DataProviderEvents } from './events'
 import { DataLoaderState, ResourceLoadInfo, LoaderStatus, LoaderState } from './data-loader-state'
+
+export const DataLoaderContextComponent = React.createContext<DataLoaderContext | undefined>(
+    undefined
+)
+
+export function ensureContext(context: DataLoaderContext | undefined): DataLoaderContext {
+    if (!context) {
+        throw new Error(
+            'Data loader context missing, ensure you have wrapped your application in a DataLoaderProvider'
+        )
+    }
+
+    return context
+}
 
 export class DataLoaderContext {
     // We need to track this in two places, one with immediate effect,
@@ -280,6 +295,7 @@ export class DataLoaderContext {
             type: 'load-error',
             data: {
                 error,
+                errorMessage: error.message,
                 resourceType: metadata.resourceType,
                 resourceId: metadata.resourceId
             }
@@ -347,7 +363,7 @@ export class DataLoaderContext {
                 type: 'load-error',
                 data: {
                     error,
-
+                    errorMessage: error.message,
                     resourceType: metadata.resourceType,
                     resourceId: metadata.resourceId
                 }

@@ -1,10 +1,9 @@
-import * as React from 'react'
+import React from 'react'
 import { INIT } from './data-loader-actions'
 import reducer from './data-loader-reducer'
 import { DataLoaderResources } from './data-loader-resources'
-import * as PropTypes from 'prop-types'
 import { DataProviderEvents } from './events'
-import { DataLoaderContext } from './data-loader-context'
+import { DataLoaderContext, DataLoaderContextComponent } from './data-loader-context'
 import { DataLoaderState, ResourceLoadInfo } from './data-loader-state'
 
 export interface Props {
@@ -17,11 +16,7 @@ export interface Props {
 
 export type State = DataLoaderState
 
-export class DataProvider extends React.Component<Props, {}> {
-    static childContextTypes = {
-        dataLoader: PropTypes.object
-    }
-
+export class DataLoaderProvider extends React.Component<Props, {}> {
     state: State = reducer(undefined, { type: INIT })
     private dataLoader: DataLoaderContext
 
@@ -37,12 +32,12 @@ export class DataProvider extends React.Component<Props, {}> {
         )
     }
 
-    getChildContext = (): { dataLoader: DataLoaderContext } => ({
-        dataLoader: this.dataLoader
-    })
-
     render() {
-        return React.Children.only(this.props.children)
+        return (
+            <DataLoaderContextComponent.Provider value={this.dataLoader}>
+                {this.props.children}
+            </DataLoaderContextComponent.Provider>
+        )
     }
 
     private loadData = (metadata: ResourceLoadInfo<any, any>, existingData: any): Promise<any> => {

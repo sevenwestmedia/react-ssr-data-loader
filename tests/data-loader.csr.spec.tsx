@@ -1,4 +1,8 @@
 import { ComponentFixture } from './helpers/component-fixture'
+import Adapter from 'enzyme-adapter-react-16'
+import { configure } from 'enzyme'
+
+configure({ adapter: new Adapter() })
 
 describe('Client side render', () => {
     it('should start loading data if not loaded', () => {
