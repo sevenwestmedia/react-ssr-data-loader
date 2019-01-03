@@ -1,8 +1,8 @@
 import * as React from 'react'
-import ComponentFixture from './helpers/component-fixture'
-import SharedDataComponentFixture from './helpers/shared-data-component-fixture'
-import DifferentKeysDataComponentFixture from './helpers/different-keys-data-component-fixture'
-import DataProvider from '../src/data-provider'
+import { ComponentFixture } from './helpers/component-fixture'
+import { SharedDataComponentFixture } from './helpers/shared-data-component-fixture'
+import { DifferentKeysDataComponentFixture } from './helpers/different-keys-data-component-fixture'
+import { DataProvider } from '../src/data-provider'
 import { DataLoaderResources } from '../src/index'
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount } from 'enzyme'
@@ -51,6 +51,7 @@ describe('data-loader', () => {
 
     it('handles onEvent throwing gracefully', async () => {
         const errors: string[] = []
+        // tslint:disable-next-line:no-console
         console.error = jest.fn((...err: any[]) => {
             errors.push(JSON.stringify(err))
         })
@@ -123,6 +124,7 @@ describe('data-loader', () => {
             <DataProvider resources={resources}>
                 <LoadTest
                     resourceId="Test!"
+                    // tslint:disable-next-line:jsx-no-lambda
                     renderData={renderProps => {
                         loadCount++
                         if (renderProps.data.hasData) {
@@ -153,6 +155,7 @@ describe('data-loader', () => {
             <DataProvider resources={resources}>
                 <LoadTest
                     resourceId="Test!"
+                    // tslint:disable-next-line:jsx-no-lambda
                     renderData={renderProps => {
                         loadCount++
                         if (!renderProps.lastAction.success) {

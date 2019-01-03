@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Props } from '../../src/data-loader'
-import DataProvider from '../../src/data-provider'
-import DataLoaderResources, { RefreshAction } from '../../src/data-loader-resources'
+import { DataProvider } from '../../src/data-provider'
+import { DataLoaderResources, RefreshAction } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
-import PromiseCompletionSource from './promise-completion-source'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
+import { PromiseCompletionSource } from '../../src/promise-completion-source'
 
-export default class ComponentFixture<T extends object> {
+export class ComponentWithArgsFixture<T extends object> {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
@@ -17,11 +17,11 @@ export default class ComponentFixture<T extends object> {
     root: ReactWrapper<{ resourceId: string } & T, any>
     component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
-    passedParams: T
+    passedParams!: T
     currentState: DataLoaderState | undefined
-    lastRenderProps: LoaderState<Data>
-    lastRenderActions: RefreshAction
-    existingData: Data
+    lastRenderProps!: LoaderState<Data>
+    lastRenderActions!: RefreshAction
+    existingData!: Data
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -30,6 +30,7 @@ export default class ComponentFixture<T extends object> {
         isServerSideRender: boolean,
         // For some reason the typescript compiler is not validating the JSX below properly
         // And is saying this variable is not used
+        // tslint:disable-next-line:variable-name
         _clientLoadOnly = false
     ) {
         this.currentState = initialState
@@ -51,6 +52,7 @@ export default class ComponentFixture<T extends object> {
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
+                // tslint:disable-next-line:jsx-no-lambda
                 onEvent={event => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
@@ -65,6 +67,7 @@ export default class ComponentFixture<T extends object> {
                 <TestDataLoader
                     {...props as any}
                     clientLoadOnly={_clientLoadOnly}
+                    // tslint:disable-next-line:jsx-no-lambda
                     renderData={(renderProps, actions) => {
                         this.renderCount++
                         this.lastRenderProps = renderProps

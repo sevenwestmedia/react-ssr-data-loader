@@ -147,7 +147,11 @@ export default (
 
             const failed: LoaderState<any> = {
                 status: LoaderStatus.Idle,
-                lastAction: { type: lastAction, success: false, error: action.payload },
+                lastAction: {
+                    type: lastAction,
+                    success: false,
+                    error: action.payload
+                },
                 data: currentState.data
             }
             return {
@@ -163,7 +167,10 @@ export default (
             }
         }
         case Actions.UNLOAD_DATA: {
-            const newState = { loadingCount: state.loadingCount, data: { ...state.data } }
+            const newState = {
+                loadingCount: state.loadingCount,
+                data: { ...state.data }
+            }
             const dataType = newState.data[action.meta.resourceType]
             delete dataType[action.meta.resourceId]
 

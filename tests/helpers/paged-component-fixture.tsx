@@ -1,30 +1,32 @@
 import * as React from 'react'
 import { Props } from '../../src/data-loader'
-import DataProvider from '../../src/data-provider'
-import DataLoaderResources, {
+import { DataProvider } from '../../src/data-provider'
+import {
+    DataLoaderResources,
     PageActions,
     PagedData,
     PageComponentProps
 } from '../../src/data-loader-resources'
 import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
-import PromiseCompletionSource from './promise-completion-source'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
+import { PromiseCompletionSource } from '../../src/promise-completion-source'
 
-export type DataResource = {}
+// tslint:disable-next-line:no-empty-interface
+export interface DataResource {}
 
-export default class ComponentFixture {
+export class PagedComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps: LoaderState<DataResource>
+    lastRenderProps!: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ resourceId: string }, any>
     component: ReactWrapper<Props<PagedData<DataResource>, PageActions> & PageComponentProps, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderActions: PageActions
+    lastRenderActions!: PageActions
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -48,6 +50,7 @@ export default class ComponentFixture {
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
+                // tslint:disable-next-line:jsx-no-lambda
                 onEvent={event => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
@@ -63,6 +66,7 @@ export default class ComponentFixture {
                     resourceId={testComponentProps.resourceId}
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
+                    // tslint:disable-next-line:jsx-no-lambda
                     renderData={(props, actions) => {
                         this.renderCount++
                         this.lastRenderProps = props

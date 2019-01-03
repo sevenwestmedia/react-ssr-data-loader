@@ -1,6 +1,6 @@
 import * as React from 'react'
 import shallowEqual = require('shallowequal')
-import { Props, createTypedDataLoader, ActionContext } from './data-loader'
+import { Props, createTypedDataLoader, ActionContext, DataLoaderAction } from './data-loader'
 
 export type LoadResource<TData, TResourceParameters> = (
     resourceId: string,
@@ -16,7 +16,10 @@ export interface PagedData<Datum> {
     pageNumber: number
     data: Datum[]
 }
-export type RefreshAction = { refresh: () => void }
+export interface RefreshAction {
+    refresh: () => void
+    [actionName: string]: DataLoaderAction<any, any, any>
+}
 export type PageActions = { nextPage: () => void } & RefreshAction
 export interface Paging {
     /** Defaults to 0 */
@@ -31,11 +34,15 @@ export interface Paging {
      */
     keepPreviousPagesData?: boolean
 }
-export type PageComponentProps = { paging: Paging }
-type PageState = { page: number }
+export interface PageComponentProps {
+    paging: Paging
+}
+interface PageState {
+    page: number
+}
 
 /** TAdditionalParameters is the type passed to `additionalLoaderProps` on the DataProvider */
-export default class DataLoaderResources<TAdditionalParameters> {
+export class DataLoaderResources<TAdditionalParameters> {
     private resources: Resources = {}
 
     /**
@@ -72,11 +79,7 @@ export default class DataLoaderResources<TAdditionalParameters> {
             TResourceParameters,
             {},
             RefreshAction
-            >(
-            resourceType,
-            {},
-            actions
-            )
+        >(resourceType, {}, actions)
         this.resources[resourceType] = loadResource
 
         return typedDataLoader
@@ -95,7 +98,9 @@ export default class DataLoaderResources<TAdditionalParameters> {
         const actions = {
             update(this: ActionsThis) {
                 if (!this.nextProps) {
-                    throw new Error('Check the componentWillUpdate function of the data-loader, nextProps should not be undefined')
+                    throw new Error(
+                        'Check the componentWillUpdate function of the data-loader, nextProps should not be undefined'
+                    )
                 }
 
                 const { renderData: _, paging, ...others } = this.nextProps
@@ -109,7 +114,10 @@ export default class DataLoaderResources<TAdditionalParameters> {
                     resourceType,
                     resourceId: this.nextProps.resourceId,
                     resourceLoadParams: {
-                        paging: { ...this.nextProps.paging, keepPreviousPagesData: false }
+                        paging: {
+                            ...this.nextProps.paging,
+                            keepPreviousPagesData: false
+                        }
                     },
                     internalState: { page: 1 }
                 })
@@ -119,7 +127,10 @@ export default class DataLoaderResources<TAdditionalParameters> {
                     resourceType,
                     resourceId: this.props.resourceId,
                     resourceLoadParams: {
-                        paging: { ...this.props.paging, keepPreviousPagesData: false }
+                        paging: {
+                            ...this.props.paging,
+                            keepPreviousPagesData: false
+                        }
                     },
                     internalState: { page: 1 }
                 })
@@ -130,7 +141,10 @@ export default class DataLoaderResources<TAdditionalParameters> {
                     resourceType,
                     resourceId: this.props.resourceId,
                     resourceLoadParams: {
-                        paging: { keepPreviousPagesData: true, ...this.props.paging }
+                        paging: {
+                            keepPreviousPagesData: true,
+                            ...this.props.paging
+                        }
                     },
                     internalState: { page: this.internalState().page + 1 }
                 })
@@ -141,11 +155,7 @@ export default class DataLoaderResources<TAdditionalParameters> {
             PageComponentProps,
             PageState,
             PageActions
-            >(
-            resourceType,
-            { page: 1 },
-            actions
-            )
+        >(resourceType, { page: 1 }, actions)
 
         // This async function performs the loading of the paged data
         // it takes care of passing the correct params to the loadResource function

@@ -17,7 +17,7 @@ export interface Props<T, TActions> {
     renderData: RenderData<T, TActions>
 }
 
-type State<T, TInternalState extends object> = {
+interface State<T, TInternalState extends object> {
     loaderState?: LoaderState<T>
     internalState: TInternalState
 }
@@ -25,7 +25,9 @@ type State<T, TInternalState extends object> = {
 export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClass<
     Props<TResource, TActions> & TDataLoaderParams
 >
-export type Context = { dataLoader: DataLoaderContext }
+export interface Context {
+    dataLoader: DataLoaderContext
+}
 
 // The `createTypedDataLoader` function needs to exist because for each
 // resource we need a new react component
@@ -41,7 +43,7 @@ export type Context = { dataLoader: DataLoaderContext }
  * exposing it to the end user. This is where the current page number
  * is stored for instance
  */
-export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
+export interface ActionContext<TResource, TDataLoaderParams, TInternalState> {
     context: Context
     nextProps: Props<TResource, any> & TDataLoaderParams | undefined
     props: Readonly<{ children?: React.ReactNode }> &
@@ -52,6 +54,10 @@ export type ActionContext<TResource, TDataLoaderParams, TInternalState> = {
     ) => ResourceLoadInfo<any, TInternalState>
 }
 
+export type DataLoaderAction<TResource, TDataLoaderParams, TInternalState> = (
+    this: ActionContext<TResource, TDataLoaderParams, TInternalState>
+) => void
+
 export function createTypedDataLoader<
     TResource,
     TDataLoaderParams,
@@ -59,9 +65,7 @@ export function createTypedDataLoader<
     TActions extends {
         // We bind this so we can reuse the same function so actions do not cause
         // PureComponent's to re-render
-        [actionName: string]: (
-            this: ActionContext<TResource, TDataLoaderParams, TInternalState>
-        ) => void
+        [actionName: string]: DataLoaderAction<TResource, TDataLoaderParams, TInternalState>
     }
 >(
     resourceType: string,
@@ -81,12 +85,14 @@ export function createTypedDataLoader<
 
         // Need to capture actions, otherwise instances will share bound actions
         actions: TActions
-        context: Context
+        context!: Context
         state: ComponentState = {
             internalState: initialInternalState
         }
         nextProps: ComponentProps | undefined
-        private _isMounted: boolean
+
+        // tslint:disable-next-line:variable-name
+        private _isMounted: boolean = false
 
         constructor(props: ComponentProps, context?: Context) {
             super(props, context)

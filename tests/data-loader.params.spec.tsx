@@ -1,9 +1,9 @@
-import ComponentWithArgsFixture from './helpers/component-with-args-fixture'
+import { ComponentWithArgsFixture } from './helpers/component-with-args-fixture'
 
 describe('data-loader', () => {
     it('can specify arguments for data loader', async () => {
         const args = { bar: 1 }
-        const sut = new ComponentWithArgsFixture(undefined, "testKey", args, false)
+        const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, false)
 
         await sut.testDataPromise.resolve({ result: 'Test' })
 
@@ -13,7 +13,7 @@ describe('data-loader', () => {
 
     it('updates data when params change', async () => {
         const args = { bar: 1 }
-        const sut = new ComponentWithArgsFixture(undefined, "testKey", args, false)
+        const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, false)
         await sut.testDataPromise.resolve({ result: 'Test' })
         sut.resetPromise()
 
@@ -27,7 +27,7 @@ describe('data-loader', () => {
 
     it('existing data is passed when params change', async () => {
         const args = { bar: 1 }
-        const sut = new ComponentWithArgsFixture(undefined, "testKey", args, false)
+        const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, false)
         await sut.testDataPromise.resolve({ result: 'Test' })
         sut.resetPromise()
 

@@ -1,8 +1,8 @@
-import PagedComponentFixture from './helpers/paged-component-fixture'
+import { PagedComponentFixture } from './helpers/paged-component-fixture'
 
 describe('data-loader', () => {
     it('supports paged data', async () => {
-        const sut = new PagedComponentFixture(undefined, "testKey", false)
+        const sut = new PagedComponentFixture(undefined, 'testKey', false)
 
         await sut.testDataPromise.resolve(['Test'])
         sut.assertState()
@@ -14,7 +14,7 @@ describe('data-loader', () => {
     })
 
     it('paged component supports being re-rendered', async () => {
-        const sut = new PagedComponentFixture(undefined, "testKey", false)
+        const sut = new PagedComponentFixture(undefined, 'testKey', false)
 
         await sut.testDataPromise.resolve(['Test'])
         sut.nextPage()
@@ -28,7 +28,7 @@ describe('data-loader', () => {
     })
 
     it('calling nextPage when already loading a page ignores the action', async () => {
-        const sut = new PagedComponentFixture(undefined, "testKey", false)
+        const sut = new PagedComponentFixture(undefined, 'testKey', false)
 
         await sut.testDataPromise.resolve(['Test'])
         sut.nextPage()
@@ -37,7 +37,7 @@ describe('data-loader', () => {
     })
 
     it('refresh causes page to go back to page 1', async () => {
-        const sut = new PagedComponentFixture(undefined, "testKey", false)
+        const sut = new PagedComponentFixture(undefined, 'testKey', false)
 
         await sut.testDataPromise.resolve(['Test'])
         sut.nextPage()

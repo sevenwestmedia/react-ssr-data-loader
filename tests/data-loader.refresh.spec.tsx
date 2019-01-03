@@ -1,9 +1,9 @@
-import ComponentFixture from './helpers/component-fixture'
-import MultipleComponentFixture from './helpers/different-keys-data-component-fixture'
+import { ComponentFixture } from './helpers/component-fixture'
+import { DifferentKeysDataComponentFixture } from './helpers/different-keys-data-component-fixture'
 
 describe('data-loader', () => {
     it('can refresh data', async () => {
-        const sut = new ComponentFixture(undefined, "testKey", { isServerSideRender: false })
+        const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
 
         await sut.testDataPromise.resolve({ result: 'Test' })
         sut.assertState()
@@ -15,7 +15,7 @@ describe('data-loader', () => {
     })
 
     it('calling refresh when already refreshing ignores the action', async () => {
-        const sut = new ComponentFixture(undefined, "testKey", { isServerSideRender: false })
+        const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
 
         await sut.testDataPromise.resolve({ result: 'Test' })
         sut.refreshData()
@@ -24,7 +24,13 @@ describe('data-loader', () => {
     })
 
     it('refresh action is called with the correct context', async () => {
-        const sut = new MultipleComponentFixture(undefined, 'testKey', 'testKey2', false, false)
+        const sut = new DifferentKeysDataComponentFixture(
+            undefined,
+            'testKey',
+            'testKey2',
+            false,
+            false
+        )
 
         await sut.testDataPromise.resolve({ result: 'Test1_1' })
         await sut.testDataPromise2.resolve({ result: 'Test2_1' })
