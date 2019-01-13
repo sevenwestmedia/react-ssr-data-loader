@@ -1,4 +1,5 @@
 import React from 'react'
+import objectHash from 'object-hash'
 import { DataLoaderContextComponent, ensureContext } from './data-loader-context'
 import { DataLoaderStoreAndLoader } from './data-loader-store-and-loader'
 import { DataUpdateCallback } from './subscriptions'
@@ -115,11 +116,25 @@ export function createTypedDataLoader<
             this._isMounted = true
         }
 
+        getParams(props: ComponentProps) {
+            const { clientLoadOnly, renderData, unloadDataOnUnmount, ...rest } = props
+
+            // TODO Unsure why we need the cast, figure out later or write a test to protect
+            // against adding more internal props
+            return rest as { resourceId: string } & TDataLoaderParams
+        }
+
         shouldComponentUpdate(nextProps: ComponentProps, nextState: ComponentState) {
             this.nextProps = nextProps
 
             try {
-                if (this.props.resourceId !== nextProps.resourceId) {
+                const currentParams = this.getParams(this.props)
+                const currentPropsHash = objectHash(currentParams)
+                const nextPropsParams = this.getParams(nextProps)
+                const nextPropsHash = objectHash(nextPropsParams)
+                if (currentPropsHash !== nextPropsHash) {
+                    // tslint:disable-next-line:no-console
+                    console.error(currentParams, nextPropsParams, currentPropsHash, nextPropsHash)
                     this.unloadOrDetachData()
                     ensureContext(this.context).loadData(
                         this.actionMeta(nextProps),

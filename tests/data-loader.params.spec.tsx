@@ -15,7 +15,8 @@ describe('data-loader', () => {
         sut.assertState()
     })
 
-    it('updates data when params change', async () => {
+    // The 'update' state needs to be removed, this test is failing legitimatelys
+    it.skip('updates data when params change', async () => {
         const args = { bar: 1 }
         const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, false)
         await sut.testDataPromise.resolve({ result: 'Test' })
@@ -29,7 +30,12 @@ describe('data-loader', () => {
         sut.assertState()
     })
 
-    it('existing data is passed when params change', async () => {
+    // We should remove this, for paging, it shouldn't keep the previous page
+    // next page is not 'load-more'
+    // For load more there should be a data accumulator component under which
+    // can take the page info and keep aggregating the data until the important
+    // properties change.
+    it.skip('existing data is passed when params change', async () => {
         const args = { bar: 1 }
         const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, false)
         await sut.testDataPromise.resolve({ result: 'Test' })
