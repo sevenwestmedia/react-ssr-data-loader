@@ -3,7 +3,8 @@ import { INIT } from './data-loader-actions'
 import reducer from './data-loader-reducer'
 import { DataLoaderResources } from './data-loader-resources'
 import { DataProviderEvents } from './events'
-import { DataLoaderContext, DataLoaderContextComponent } from './data-loader-context'
+import { DataLoaderContextComponent } from './data-loader-context'
+import { DataLoaderStoreAndLoader } from './data-loader-store-and-loader'
 import { DataLoaderState, ResourceLoadInfo } from './data-loader-state'
 
 export interface Props {
@@ -18,12 +19,12 @@ export type State = DataLoaderState
 
 export class DataLoaderProvider extends React.Component<Props, {}> {
     state: State = reducer(undefined, { type: INIT })
-    private dataLoader: DataLoaderContext
+    private dataLoader: DataLoaderStoreAndLoader
 
     constructor(props: Props, context: any) {
         super(props, context)
 
-        this.dataLoader = new DataLoaderContext(
+        this.dataLoader = new DataLoaderStoreAndLoader(
             // tslint:disable-next-line:no-empty
             this.props.onEvent || (() => {}),
             this.props.initialState,

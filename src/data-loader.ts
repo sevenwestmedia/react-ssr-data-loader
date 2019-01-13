@@ -1,5 +1,6 @@
 import React from 'react'
-import { DataLoaderContext, DataLoaderContextComponent, ensureContext } from './data-loader-context'
+import { DataLoaderContextComponent, ensureContext } from './data-loader-context'
+import { DataLoaderStoreAndLoader } from './data-loader-store-and-loader'
 import { DataUpdateCallback } from './subscriptions'
 import { ResourceLoadInfo, LoaderState } from './data-loader-state'
 
@@ -40,7 +41,7 @@ export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClas
  * is stored for instance
  */
 export interface ActionContext<TResource, TDataLoaderParams, TInternalState> {
-    context: DataLoaderContext | undefined
+    context: DataLoaderStoreAndLoader | undefined
     nextProps: Props<TResource, any> & TDataLoaderParams | undefined
     props: Readonly<{ children?: React.ReactNode }> &
         Readonly<Props<TResource, any> & TDataLoaderParams>
