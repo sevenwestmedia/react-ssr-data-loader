@@ -1,10 +1,10 @@
 export interface SuccessAction {
-    type: 'none' | 'initial-fetch' | 'refresh' | 'page' | 'update'
+    type: 'none' | 'fetch' | 'refresh'
     success: true
 }
 
 export interface FailedAction {
-    type: 'initial-fetch' | 'refresh' | 'page' | 'update'
+    type: 'fetch' | 'refresh'
     success: false
     error: Error & { dataLoadContext?: string }
 }
@@ -28,12 +28,7 @@ export enum LoaderStatus { // The loader is ________ (the data/resource)
     /**
      * The loader is fetching the next page of a resurce
      */
-    Paging = 'Paging',
-
-    /**
-     * The loader is updating the resource
-     */
-    Updating = 'Updating'
+    Paging = 'Paging'
 }
 
 export interface LoaderState<TData> {
@@ -60,10 +55,10 @@ export interface DataLoaderState {
     data: { [resourceType: string]: DataKeyMap }
 }
 
-export interface ResourceLoadInfo<TAdditionalParameters, TInternalState> {
+export interface ResourceLoadInfo<TResourceParameters, TInternalState> {
     resourceType: string
-    resourceId: string
-    /** Optional additional parameters required to load resource, i.e paging other */
-    resourceLoadParams: TAdditionalParameters
+
+    resourceLoadParams: TResourceParameters
+
     internalState: TInternalState
 }

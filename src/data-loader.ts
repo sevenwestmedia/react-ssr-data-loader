@@ -1,9 +1,8 @@
 import React from 'react'
-import objectHash from 'object-hash'
 import { DataLoaderContextComponent, ensureContext } from './data-loader-context'
 import { DataLoaderStoreAndLoader } from './data-loader-store-and-loader'
-import { DataUpdateCallback } from './subscriptions'
 import { ResourceLoadInfo, LoaderState } from './data-loader-state'
+import cuid from 'cuid'
 
 export type RenderData<T, TActions> = (
     loaderProps: LoaderState<T>,
@@ -43,10 +42,8 @@ export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClas
  */
 export interface ActionContext<TResource, TDataLoaderParams, TInternalState> {
     context: DataLoaderStoreAndLoader | undefined
-    nextProps: Props<TResource, any> & TDataLoaderParams | undefined
     props: Readonly<{ children?: React.ReactNode }> &
         Readonly<Props<TResource, any> & TDataLoaderParams>
-    internalState: () => TInternalState
     actionMeta: (
         props: Props<TResource, any> & TDataLoaderParams
     ) => ResourceLoadInfo<any, TInternalState>
@@ -82,13 +79,9 @@ export function createTypedDataLoader<
         context!: React.ContextType<typeof DataLoaderContextComponent>
         // Need to capture actions, otherwise instances will share bound actions
         actions: TActions
-        state: ComponentState = {
-            internalState: initialInternalState
-        }
-        nextProps: ComponentProps | undefined
+        id: string
 
-        // tslint:disable-next-line:variable-name
-        private _isMounted: boolean = false
+        private isMounted: boolean = false
 
         constructor(
             props: ComponentProps,
@@ -102,18 +95,9 @@ export function createTypedDataLoader<
             Object.keys(actions).forEach(key => {
                 boundActions[key] = actions[key].bind(this)
             })
+
             this.actions = boundActions
-
-            const checkedContext = ensureContext(this.context)
-            if (checkedContext.isServerSideRender && this.props.clientLoadOnly) {
-                return
-            }
-
-            checkedContext.loadData(this.actionMeta(), this.handleStateUpdate)
-        }
-
-        componentDidMount() {
-            this._isMounted = true
+            this.id = cuid()
         }
 
         getParams(props: ComponentProps) {
@@ -124,75 +108,31 @@ export function createTypedDataLoader<
             return rest as { resourceId: string } & TDataLoaderParams
         }
 
-        shouldComponentUpdate(nextProps: ComponentProps, nextState: ComponentState) {
-            this.nextProps = nextProps
+        componentDidMount() {
+            this.isMounted = true
 
-            try {
-                const currentParams = this.getParams(this.props)
-                const currentPropsHash = objectHash(currentParams)
-                const nextPropsParams = this.getParams(nextProps)
-                const nextPropsHash = objectHash(nextPropsParams)
-                if (currentPropsHash !== nextPropsHash) {
-                    // tslint:disable-next-line:no-console
-                    console.error(currentParams, nextPropsParams, currentPropsHash, nextPropsHash)
-                    this.unloadOrDetachData()
-                    ensureContext(this.context).loadData(
-                        this.actionMeta(nextProps),
-                        this.handleStateUpdate
-                    )
-
-                    // Don't bother re-rendering yet, we will get called back with a setState
-                    return false
-                }
-
-                // When registering resource types, we register a hidden action
-                // which only performs the update if properties have changes
-                // it excludes things like renderData and paging info to make the check
-                // useful.
-                // Also paging has hooks to make update act like refresh
-                const update = this.actions.update
-                if (update) {
-                    update.call(this)
-                } else {
-                    ensureContext(this.context).update(this.actionMeta(nextProps))
-                }
-            } finally {
-                this.nextProps = undefined
-            }
-
-            return (
-                this.state.internalState !== nextState.internalState ||
-                this.state.loaderState !== nextState.loaderState
-            )
+            ensureContext(this.context).attach(this.id, resourceType, () => this.forceUpdate())
         }
 
         componentWillUnmount() {
-            this._isMounted = false
-            // TODO This was missing and no tests were failing... Add test
-            this.unloadOrDetachData()
-        }
+            this.isMounted = false
 
-        unloadOrDetachData() {
-            if (this.props.unloadDataOnUnmount === false) {
-                ensureContext(this.context).detach(this.actionMeta(), this.handleStateUpdate)
-            } else {
-                ensureContext(this.context).unloadData(this.actionMeta(), this.handleStateUpdate)
-            }
-        }
-
-        internalState = () => {
-            return this.state.internalState
+            ensureContext(this.context).detach(this.id, resourceType)
         }
 
         render() {
-            if (
-                !this.state.loaderState ||
-                (ensureContext(this.context).isServerSideRender && this.props.clientLoadOnly)
-            ) {
+            const context = ensureContext(this.context)
+            if (context.isServerSideRender && this.props.clientLoadOnly) {
                 return null
             }
 
-            return this.props.renderData(this.state.loaderState, this.actions)
+            const loaderState = context.getDataLoaderState(
+                this.id,
+                resourceType,
+                this.getParams(this.props)
+            )
+
+            return this.props.renderData(loaderState, this.actions)
         }
 
         actionMeta = (props: Props<TResource, TActions> = this.props) => {
@@ -213,28 +153,6 @@ export function createTypedDataLoader<
                 resourceLoadParams,
                 internalState: this.state.internalState
             }
-        }
-
-        private handleStateUpdate: DataUpdateCallback = (
-            loadedState: LoaderState<TResource>,
-            internalState: TInternalState
-        ): void => {
-            // If we are not mounted yet we should just load the state in
-            if (!this._isMounted) {
-                this.state = {
-                    loaderState: loadedState,
-                    internalState
-                }
-                return
-            }
-            // Don't set state during SSR
-            if (ensureContext(this.context).isServerSideRender) {
-                return
-            }
-            this.setState({
-                loaderState: loadedState,
-                internalState
-            })
         }
     }
 

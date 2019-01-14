@@ -5,7 +5,7 @@ export interface BeginLoadingEvent {
     data: {
         numberLoading: number
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 export interface EndLoadingEvent {
@@ -14,7 +14,7 @@ export interface EndLoadingEvent {
     data: {
         numberLoading: number
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 export interface DataLoadCompletedEvent {
@@ -23,7 +23,7 @@ export interface DataLoadCompletedEvent {
     data: {
         numberLoading: number
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 export interface StateChangedEvent {
@@ -37,7 +37,7 @@ export interface LoadErrorEvent {
         error: Error
         errorMessage: string
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 

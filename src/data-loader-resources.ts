@@ -2,21 +2,21 @@ import React from 'react'
 import shallowEqual from 'shallowequal'
 import { Props, createTypedDataLoader, ActionContext, DataLoaderAction } from './data-loader'
 import { ensureContext } from './data-loader-context'
+import objectHash from 'object-hash'
 
 export type LoadResource<TData, TResourceParameters> = (
-    resourceId: string,
-    resourceParameters: TResourceParameters,
-    existingData: TData
+    resourceParameters: TResourceParameters
 ) => Promise<TData> | TData
 
 interface Resources {
     [dataType: string]: LoadResource<any, any>
 }
 
-export interface PagedData<Datum> {
+export interface PagedData<Data> {
     pageNumber: number
-    data: Datum[]
+    data: Data
 }
+
 export interface RefreshAction {
     refresh: () => void
     [actionName: string]: DataLoaderAction<any, any, any>
@@ -28,12 +28,6 @@ export interface Paging {
     /** Overrides pageSize for initial page */
     initialSize?: number
     pageSize: number
-    /**
-     * If true, new page data gets appended to existing data
-     * if false, only the current page will be kept
-     * Defaults to true
-     */
-    keepPreviousPagesData?: boolean
 }
 export interface PageComponentProps {
     paging: Paging
@@ -93,10 +87,10 @@ export class DataLoaderResources<TAdditionalParameters> {
     }
 
     /** Page numbers start at 1 */
-    registerPagedResource<TData>(
+    registerPagedResource<TParams, TData>(
         resourceType: string,
-        loadResource: (resourceId: string, paging: Paging, page: number) => Promise<TData[]>
-    ): React.ComponentClass<Props<PagedData<TData>, PageActions> & PageComponentProps> {
+        loadResource: (params: TParams, paging: Paging, page: number) => Promise<TData>
+    ): React.ComponentClass<Props<PagedData<TData> & TParams, PageActions> & PageComponentProps> {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
@@ -117,26 +111,24 @@ export class DataLoaderResources<TAdditionalParameters> {
                     return
                 }
 
+                const resourceLoadParams = {
+                    paging: {
+                        ...this.nextProps.paging
+                    }
+                }
                 ensureContext(this.context).update({
                     resourceType,
-                    resourceId: this.nextProps.resourceId,
-                    resourceLoadParams: {
-                        paging: {
-                            ...this.nextProps.paging,
-                            keepPreviousPagesData: false
-                        }
-                    },
+                    resourceLoadParamsHash: objectHash(resourceLoadParams),
+                    resourceLoadParams,
                     internalState: { page: 1 }
                 })
             },
             refresh(this: ActionsThis) {
                 return ensureContext(this.context).refresh({
                     resourceType,
-                    resourceId: this.props.resourceId,
                     resourceLoadParams: {
                         paging: {
-                            ...this.props.paging,
-                            keepPreviousPagesData: false
+                            ...this.props.paging
                         }
                     },
                     internalState: { page: 1 }
@@ -146,12 +138,8 @@ export class DataLoaderResources<TAdditionalParameters> {
             nextPage(this: ActionsThis) {
                 return ensureContext(this.context).nextPage({
                     resourceType,
-                    resourceId: this.props.resourceId,
                     resourceLoadParams: {
-                        paging: {
-                            keepPreviousPagesData: true,
-                            ...this.props.paging
-                        }
+                        paging: this.props.paging
                     },
                     internalState: { page: this.internalState().page + 1 }
                 })
@@ -168,18 +156,10 @@ export class DataLoaderResources<TAdditionalParameters> {
         // it takes care of passing the correct params to the loadResource function
         // then merging the new data when it comes back
         this.resources[resourceType] = async (
-            dataKey,
-            pageInfo: PageComponentProps & { page: number },
-            existingData: PagedData<TData>
+            pageInfo: PageComponentProps & { page: number } & TParams
         ): Promise<PagedData<TData>> => {
             const pageNumber = pageInfo && pageInfo.page ? pageInfo.page : 1
-            const data = await loadResource(dataKey, pageInfo.paging, pageNumber)
-            if (existingData && existingData.data && pageInfo.paging.keepPreviousPagesData) {
-                return {
-                    pageNumber,
-                    data: [...existingData.data, ...data]
-                }
-            }
+            const data = await loadResource(pageInfo, pageInfo.paging, pageNumber)
 
             return {
                 pageNumber,

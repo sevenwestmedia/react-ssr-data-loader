@@ -22,7 +22,7 @@ const currentDataOrDefault = (
         return defaultState
     }
 
-    const keyData = resourceTypeData[meta.resourceId]
+    const keyData = resourceTypeData[meta.resourceLoadParamsHash]
     if (!keyData) {
         return defaultState
     }
@@ -58,7 +58,7 @@ export default (
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading
+                        [action.meta.resourceLoadParamsHash]: loading
                     }
                 }
             }
@@ -76,7 +76,7 @@ export default (
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading
+                        [action.meta.resourceLoadParamsHash]: loading
                     }
                 }
             }
@@ -94,7 +94,7 @@ export default (
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading
+                        [action.meta.resourceLoadParamsHash]: loading
                     }
                 }
             }
@@ -112,7 +112,7 @@ export default (
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: loading
+                        [action.meta.resourceLoadParamsHash]: loading
                     }
                 }
             }
@@ -136,11 +136,12 @@ export default (
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: completed
+                        [action.meta.resourceLoadParamsHash]: completed
                     }
                 }
             }
         }
+
         case Actions.LOAD_DATA_FAILED: {
             const currentState = currentDataOrDefault(action.meta, state)
             const lastAction = statusMap[currentState.status]
@@ -161,7 +162,7 @@ export default (
                     ...state.data,
                     [action.meta.resourceType]: {
                         ...state.data[action.meta.resourceType],
-                        [action.meta.resourceId]: failed
+                        [action.meta.resourceLoadParamsHash]: failed
                     }
                 }
             }
@@ -172,7 +173,7 @@ export default (
                 data: { ...state.data }
             }
             const dataType = newState.data[action.meta.resourceType]
-            delete dataType[action.meta.resourceId]
+            delete dataType[action.meta.resourceLoadParamsHash]
 
             if (Object.keys(dataType).length === 0) {
                 delete newState.data[action.meta.resourceType]
