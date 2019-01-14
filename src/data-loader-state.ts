@@ -23,12 +23,7 @@ export enum LoaderStatus { // The loader is ________ (the data/resource)
     /**
      * The loader is re-fetching the resource
      */
-    Refreshing = 'Refreshing',
-
-    /**
-     * The loader is fetching the next page of a resurce
-     */
-    Paging = 'Paging'
+    Refreshing = 'Refreshing'
 }
 
 export interface LoaderState<TData> {
@@ -45,20 +40,3 @@ export interface LoaderState<TData> {
 export type Data<TData> =
     | { hasData: true; result: TData; dataFromServerSideRender: boolean }
     | { hasData: false }
-
-export interface DataKeyMap {
-    [dataKey: string]: LoaderState<any>
-}
-
-export interface DataLoaderState {
-    loadingCount: number
-    data: { [resourceType: string]: DataKeyMap }
-}
-
-export interface ResourceLoadInfo<TResourceParameters, TInternalState> {
-    resourceType: string
-
-    resourceLoadParams: TResourceParameters
-
-    internalState: TInternalState
-}

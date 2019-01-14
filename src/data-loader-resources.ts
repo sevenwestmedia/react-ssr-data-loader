@@ -19,7 +19,7 @@ export interface PagedData<Data> {
 
 export interface RefreshAction {
     refresh: () => void
-    [actionName: string]: DataLoaderAction<any, any, any>
+    [actionName: string]: DataLoaderAction<any, any>
 }
 export type PageActions = { nextPage: () => void } & RefreshAction
 export interface Paging {
