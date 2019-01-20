@@ -27,12 +27,13 @@ export enum LoaderStatus { // The loader is ________ (the data/resource)
 }
 
 export interface LoaderState<TData> {
+    // TODO This should probably be on a higher object, we don't want this going to users
+    version: number
     status: LoaderStatus
     lastAction: SuccessAction | FailedAction
     /**
      * Some kind of sentinel value so that the object doesn't become top heavy ???
      */
-
     data: Data<TData>
 }
 

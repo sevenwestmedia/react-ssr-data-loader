@@ -120,13 +120,13 @@ describe('data-loader', () => {
     it('resource can resolve synchronously', async () => {
         const resources = new DataLoaderResources()
 
-        const LoadTest = resources.registerResource('test', () => 'Result!')
+        const LoadTest = resources.registerResource<string, { id: string }>('test', () => 'Result!')
         let loadCount = 0
 
         const wrapper = mount(
             <DataLoaderProvider resources={resources}>
                 <LoadTest
-                    resourceId="Test!"
+                    id="Test!"
                     // tslint:disable-next-line:jsx-no-lambda
                     renderData={renderProps => {
                         loadCount++
@@ -149,7 +149,7 @@ describe('data-loader', () => {
     it('data loader handles synchronous throw', async () => {
         const resources = new DataLoaderResources()
 
-        const LoadTest = resources.registerResource('test', () => {
+        const LoadTest = resources.registerResource<string, { id: string }>('test', () => {
             throw new Error('Synchronous fail')
         })
         let loadCount = 0
@@ -157,7 +157,7 @@ describe('data-loader', () => {
         const wrapper = mount(
             <DataLoaderProvider resources={resources}>
                 <LoadTest
-                    resourceId="Test!"
+                    id="Test!"
                     // tslint:disable-next-line:jsx-no-lambda
                     renderData={renderProps => {
                         loadCount++

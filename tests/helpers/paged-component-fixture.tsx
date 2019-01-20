@@ -1,17 +1,13 @@
 import React from 'react'
-import { Props } from '../../src/data-loader'
+import { Props, UserActions } from '../../src/data-loader'
 import { DataLoaderProvider } from '../../src/data-provider'
-import {
-    DataLoaderResources,
-    PageActions,
-    PagedData,
-    PageComponentProps
-} from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
+import { DataLoaderResources, PagedData, PageComponentProps } from '../../src/data-loader-resources'
+import { LoaderState } from '../../src/data-loader-state'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
 // tslint:disable-next-line:no-empty-interface
 export interface DataResource {}
@@ -23,10 +19,10 @@ export class PagedComponentFixture {
     lastRenderProps!: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ resourceId: string }, any>
-    component: ReactWrapper<Props<PagedData<DataResource>, PageActions> & PageComponentProps, any>
+    component: ReactWrapper<Props<PagedData<DataResource>, any> & PageComponentProps, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderActions!: PageActions
+    lastRenderActions!: UserActions<'nextPage' | 'refresh'>
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -37,7 +33,7 @@ export class PagedComponentFixture {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerPagedResource<DataResource>(
+        const TestDataLoader = this.resources.registerPagedResource<DataResource, { id: string }>(
             'testDataType',
             () => {
                 this.loadDataCount++
@@ -63,7 +59,7 @@ export class PagedComponentFixture {
                 }}
             >
                 <TestDataLoader
-                    resourceId={testComponentProps.resourceId}
+                    id={testComponentProps.resourceId}
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
                     // tslint:disable-next-line:jsx-no-lambda

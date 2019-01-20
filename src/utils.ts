@@ -1,14 +1,10 @@
-import { ResourceLoadInfo } from './data-loader-state'
+import { LoadParams } from './data-loader-store-and-loader'
 
 export function isPromise(value: any): value is Promise<any> {
     return Promise.resolve(value) === value
 }
 
-export function getError(
-    metadata: ResourceLoadInfo<any, any>,
-    err: any,
-    fallbackMsg?: string
-): Error {
+export function getError(metadata: LoadParams, err: any, fallbackMsg?: string): Error {
     if (err instanceof Error) {
         ;(err as any).dataLoadContext = `${metadata.resourceType} ${metadata.resourceId}`
 

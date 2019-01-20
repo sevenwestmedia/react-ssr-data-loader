@@ -1,13 +1,14 @@
 import React from 'react'
-import { Props } from '../../src/data-loader'
+import { Props, UserActions } from '../../src/data-loader'
 import { DataLoaderProvider } from '../../src/data-provider'
-import { DataLoaderResources, RefreshAction } from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
+import { DataLoaderResources } from '../../src/data-loader-resources'
+import { LoaderState } from '../../src/data-loader-state'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
 export class ComponentWithArgsFixture<T extends object> {
     loadAllCompletedCalled = 0
@@ -20,8 +21,7 @@ export class ComponentWithArgsFixture<T extends object> {
     passedParams!: T
     currentState: DataLoaderState | undefined
     lastRenderProps!: LoaderState<Data>
-    lastRenderActions!: RefreshAction
-    existingData!: Data
+    lastRenderActions!: UserActions<any>
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -37,15 +37,11 @@ export class ComponentWithArgsFixture<T extends object> {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
 
-        const TestDataLoader = this.resources.registerResource(
-            resourceType,
-            (_: string, params: T, existingData: Data) => {
-                this.loadDataCount++
-                this.passedParams = params
-                this.existingData = existingData
-                return this.testDataPromise.promise
-            }
-        )
+        const TestDataLoader = this.resources.registerResource(resourceType, params => {
+            this.loadDataCount++
+            this.passedParams = params
+            return this.testDataPromise.promise
+        })
 
         const TestComponent: React.SFC<{ resourceId: string } & T> = props => (
             <DataLoaderProvider

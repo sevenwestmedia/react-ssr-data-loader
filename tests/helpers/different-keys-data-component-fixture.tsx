@@ -1,13 +1,14 @@
 import React from 'react'
-import { Props } from '../../src/data-loader'
+import { Props, UserActions } from '../../src/data-loader'
 import { DataLoaderProvider } from '../../src/data-provider'
-import { DataLoaderResources, RefreshAction } from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
+import { DataLoaderResources } from '../../src/data-loader-resources'
+import { LoaderState } from '../../src/data-loader-state'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
 export class DifferentKeysDataComponentFixture {
     loadAllCompletedCalled = 0
@@ -22,8 +23,8 @@ export class DifferentKeysDataComponentFixture {
     currentState: DataLoaderState | undefined
     lastRenderProps!: LoaderState<Data>
     lastRenderProps2!: LoaderState<Data>
-    lastRenderActions1!: RefreshAction
-    lastRenderActions2!: RefreshAction
+    lastRenderActions1!: UserActions<any>
+    lastRenderActions2!: UserActions<any>
 
     constructor(
         initialState: DataLoaderState | undefined,
@@ -36,17 +37,21 @@ export class DifferentKeysDataComponentFixture {
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.testDataPromise2 = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(resourceType, (key: string) => {
-            if (key === resourceId) {
-                this.loadDataCount1++
-                return this.testDataPromise.promise
-            } else if (key === resourceId2) {
-                this.loadDataCount2++
-                return this.testDataPromise2.promise
-            }
 
-            return Promise.reject("Key doesn't match?")
-        })
+        const TestDataLoader = this.resources.registerResource<Data, { id: string }>(
+            resourceType,
+            params => {
+                if (params.id === resourceId) {
+                    this.loadDataCount1++
+                    return this.testDataPromise.promise
+                } else if (params.id === resourceId2) {
+                    this.loadDataCount2++
+                    return this.testDataPromise2.promise
+                }
+
+                return Promise.reject("Key doesn't match?")
+            }
+        )
 
         const TestComponent: React.SFC<{ resourceId: string; resourceId2: string }> = testProp => (
             <DataLoaderProvider
@@ -67,7 +72,7 @@ export class DifferentKeysDataComponentFixture {
             >
                 <div>
                     <TestDataLoader
-                        resourceId={testProp.resourceId}
+                        id={testProp.resourceId}
                         clientLoadOnly={clientLoadOnly}
                         // tslint:disable-next-line:jsx-no-lambda
                         renderData={(props, actions) => {
@@ -78,7 +83,7 @@ export class DifferentKeysDataComponentFixture {
                         }}
                     />
                     <TestDataLoader
-                        resourceId={testProp.resourceId2}
+                        id={testProp.resourceId2}
                         clientLoadOnly={clientLoadOnly}
                         // tslint:disable-next-line:jsx-no-lambda
                         renderData={(props, actions) => {

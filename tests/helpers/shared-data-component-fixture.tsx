@@ -2,12 +2,13 @@ import React from 'react'
 import { Props } from '../../src/data-loader'
 import { DataLoaderProvider } from '../../src/data-provider'
 import { DataLoaderResources } from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
+import { LoaderState } from '../../src/data-loader-state'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
 export class SharedDataComponentFixture {
     loadAllCompletedCalled = 0
@@ -40,10 +41,13 @@ export class SharedDataComponentFixture {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(resourceType, () => {
-            this.loadDataCount++
-            return this.testDataPromise.promise
-        })
+        const TestDataLoader = this.resources.registerResource<Data, { id: string }>(
+            resourceType,
+            () => {
+                this.loadDataCount++
+                return this.testDataPromise.promise
+            }
+        )
 
         const TestComponent: React.SFC<{
             resourceId: string
@@ -73,7 +77,7 @@ export class SharedDataComponentFixture {
                 >
                     <div>
                         <TestDataLoader
-                            resourceId={testResourceId}
+                            id={testResourceId}
                             clientLoadOnly={clientLoadOnly}
                             // tslint:disable-next-line:jsx-no-lambda
                             renderData={props => {
@@ -85,7 +89,7 @@ export class SharedDataComponentFixture {
 
                         {renderAdditionalDataLoader && (
                             <TestDataLoader
-                                resourceId={testResourceId}
+                                id={testResourceId}
                                 clientLoadOnly={clientLoadOnly}
                                 // tslint:disable-next-line:jsx-no-lambda
                                 renderData={() => {
@@ -95,7 +99,7 @@ export class SharedDataComponentFixture {
                         )}
                         {!unmountLastDataLoader && (
                             <TestDataLoader
-                                resourceId={testResourceId}
+                                id={testResourceId}
                                 clientLoadOnly={clientLoadOnly}
                                 // tslint:disable-next-line:jsx-no-lambda
                                 renderData={props => {

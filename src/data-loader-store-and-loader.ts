@@ -2,9 +2,24 @@ import objectHash from 'object-hash'
 import { DataProviderEvents } from './events'
 import { LoaderState, LoaderStatus } from './data-loader-state'
 import { isPromise } from './utils'
+import { getDataState } from './state-helper'
 
 export interface DataLoaderState {
     [paramsHash: string]: LoaderState<any>
+}
+
+export interface ActionResult<TInternalState> {
+    /** Directive to keep the existing data if this action causes a data load */
+    keepData: boolean
+    /** Directive to refresh the data, even if the inputs are all the same */
+    refresh: boolean
+    /** Internal state for this data loader, useful for paging and other exensions */
+    newInternalState: TInternalState
+}
+
+export interface LoadParams {
+    resourceType: string
+    [param: string]: any
 }
 
 // Some other names
@@ -22,11 +37,12 @@ export class DataLoaderStoreAndLoader {
     /** Lookup of the dataLoaderIds which currently are consuming the params. Used for ref counting */
     private paramHashConsumers: { [paramsHash: string]: string[] } = {}
     private dataStore: DataLoaderState = {}
+    private stateVersionCounter = 0
 
     constructor(
         private onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
-        private performLoad: (metadata: { resourceType: string }) => Promise<any> | any,
+        private performLoad: (dataLoadParams: LoadParams) => Promise<any> | any,
         public isServerSideRender: boolean
     ) {
         if (initialState) {
@@ -52,19 +68,25 @@ export class DataLoaderStoreAndLoader {
     }
 
     /** Should only be called from render of data loader component (through context) */
-    getDataLoaderState(componentInstanceId: string, resourceType: string, dataLoadParams: object) {
-        if (!this.registeredDataLoaders[componentInstanceId]) {
-            throw new Error(`Data loader with id ${componentInstanceId}`)
-        }
-
+    getDataLoaderState(
+        componentInstanceId: string,
+        resourceType: string,
+        dataLoadParams: object,
+        internalState: object,
+        keepData = false,
+        forceRefresh = false
+    ) {
         const paramsObject = {
             resourceType,
-            ...dataLoadParams
-            // Need to get internal state from somewhere?
+            ...dataLoadParams,
+            ...internalState
         }
 
+        // Initial render (before mount) and SSR will not be registered, we can safely fall back to
+        // undefined in both these instances
         const previousRenderParamsObjectHash = this.registeredDataLoaders[componentInstanceId]
-            .currentParamsHash
+            ? this.registeredDataLoaders[componentInstanceId].currentParamsHash
+            : undefined
         const paramsObjectHash = objectHash(paramsObject)
 
         // Cleanup data which is not needed
@@ -83,7 +105,7 @@ export class DataLoaderStoreAndLoader {
 
         // If we have state for the current renders params, return it synchronously
         const stateForParams = this.dataStore[paramsObjectHash]
-        if (stateForParams) {
+        if (stateForParams && !forceRefresh) {
             return stateForParams
         }
 
@@ -97,19 +119,19 @@ export class DataLoaderStoreAndLoader {
         if (isPromise(result)) {
             // Init state as loading
             this.dataStore[paramsObjectHash] = {
+                version: this.stateVersionCounter++,
                 status: LoaderStatus.Fetching,
                 lastAction: {
                     type: 'none',
                     success: true
                 },
-                data: {
-                    hasData: false
-                }
+                data: getDataState(keepData, previousRenderParamsObjectHash, this.dataStore)
             }
             this.monitorLoad(paramsObjectHash, result)
         } else {
             // Init state as loaded, nothing async to monitor
             this.dataStore[paramsObjectHash] = {
+                version: this.stateVersionCounter++,
                 status: LoaderStatus.Idle,
                 lastAction: {
                     type: 'fetch',
@@ -135,9 +157,11 @@ export class DataLoaderStoreAndLoader {
             }
 
             this.dataStore[paramsObjectHash] = {
+                version: this.stateVersionCounter++,
                 status: LoaderStatus.Idle,
                 lastAction: {
                     type: 'fetch',
+
                     success: true
                 },
                 data: {

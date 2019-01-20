@@ -1,23 +1,20 @@
 import React from 'react'
 import { DataLoaderContextComponent, ensureContext } from './data-loader-context'
-import { DataLoaderStoreAndLoader } from './data-loader-store-and-loader'
+import { ActionResult } from './data-loader-store-and-loader'
 import { LoaderState } from './data-loader-state'
 import cuid from 'cuid'
 
 export type RenderData<T, TActions> = (
     loaderProps: LoaderState<T>,
-    actions: TActions
+    actions: UserActions<keyof TActions>
 ) => React.ReactElement<any> | null
 
 export interface Props<T, TActions> {
-    /** The id of the resource */
-    resourceId: string
     clientLoadOnly?: boolean
     renderData: RenderData<T, TActions>
 }
 
-interface State<T, TInternalState extends object> {
-    loaderState?: LoaderState<T>
+interface State<TInternalState extends object> {
     internalState: TInternalState
 }
 
@@ -25,56 +22,39 @@ export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClas
     Props<TResource, TActions> & TDataLoaderParams
 >
 
-// The `createTypedDataLoader` function needs to exist because for each
-// resource we need a new react component
-// The function provides a closure for anything specific to that resource
+export type DataLoaderAction<TInternalState> = (
+    internalState: TInternalState
+) => ActionResult<TInternalState>
 
-/**
- * TDataLoaderParams is the type of the arguments to load the resource
- *
- * TActions is the type of additional actions provided by the renderData function
- * (in addition to the BuildInActions like refresh)
- *
- * TInternalState allows a resource to track some sort of state without
- * exposing it to the end user. This is where the current page number
- * is stored for instance
- */
-export interface ActionContext<TResource, TDataLoaderParams> {
-    context: DataLoaderStoreAndLoader | undefined
-    props: Readonly<{ children?: React.ReactNode }> &
-        Readonly<Props<TResource, any> & TDataLoaderParams>
+export interface DataLoaderActions<TInternalState> {
+    [actionName: string]: DataLoaderAction<TInternalState>
 }
 
-export type DataLoaderAction<TResource, TDataLoaderParams> = (
-    this: ActionContext<TResource, TDataLoaderParams>
-) => void
+export type UserActions<TActions extends string | number | symbol> = {
+    [action in TActions]: () => void
+}
 
 export function createTypedDataLoader<
     TResource,
-    TDataLoaderParams,
-    TInternalState extends object,
-    TActions extends {
-        // We bind this so we can reuse the same function so actions do not cause
-        // PureComponent's to re-render
-        [actionName: string]: DataLoaderAction<TResource, TDataLoaderParams>
-    }
+    TDataLoaderParams extends {},
+    TInternalState extends {},
+    TActions extends DataLoaderActions<TInternalState>
 >(
     resourceType: string,
-    // initialInternalState: TInternalState,
+    initialInternalState: TInternalState,
     /** Callback to provide additional actions */
     actions: TActions
 ): Return<TResource, TActions, TDataLoaderParams> {
     type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
-    type ComponentState = State<TResource, TInternalState>
+    type ComponentState = State<TInternalState>
 
-    class DataLoader extends React.Component<ComponentProps, ComponentState>
-        implements ActionContext<TResource, TDataLoaderParams> {
+    class DataLoader extends React.Component<ComponentProps, ComponentState> {
         static contextType = DataLoaderContextComponent
         static displayName = `DataLoader(${resourceType})`
 
         context!: React.ContextType<typeof DataLoaderContextComponent>
         // Need to capture actions, otherwise instances will share bound actions
-        actions: TActions
+        userActions: UserActions<keyof TActions>
         id: string
 
         constructor(
@@ -83,23 +63,40 @@ export function createTypedDataLoader<
         ) {
             super(props, context)
 
-            // Bind each action to the instance of this data loader
-            // so the actions can access current state/props when they need to
-            const boundActions: any = {}
+            const userActions: any = {}
             Object.keys(actions).forEach(key => {
-                boundActions[key] = actions[key].bind(this)
+                userActions[key] = () => {
+                    const actionResult = actions[key](this.state.internalState)
+                    // This will trigger loading/resolving of the data for the new internal state
+                    ensureContext(this.context).getDataLoaderState(
+                        this.id,
+                        resourceType,
+                        this.getParams(this.props),
+                        actionResult.newInternalState,
+                        actionResult.keepData,
+                        actionResult.refresh
+                    )
+
+                    // We can then set internal state, which will cause a re-render
+                    // calling the above method without refreshing/keeping data flags
+                    this.setState({
+                        internalState: actionResult.newInternalState
+                    })
+                }
             })
 
-            this.actions = boundActions
             this.id = cuid()
+            this.userActions = userActions
+            this.state = {
+                internalState: initialInternalState
+            }
         }
 
-        getParams(props: ComponentProps) {
+        getParams(props: ComponentProps): TDataLoaderParams & TInternalState {
             const { clientLoadOnly, renderData, ...rest } = props
 
-            // TODO Unsure why we need the cast, figure out later or write a test to protect
-            // against adding more internal props
-            return rest as { resourceId: string } & TDataLoaderParams
+            // Need to figure out why we need the casts here
+            return { ...((rest as unknown) as TDataLoaderParams), ...this.state.internalState }
         }
 
         componentDidMount() {
@@ -119,10 +116,11 @@ export function createTypedDataLoader<
             const loaderState = context.getDataLoaderState(
                 this.id,
                 resourceType,
-                this.getParams(this.props)
+                this.getParams(this.props),
+                this.state.internalState
             )
 
-            return this.props.renderData(loaderState, this.actions)
+            return this.props.renderData(loaderState, this.userActions)
         }
     }
 

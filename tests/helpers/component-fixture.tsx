@@ -1,14 +1,15 @@
 import React from 'react'
-import { Props } from '../../src/data-loader'
+import { Props, UserActions } from '../../src/data-loader'
 import { DataLoaderProvider } from '../../src/data-provider'
-import { DataLoaderResources, RefreshAction } from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
+import { DataLoaderResources } from '../../src/data-loader-resources'
+import { LoaderState } from '../../src/data-loader-state'
 import { DataProviderEvents } from '../../src/events'
 import { Data, resourceType } from './test-data'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
 export interface FixtureOptions<T> {
     isServerSideRender: boolean
@@ -30,23 +31,21 @@ export class ComponentFixture {
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
     lastRenderProps!: LoaderState<Data>
-    lastRenderActions!: RefreshAction
-    lastExistingData!: Data
+    lastRenderActions!: UserActions<any>
     events: any[] = []
 
     constructor(
         initialState: DataLoaderState | undefined,
-        initialResourceId: string,
+        initialId: string,
         options: FixtureOptions<Data>
     ) {
         this.currentState = initialState
         this.testDataResult = options.syncResult
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerResource(
+        const TestDataLoader = this.resources.registerResource<Data, { id: string }>(
             resourceType,
-            (_, __, existingData: Data) => {
-                this.lastExistingData = existingData
+            () => {
                 this.loadDataCount++
                 if (this.testDataResult) {
                     return this.testDataResult
@@ -55,7 +54,7 @@ export class ComponentFixture {
             }
         )
 
-        const TestComponent: React.SFC<{ resourceId: string }> = ({ resourceId }) => (
+        const TestComponent: React.SFC<{ id: string }> = ({ id }) => (
             <DataLoaderProvider
                 initialState={initialState}
                 isServerSideRender={options.isServerSideRender}
@@ -74,9 +73,8 @@ export class ComponentFixture {
                 }}
             >
                 <TestDataLoader
-                    resourceId={resourceId}
+                    id={id}
                     clientLoadOnly={options.clientLoadOnly}
-                    unloadDataOnUnmount={options.unloadDataOnUnmount}
                     // tslint:disable-next-line:jsx-no-lambda
                     renderData={(props, actions) => {
                         this.renderCount++
@@ -88,7 +86,7 @@ export class ComponentFixture {
             </DataLoaderProvider>
         )
 
-        this.root = mount(<TestComponent resourceId={initialResourceId} />)
+        this.root = mount(<TestComponent id={initialId} />)
 
         this.component = this.root.find(TestDataLoader)
     }
@@ -99,7 +97,6 @@ export class ComponentFixture {
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
-            existingData: this.lastExistingData,
             loadDataCount: this.loadDataCount,
             events: this.events
         }).toMatchSnapshot()
