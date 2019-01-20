@@ -3,7 +3,6 @@ import { DataLoaderState } from './data-loader-store-and-loader'
 export interface BeginLoadingEvent {
     type: 'begin-loading-event'
     data: {
-        numberLoading: number
         resourceType: string
         resourceLoadParamsHash: string
     }
@@ -12,7 +11,6 @@ export interface EndLoadingEvent {
     type: 'end-loading-event'
 
     data: {
-        numberLoading: number
         resourceType: string
         resourceLoadParamsHash: string
     }
@@ -21,7 +19,6 @@ export interface DataLoadCompletedEvent {
     type: 'data-load-completed'
 
     data: {
-        numberLoading: number
         resourceType: string
         resourceLoadParamsHash: string
     }

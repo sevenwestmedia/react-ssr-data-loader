@@ -31,10 +31,6 @@ interface PageState {
 export class DataLoaderResources<TGlobalParameters> {
     private resources: Resources = {}
 
-    /**
-     * When using parameterised resources you cannot have multiple instances of the returned data loader
-     * with the same resourceId.
-     */
     registerResource<TData, TResourceParameters>(
         resourceType: string,
         loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>

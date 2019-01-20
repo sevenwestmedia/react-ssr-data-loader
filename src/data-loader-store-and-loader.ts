@@ -5,7 +5,13 @@ import { isPromise } from './utils'
 import { getDataState } from './state-helper'
 
 export interface DataLoaderState {
-    [paramsHash: string]: LoaderState<any>
+    [paramsHash: string]: {
+        // Version allows us to throw away events which are not for the correct version
+        // for example, refresh while loading initial data. We only want final refresh
+        // result
+        version: number
+        state: LoaderState<any>
+    }
 }
 
 export interface ActionResult<TInternalState> {
@@ -22,11 +28,18 @@ export interface LoadParams {
     [param: string]: any
 }
 
+/** Tracks data loader components */
+export class DataLoaderRegistrar {}
+
 // Some other names
 // DataLoaderDataAccessor
 // DataLoaderCore
+// DataLoaderSmurf
 // ?
+// tslint:disable-next-line:max-classes-per-file
 export class DataLoaderStoreAndLoader {
+    private requiresUpdateOnMount: string[] = []
+
     private registeredDataLoaders: {
         [dataLoaderId: string]: {
             update: () => void
@@ -38,32 +51,56 @@ export class DataLoaderStoreAndLoader {
     private paramHashConsumers: { [paramsHash: string]: string[] } = {}
     private dataStore: DataLoaderState = {}
     private stateVersionCounter = 0
+    private currentWorkCount = 0
 
     constructor(
         private onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
         private performLoad: (dataLoadParams: LoadParams) => Promise<any> | any,
-        public isServerSideRender: boolean
+        public isServerSideRender: boolean,
     ) {
         if (initialState) {
             this.dataStore = initialState
         } else {
+            // Raise state change only if we haven't got initial state
             this.onEvent({
                 type: 'state-changed',
-                state: this.dataStore
+                state: { ...this.dataStore },
             })
         }
     }
 
-    attach(componentInstanceId: string, update: () => void): void {
+    attach(
+        componentInstanceId: string,
+        resourceType: string,
+        dataLoadParams: object,
+        update: () => void,
+    ): void {
+        const paramsObject = this.getParamsObject(resourceType, dataLoadParams)
+        const paramsObjectHash = objectHash(paramsObject)
+
+        this.registerDataLoaderHash(paramsObjectHash, componentInstanceId)
         this.registeredDataLoaders[componentInstanceId] = {
             update,
-            currentParamsHash: undefined
+            currentParamsHash: paramsObjectHash,
+        }
+
+        // If the data has resolved between initial render, and mounting
+        // then we need to dispatch an update if not in a fetching state
+        const requiresUpdateIndex = this.requiresUpdateOnMount.indexOf(componentInstanceId)
+        if (requiresUpdateIndex !== -1) {
+            this.requiresUpdateOnMount.splice(requiresUpdateIndex, 1)
+            if (this.dataStore[paramsObjectHash].state.status !== LoaderStatus.Fetching) {
+                update()
+            }
         }
     }
 
     // Returns true when data needs to be unloaded from redux
-    detach(componentInstanceId: string) {
+    detach(componentInstanceId: string, resourceType: string, dataLoadParams: object) {
+        const paramsObject = this.getParamsObject(resourceType, dataLoadParams)
+        const paramsObjectHash = objectHash(paramsObject)
+        this.cleanupDataLoader(paramsObjectHash, componentInstanceId)
         delete this.registeredDataLoaders[componentInstanceId]
     }
 
@@ -72,15 +109,10 @@ export class DataLoaderStoreAndLoader {
         componentInstanceId: string,
         resourceType: string,
         dataLoadParams: object,
-        internalState: object,
         keepData = false,
-        forceRefresh = false
+        forceRefresh = false,
     ) {
-        const paramsObject = {
-            resourceType,
-            ...dataLoadParams,
-            ...internalState
-        }
+        const paramsObject = this.getParamsObject(resourceType, dataLoadParams)
 
         // Initial render (before mount) and SSR will not be registered, we can safely fall back to
         // undefined in both these instances
@@ -91,91 +123,166 @@ export class DataLoaderStoreAndLoader {
 
         // Cleanup data which is not needed
         if (previousRenderParamsObjectHash && paramsObjectHash !== previousRenderParamsObjectHash) {
-            const consumersForPreviousHash = this.paramHashConsumers[previousRenderParamsObjectHash]
-            consumersForPreviousHash.splice(
-                consumersForPreviousHash.indexOf(componentInstanceId),
-                1
-            )
-            if (consumersForPreviousHash.length === 0) {
-                // We no longer need this data
-                delete this.dataStore[previousRenderParamsObjectHash]
-                delete this.paramHashConsumers[previousRenderParamsObjectHash]
-            }
+            this.cleanupDataLoader(previousRenderParamsObjectHash, componentInstanceId)
         }
 
         // If we have state for the current renders params, return it synchronously
         const stateForParams = this.dataStore[paramsObjectHash]
         if (stateForParams && !forceRefresh) {
-            return stateForParams
+            return stateForParams.state
         }
 
         // Register the calling data loader as a consumer
-        if (!this.paramHashConsumers[paramsObjectHash]) {
-            this.paramHashConsumers[paramsObjectHash] = []
-        }
-        this.paramHashConsumers[paramsObjectHash].push(componentInstanceId)
+        const wasRegistered = this.registerDataLoaderHash(paramsObjectHash, componentInstanceId)
 
         const result = this.performLoad(paramsObject)
         if (isPromise(result)) {
+            if (wasRegistered) {
+                // If this render caused the data load and the data
+                // loader was registered, we need to register it
+                this.requiresUpdateOnMount.push(componentInstanceId)
+            }
             // Init state as loading
-            this.dataStore[paramsObjectHash] = {
-                version: this.stateVersionCounter++,
+            this.updateParamsHashState(paramsObjectHash, {
                 status: LoaderStatus.Fetching,
                 lastAction: {
                     type: 'none',
-                    success: true
+                    success: true,
                 },
-                data: getDataState(keepData, previousRenderParamsObjectHash, this.dataStore)
-            }
-            this.monitorLoad(paramsObjectHash, result)
+                data: getDataState(keepData, previousRenderParamsObjectHash, this.dataStore),
+            })
+            this.onEvent({
+                type: 'begin-loading-event',
+                data: {
+                    resourceLoadParamsHash: paramsObjectHash,
+                    resourceType,
+                },
+            })
+            this.monitorLoad(resourceType, paramsObjectHash, result, this.stateVersionCounter)
         } else {
             // Init state as loaded, nothing async to monitor
-            this.dataStore[paramsObjectHash] = {
-                version: this.stateVersionCounter++,
+            this.updateParamsHashState(paramsObjectHash, {
                 status: LoaderStatus.Idle,
                 lastAction: {
                     type: 'fetch',
-                    success: true
+                    success: true,
                 },
                 data: {
                     hasData: true,
                     dataFromServerSideRender: this.isServerSideRender,
-                    result
-                }
-            }
+                    result,
+                },
+            })
         }
 
-        return this.dataStore[paramsObjectHash]
+        return this.dataStore[paramsObjectHash].state
     }
 
-    monitorLoad(paramsObjectHash: string, work: Promise<any>) {
+    private getParamsObject(resourceType: string, dataLoadParams: object) {
+        return {
+            resourceType,
+            ...dataLoadParams,
+        }
+    }
+
+    private monitorLoad(
+        resourceType: string,
+        paramsObjectHash: string,
+        work: Promise<any>,
+        currentVersion: number,
+    ) {
+        this.currentWorkCount++
         work.then(result => {
-            // Check to see if any data loaders care, if they don't return
+            const currentState = this.dataStore[paramsObjectHash]
+            const versionMismatch = currentState && currentState.version !== currentVersion
+
             const dataLoadersForHash = this.paramHashConsumers[paramsObjectHash]
-            if (!dataLoadersForHash) {
-                return
+
+            // We shouldn't update internal state if there is a version
+            // mismatch, or there are no data loaders left who care
+            // about this data
+            if (!versionMismatch && dataLoadersForHash) {
+                this.updateParamsHashState(paramsObjectHash, {
+                    status: LoaderStatus.Idle,
+                    lastAction: {
+                        type: 'fetch',
+                        success: true,
+                    },
+                    data: {
+                        hasData: true,
+                        dataFromServerSideRender: this.isServerSideRender,
+                        result,
+                    },
+                })
+
+                dataLoadersForHash.forEach(dataLoader => {
+                    const dataLoaderInfo = this.registeredDataLoaders[dataLoader]
+                    // If data loaders are not mounted yet, can't call update..
+                    // TODO when it registers, if the state has changed, need to call update
+                    // Otherwise it will be out of sync
+                    if (dataLoaderInfo) {
+                        // Tell the data loader to update
+                        dataLoaderInfo.update()
+                    }
+                })
             }
 
-            this.dataStore[paramsObjectHash] = {
-                version: this.stateVersionCounter++,
-                status: LoaderStatus.Idle,
-                lastAction: {
-                    type: 'fetch',
-
-                    success: true
-                },
+            this.onEvent({
+                type: 'end-loading-event',
                 data: {
-                    hasData: true,
-                    dataFromServerSideRender: this.isServerSideRender,
-                    result
-                }
-            }
-
-            dataLoadersForHash.forEach(dataLoader => {
-                const dataLoaderInfo = this.registeredDataLoaders[dataLoader]
-                // Tell the data loader to update
-                dataLoaderInfo.update()
+                    resourceType,
+                    resourceLoadParamsHash: paramsObjectHash,
+                },
             })
+
+            const currentCount = --this.currentWorkCount
+            if (currentCount === 0) {
+                this.onEvent({
+                    type: 'data-load-completed',
+                    data: {
+                        resourceType,
+                        resourceLoadParamsHash: paramsObjectHash,
+                    },
+                })
+            }
+        })
+    }
+
+    private registerDataLoaderHash(paramsObjectHash: string, componentInstanceId: string) {
+        if (!this.paramHashConsumers[paramsObjectHash]) {
+            this.paramHashConsumers[paramsObjectHash] = []
+        }
+        if (this.paramHashConsumers[paramsObjectHash].indexOf(componentInstanceId) === -1) {
+            this.paramHashConsumers[paramsObjectHash].push(componentInstanceId)
+            return true
+        }
+
+        return false
+    }
+
+    private cleanupDataLoader(previousRenderParamsObjectHash: string, componentInstanceId: string) {
+        const consumersForPreviousHash = this.paramHashConsumers[previousRenderParamsObjectHash]
+        consumersForPreviousHash.splice(consumersForPreviousHash.indexOf(componentInstanceId), 1)
+        if (consumersForPreviousHash.length === 0) {
+            // We no longer need this data
+            delete this.dataStore[previousRenderParamsObjectHash]
+            delete this.paramHashConsumers[previousRenderParamsObjectHash]
+
+            this.onEvent({
+                type: 'state-changed',
+                state: { ...this.dataStore },
+            })
+        }
+    }
+
+    private updateParamsHashState(paramsObjectHash: string, newState: LoaderState<any>) {
+        this.dataStore[paramsObjectHash] = {
+            version: ++this.stateVersionCounter,
+            state: newState,
+        }
+        this.onEvent({
+            type: 'state-changed',
+            state: { ...this.dataStore },
         })
     }
 }

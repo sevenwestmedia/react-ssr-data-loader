@@ -71,8 +71,7 @@ export function createTypedDataLoader<
                     ensureContext(this.context).getDataLoaderState(
                         this.id,
                         resourceType,
-                        this.getParams(this.props),
-                        actionResult.newInternalState,
+                        this.getParams(this.props, actionResult.newInternalState),
                         actionResult.keepData,
                         actionResult.refresh
                     )
@@ -92,19 +91,31 @@ export function createTypedDataLoader<
             }
         }
 
-        getParams(props: ComponentProps): TDataLoaderParams & TInternalState {
+        getParams(
+            props: ComponentProps,
+            internalState: TInternalState
+        ): TDataLoaderParams & TInternalState {
             const { clientLoadOnly, renderData, ...rest } = props
 
             // Need to figure out why we need the casts here
-            return { ...((rest as unknown) as TDataLoaderParams), ...this.state.internalState }
+            return { ...((rest as unknown) as TDataLoaderParams), ...internalState }
         }
 
         componentDidMount() {
-            ensureContext(this.context).attach(this.id, () => this.forceUpdate())
+            ensureContext(this.context).attach(
+                this.id,
+                resourceType,
+                this.getParams(this.props, this.state.internalState),
+                () => this.forceUpdate()
+            )
         }
 
         componentWillUnmount() {
-            ensureContext(this.context).detach(this.id)
+            ensureContext(this.context).detach(
+                this.id,
+                resourceType,
+                this.getParams(this.props, this.state.internalState)
+            )
         }
 
         render() {
@@ -116,8 +127,7 @@ export function createTypedDataLoader<
             const loaderState = context.getDataLoaderState(
                 this.id,
                 resourceType,
-                this.getParams(this.props),
-                this.state.internalState
+                this.getParams(this.props, this.state.internalState)
             )
 
             return this.props.renderData(loaderState, this.userActions)

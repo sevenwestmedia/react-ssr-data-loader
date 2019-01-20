@@ -1,10 +1,10 @@
 export interface SuccessAction {
-    type: 'none' | 'fetch' | 'refresh'
+    type: 'none' | 'fetch'
     success: true
 }
 
 export interface FailedAction {
-    type: 'fetch' | 'refresh'
+    type: 'fetch'
     success: false
     error: Error & { dataLoadContext?: string }
 }
@@ -19,16 +19,9 @@ export enum LoaderStatus { // The loader is ________ (the data/resource)
      * The loader has been instantiated and is fetching the resource for the first time
      */
     Fetching = 'Fetching',
-
-    /**
-     * The loader is re-fetching the resource
-     */
-    Refreshing = 'Refreshing'
 }
 
 export interface LoaderState<TData> {
-    // TODO This should probably be on a higher object, we don't want this going to users
-    version: number
     status: LoaderStatus
     lastAction: SuccessAction | FailedAction
     /**
