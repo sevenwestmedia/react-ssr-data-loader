@@ -135,7 +135,23 @@ export class DataLoaderStoreAndLoader {
         // Register the calling data loader as a consumer
         const wasRegistered = this.registerDataLoaderHash(paramsObjectHash, componentInstanceId)
 
-        const result = this.performLoad(paramsObject)
+        let result: any
+        try {
+            result = this.performLoad(paramsObject)
+        } catch (err) {
+            this.updateParamsHashState(paramsObjectHash, {
+                status: LoaderStatus.Idle,
+                lastAction: {
+                    type: 'fetch',
+                    success: false,
+                    error: err,
+                },
+                data: getDataState(keepData, previousRenderParamsObjectHash, this.dataStore),
+            })
+
+            return this.dataStore[paramsObjectHash].state
+        }
+
         if (isPromise(result)) {
             if (wasRegistered) {
                 // If this render caused the data load and the data
@@ -192,7 +208,10 @@ export class DataLoaderStoreAndLoader {
         currentVersion: number,
     ) {
         this.currentWorkCount++
-        work.then(result => {
+        work.then(
+            result => ({ success: true as true, result }),
+            err => ({ success: false as false, err }),
+        ).then(result => {
             const currentState = this.dataStore[paramsObjectHash]
             const versionMismatch = currentState && currentState.version !== currentVersion
 
@@ -202,18 +221,30 @@ export class DataLoaderStoreAndLoader {
             // mismatch, or there are no data loaders left who care
             // about this data
             if (!versionMismatch && dataLoadersForHash) {
-                this.updateParamsHashState(paramsObjectHash, {
-                    status: LoaderStatus.Idle,
-                    lastAction: {
-                        type: 'fetch',
-                        success: true,
-                    },
-                    data: {
-                        hasData: true,
-                        dataFromServerSideRender: this.isServerSideRender,
-                        result,
-                    },
-                })
+                if (result.success) {
+                    this.updateParamsHashState(paramsObjectHash, {
+                        status: LoaderStatus.Idle,
+                        lastAction: {
+                            type: 'fetch',
+                            success: true,
+                        },
+                        data: {
+                            hasData: true,
+                            dataFromServerSideRender: this.isServerSideRender,
+                            result: result.result,
+                        },
+                    })
+                } else {
+                    this.updateParamsHashState(paramsObjectHash, {
+                        status: LoaderStatus.Idle,
+                        lastAction: {
+                            type: 'fetch',
+                            success: false,
+                            error: result.err,
+                        },
+                        data: currentState.state.data,
+                    })
+                }
 
                 dataLoadersForHash.forEach(dataLoader => {
                     const dataLoaderInfo = this.registeredDataLoaders[dataLoader]
@@ -227,13 +258,24 @@ export class DataLoaderStoreAndLoader {
                 })
             }
 
-            this.onEvent({
-                type: 'end-loading-event',
-                data: {
-                    resourceType,
-                    resourceLoadParamsHash: paramsObjectHash,
-                },
-            })
+            if (result.success) {
+                this.onEvent({
+                    type: 'end-loading-event',
+                    data: {
+                        resourceType,
+                        resourceLoadParamsHash: paramsObjectHash,
+                    },
+                })
+            } else {
+                this.onEvent({
+                    type: 'load-error',
+                    data: {
+                        resourceType,
+                        resourceLoadParamsHash: paramsObjectHash,
+                        error: result.err,
+                    },
+                })
+            }
 
             const currentCount = --this.currentWorkCount
             if (currentCount === 0) {

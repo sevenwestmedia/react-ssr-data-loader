@@ -37,6 +37,11 @@ describe('get data loader state for asynchronous data load', () => {
             expect(state.status).toBe(LoaderStatus.Fetching)
         })
 
+        it('has a successful last action of type none', () => {
+            expect(state.lastAction.success).toBe(true)
+            expect(state.lastAction.type).toBe('none')
+        })
+
         it('raises begin data loading event', () => {
             expect(events).toEqual([
                 expect.objectContaining({ type: 'state-changed' }),
@@ -47,13 +52,21 @@ describe('get data loader state for asynchronous data load', () => {
     })
 
     describe('when data finishes loading', () => {
-        beforeEach(() => {
-            promiseCompletionSource[0].resolve(1)
-            clearEventLoop()
+        beforeEach(async () => {
+            promiseCompletionSource[0].resolve(42)
+            await clearEventLoop()
+            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
         })
 
         it('is in an idle state', () => {
-            expect(state.status).toBe(LoaderStatus.Fetching)
+            expect(state.status).toBe(LoaderStatus.Idle)
+        })
+
+        it('has the resolved result', () => {
+            expect(state.data.hasData).toBe(true)
+            if (state.data.hasData) {
+                expect(state.data.result).toBe(42)
+            }
         })
 
         it('raises end and completed events', () => {
@@ -63,6 +76,39 @@ describe('get data loader state for asynchronous data load', () => {
                 expect.objectContaining({ type: 'begin-loading-event' }),
                 expect.objectContaining({ type: 'state-changed' }),
                 expect.objectContaining({ type: 'end-loading-event' }),
+                expect.objectContaining({ type: 'data-load-completed' }),
+            ])
+        })
+    })
+
+    describe('when data load fails', () => {
+        beforeEach(async () => {
+            promiseCompletionSource[0].reject(new Error('async boom'))
+            await clearEventLoop()
+            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
+        })
+
+        it('is in an idle state', () => {
+            expect(state.status).toBe(LoaderStatus.Idle)
+        })
+
+        it("it's last action failed", () => {
+            expect(state.lastAction.success).toBe(false)
+            if (!state.lastAction.success) {
+                const err = state.lastAction.error
+                expect(() => {
+                    throw err
+                }).toThrowError('async boom')
+            }
+        })
+
+        it('raises end and completed events', () => {
+            expect(events).toEqual([
+                expect.objectContaining({ type: 'state-changed' }),
+                expect.objectContaining({ type: 'state-changed' }),
+                expect.objectContaining({ type: 'begin-loading-event' }),
+                expect.objectContaining({ type: 'state-changed' }),
+                expect.objectContaining({ type: 'load-error' }),
                 expect.objectContaining({ type: 'data-load-completed' }),
             ])
         })
@@ -158,27 +204,73 @@ describe('get data loader state for synchronous data load', () => {
     let loader: DataLoaderStoreAndLoader
     let state: LoaderState<any>
 
-    beforeEach(() => {
-        events = []
-        loader = new DataLoaderStoreAndLoader(
-            event => {
-                events.push(event)
-            },
-            undefined,
-            () => {
-                return 42
-            },
-            false,
-        )
-        state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
+    describe('and data load will be successful', () => {
+        beforeEach(() => {
+            events = []
+            loader = new DataLoaderStoreAndLoader(
+                event => {
+                    events.push(event)
+                },
+                undefined,
+                () => {
+                    return 42
+                },
+                false,
+            )
+            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
+        })
+
+        describe('when not mounted yet', () => {
+            it('enters a Idle state immediately', () => {
+                expect(state.status).toBe(LoaderStatus.Idle)
+                expect(state.data.hasData).toBe(true)
+                if (state.data.hasData) {
+                    expect(state.data.result).toBe(42)
+                }
+            })
+
+            it('has a successful last action', () => {
+                expect(state.lastAction.success).toBe(true)
+                expect(state.lastAction.type).toBe('fetch')
+            })
+
+            it('raises state changed event', () => {
+                expect(events).toEqual([
+                    expect.objectContaining({ type: 'state-changed' }),
+                    expect.objectContaining({ type: 'state-changed' }),
+                ])
+            })
+        })
     })
 
-    describe('when not mounted yet', () => {
-        it('enters a loaded state immediately', () => {
+    describe('and data load will fail', () => {
+        beforeEach(() => {
+            events = []
+            loader = new DataLoaderStoreAndLoader(
+                event => {
+                    events.push(event)
+                },
+                undefined,
+                () => {
+                    throw new Error('sync data load fail')
+                },
+                false,
+            )
+            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
+        })
+
+        it('enters a Idle state immediately', () => {
             expect(state.status).toBe(LoaderStatus.Idle)
-            expect(state.data.hasData).toBe(true)
-            if (state.data.hasData) {
-                expect(state.data.result).toBe(42)
+            expect(state.data.hasData).toBe(false)
+        })
+
+        it('has a failed last action', () => {
+            expect(state.lastAction.success).toBe(false)
+            expect(state.lastAction.type).toBe('fetch')
+            if (!state.lastAction.success) {
+                expect(state.lastAction.error).toMatchObject({
+                    message: 'sync data load fail',
+                })
             }
         })
 

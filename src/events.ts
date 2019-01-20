@@ -31,8 +31,7 @@ export interface LoadErrorEvent {
     type: 'load-error'
 
     data: {
-        error: Error
-        errorMessage: string
+        error: any
         resourceType: string
         resourceLoadParamsHash: string
     }

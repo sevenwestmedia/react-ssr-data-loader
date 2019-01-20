@@ -6,7 +6,7 @@ export interface SuccessAction {
 export interface FailedAction {
     type: 'fetch'
     success: false
-    error: Error & { dataLoadContext?: string }
+    error: Error
 }
 
 export enum LoaderStatus { // The loader is ________ (the data/resource)
