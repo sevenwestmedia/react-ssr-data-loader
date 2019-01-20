@@ -5,13 +5,7 @@ import { isPromise } from './utils'
 import { getDataState } from './state-helper'
 
 export interface DataLoaderState {
-    [paramsHash: string]: {
-        // Version allows us to throw away events which are not for the correct version
-        // for example, refresh while loading initial data. We only want final refresh
-        // result
-        version: number
-        state: LoaderState<any>
-    }
+    [paramsHash: string]: LoaderState<any>
 }
 
 export interface ActionResult<TInternalState> {
@@ -49,6 +43,11 @@ export class DataLoaderStoreAndLoader {
 
     /** Lookup of the dataLoaderIds which currently are consuming the params. Used for ref counting */
     private paramHashConsumers: { [paramsHash: string]: string[] } = {}
+
+    // Version allows us to throw away events which are not for the correct version
+    // for example, refresh while loading initial data. We only want final refresh
+    // result
+    private paramHashVersion: { [paramsHash: string]: number } = {}
     private dataStore: DataLoaderState = {}
     private stateVersionCounter = 0
     private currentWorkCount = 0
@@ -90,7 +89,7 @@ export class DataLoaderStoreAndLoader {
         const requiresUpdateIndex = this.requiresUpdateOnMount.indexOf(componentInstanceId)
         if (requiresUpdateIndex !== -1) {
             this.requiresUpdateOnMount.splice(requiresUpdateIndex, 1)
-            if (this.dataStore[paramsObjectHash].state.status !== LoaderStatus.Fetching) {
+            if (this.dataStore[paramsObjectHash].status !== LoaderStatus.Fetching) {
                 update()
             }
         }
@@ -129,7 +128,7 @@ export class DataLoaderStoreAndLoader {
         // If we have state for the current renders params, return it synchronously
         const stateForParams = this.dataStore[paramsObjectHash]
         if (stateForParams && !forceRefresh) {
-            return stateForParams.state
+            return stateForParams
         }
 
         // Register the calling data loader as a consumer
@@ -149,7 +148,7 @@ export class DataLoaderStoreAndLoader {
                 data: getDataState(keepData, previousRenderParamsObjectHash, this.dataStore),
             })
 
-            return this.dataStore[paramsObjectHash].state
+            return this.dataStore[paramsObjectHash]
         }
 
         if (isPromise(result)) {
@@ -191,7 +190,7 @@ export class DataLoaderStoreAndLoader {
             })
         }
 
-        return this.dataStore[paramsObjectHash].state
+        return this.dataStore[paramsObjectHash]
     }
 
     private getParamsObject(resourceType: string, dataLoadParams: object) {
@@ -205,7 +204,7 @@ export class DataLoaderStoreAndLoader {
         resourceType: string,
         paramsObjectHash: string,
         work: Promise<any>,
-        currentVersion: number,
+        beginLoadVersion: number,
     ) {
         this.currentWorkCount++
         work.then(
@@ -213,7 +212,8 @@ export class DataLoaderStoreAndLoader {
             err => ({ success: false as false, err }),
         ).then(result => {
             const currentState = this.dataStore[paramsObjectHash]
-            const versionMismatch = currentState && currentState.version !== currentVersion
+            const currentStateVersion = this.paramHashVersion[paramsObjectHash]
+            const versionMismatch = currentState && currentStateVersion !== beginLoadVersion
 
             const dataLoadersForHash = this.paramHashConsumers[paramsObjectHash]
 
@@ -242,7 +242,7 @@ export class DataLoaderStoreAndLoader {
                             success: false,
                             error: result.err,
                         },
-                        data: currentState.state.data,
+                        data: currentState.data,
                     })
                 }
 
@@ -318,10 +318,8 @@ export class DataLoaderStoreAndLoader {
     }
 
     private updateParamsHashState(paramsObjectHash: string, newState: LoaderState<any>) {
-        this.dataStore[paramsObjectHash] = {
-            version: ++this.stateVersionCounter,
-            state: newState,
-        }
+        this.dataStore[paramsObjectHash] = newState
+        this.paramHashVersion[paramsObjectHash] = this.paramHashVersion[paramsObjectHash] + 1
         this.onEvent({
             type: 'state-changed',
             state: { ...this.dataStore },
