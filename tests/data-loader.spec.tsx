@@ -36,7 +36,7 @@ describe('data-loader', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.resetPromise()
-        sut.root.setProps({ resourceId: 'newData' })
+        sut.root.setProps({ id: 'newData' })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
 
         sut.assertState()
@@ -84,23 +84,6 @@ describe('data-loader', () => {
         expect(sut.loadAllCompletedCalled).toBe(0)
         await sut.testDataPromise.resolve({ result: 'Test' })
         expect(sut.loadAllCompletedCalled).toBe(1)
-    })
-
-    it('can support preserving data on unmount', async () => {
-        let sut = new ComponentFixture(undefined, 'testKey', {
-            isServerSideRender: false,
-            unloadDataOnUnmount: false
-        })
-        await sut.testDataPromise.resolve({ result: 'Test' })
-        await sut.unmount()
-
-        sut.assertState()
-        // Check we can re-mount the existing data
-        sut = new ComponentFixture(sut.currentState, 'testKey', {
-            isServerSideRender: false,
-            unloadDataOnUnmount: false
-        })
-        sut.assertState()
     })
 
     it('throws when the same resource is registered multiple times', () => {
@@ -192,7 +175,7 @@ describe('data-loader', () => {
         sut.testDataResult = {
             result: 'Result2!'
         }
-        sut.root.setProps({ resourceId: 'newData' })
+        sut.root.setProps({ id: 'newData' })
 
         sut.assertState()
     })

@@ -15,7 +15,7 @@ export class ComponentWithArgsFixture<T extends object> {
     loadDataCount = 0
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ resourceId: string } & T, any>
+    root: ReactWrapper<{ id: string } & T, any>
     component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     passedParams!: T
@@ -25,7 +25,7 @@ export class ComponentWithArgsFixture<T extends object> {
 
     constructor(
         initialState: DataLoaderState | undefined,
-        resourceId: string,
+        id: string,
         args: T,
         isServerSideRender: boolean,
         // For some reason the typescript compiler is not validating the JSX below properly
@@ -43,7 +43,7 @@ export class ComponentWithArgsFixture<T extends object> {
             return this.testDataPromise.promise
         })
 
-        const TestComponent: React.SFC<{ resourceId: string } & T> = props => (
+        const TestComponent: React.SFC<{ id: string } & T> = props => (
             <DataLoaderProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -75,7 +75,7 @@ export class ComponentWithArgsFixture<T extends object> {
             </DataLoaderProvider>
         )
 
-        this.root = mount(<TestComponent resourceId={resourceId} {...args as any} />)
+        this.root = mount(<TestComponent id={id} {...args as any} />)
 
         this.component = this.root.find(TestDataLoader)
     }

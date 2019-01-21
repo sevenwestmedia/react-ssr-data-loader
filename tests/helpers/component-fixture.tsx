@@ -26,7 +26,7 @@ export class ComponentFixture {
     /** Used instead of the promise to trigger sync data load */
     testDataResult?: Data
     testDataPromise: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ resourceId: string }, any>
+    root: ReactWrapper<{ id: string }, any>
     component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined

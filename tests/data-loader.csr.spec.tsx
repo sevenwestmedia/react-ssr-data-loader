@@ -15,7 +15,7 @@ describe('Client side render', () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
 
         await sut.testDataPromise.resolve({
-            result: 'Success!'
+            result: 'Success!',
         })
 
         sut.assertState()
@@ -26,7 +26,7 @@ describe('Client side render', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.resetPromise()
-        sut.root.setProps({ resourceId: 'newData' })
+        sut.root.setProps({ id: 'newData' })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
 
         sut.assertState()
@@ -49,6 +49,7 @@ describe('Client side render', () => {
         sut.assertState()
     })
 
+    // TODO Rename once snapshots are stable
     it('should remove data from redux when unmounted', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
         await sut.testDataPromise.resolve({ result: 'Success!' })

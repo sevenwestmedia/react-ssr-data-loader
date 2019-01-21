@@ -19,7 +19,7 @@ export class SharedDataComponentFixture {
     testDataPromise2!: PromiseCompletionSource<Data>
     root: ReactWrapper<
         {
-            resourceId: string
+            id: string
             unmountLastDataLoader: boolean
             renderAdditionalDataLoader: boolean
         },
@@ -33,7 +33,7 @@ export class SharedDataComponentFixture {
 
     constructor(
         initialState: DataLoaderState | undefined,
-        resourceId: string,
+        id: string,
         isServerSideRender: boolean,
         clientLoadOnly = false,
         additionalDataLoader = false
@@ -50,14 +50,10 @@ export class SharedDataComponentFixture {
         )
 
         const TestComponent: React.SFC<{
-            resourceId: string
+            id: string
             renderAdditionalDataLoader: boolean
             unmountLastDataLoader: boolean
-        }> = ({
-            resourceId: testResourceId,
-            renderAdditionalDataLoader,
-            unmountLastDataLoader
-        }) => {
+        }> = ({ id: testId, renderAdditionalDataLoader, unmountLastDataLoader }) => {
             return (
                 <DataLoaderProvider
                     initialState={initialState}
@@ -77,7 +73,7 @@ export class SharedDataComponentFixture {
                 >
                     <div>
                         <TestDataLoader
-                            id={testResourceId}
+                            id={testId}
                             clientLoadOnly={clientLoadOnly}
                             // tslint:disable-next-line:jsx-no-lambda
                             renderData={props => {
@@ -89,7 +85,7 @@ export class SharedDataComponentFixture {
 
                         {renderAdditionalDataLoader && (
                             <TestDataLoader
-                                id={testResourceId}
+                                id={testId}
                                 clientLoadOnly={clientLoadOnly}
                                 // tslint:disable-next-line:jsx-no-lambda
                                 renderData={() => {
@@ -99,7 +95,7 @@ export class SharedDataComponentFixture {
                         )}
                         {!unmountLastDataLoader && (
                             <TestDataLoader
-                                id={testResourceId}
+                                id={testId}
                                 clientLoadOnly={clientLoadOnly}
                                 // tslint:disable-next-line:jsx-no-lambda
                                 renderData={props => {
@@ -116,7 +112,7 @@ export class SharedDataComponentFixture {
 
         this.root = mount(
             <TestComponent
-                resourceId={resourceId}
+                id={id}
                 unmountLastDataLoader={false}
                 renderAdditionalDataLoader={additionalDataLoader}
             />

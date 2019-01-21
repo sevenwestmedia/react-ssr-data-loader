@@ -3,12 +3,10 @@
 exports[`Client side render client render after SSR with data should not fetch data 1`] = `
 Object {
   "events": Array [],
-  "existingData": undefined,
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
   "renderActions": Object {
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 1,
   "renderProps": Object {
@@ -32,18 +30,13 @@ exports[`Client side render loads data when props change 1`] = `
 Object {
   "events": Array [
     Object {
-      "state": Object {
-        "data": Object {},
-        "loadingCount": 0,
-      },
+      "state": Object {},
       "type": "state-changed",
     },
     Object {
       "state": Object {
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
         "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
                 "hasData": false,
               },
               "lastAction": Object {
@@ -53,57 +46,37 @@ Object {
               "status": "Fetching",
             },
           },
-        },
-        "loadingCount": 1,
-      },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
-      "state": Object {
         "data": Object {
-          "testDataType": Object {},
-        },
-        "loadingCount": 0,
-      },
-      "type": "state-changed",
-    },
-    Object {
-      "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "numberLoading": 0,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
     },
     Object {
-      "state": Object {
-        "data": Object {},
-        "loadingCount": 0,
-      },
+      "state": Object {},
       "type": "state-changed",
     },
     Object {
       "state": Object {
+        "b85e504b06b7283a19328a521797e110892ab0b4": Object {
         "data": Object {
-          "testDataType": Object {
-            "newData": Object {
-              "data": Object {
                 "hasData": false,
               },
               "lastAction": Object {
@@ -113,15 +86,11 @@ Object {
               "status": "Fetching",
             },
           },
-        },
-        "loadingCount": 1,
-      },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "newData",
+        "resourceLoadParamsHash": "b85e504b06b7283a19328a521797e110892ab0b4",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",

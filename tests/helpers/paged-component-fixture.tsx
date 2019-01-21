@@ -18,7 +18,7 @@ export class PagedComponentFixture {
     renderCount = 0
     lastRenderProps!: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
-    root: ReactWrapper<{ resourceId: string }, any>
+    root: ReactWrapper<{ id: string }, any>
     component: ReactWrapper<Props<PagedData<DataResource>, any> & PageComponentProps, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
@@ -26,7 +26,7 @@ export class PagedComponentFixture {
 
     constructor(
         initialState: DataLoaderState | undefined,
-        resourceId: string,
+        id: string,
         isServerSideRender: boolean,
         clientLoadOnly = false
     ) {
@@ -41,7 +41,7 @@ export class PagedComponentFixture {
             }
         )
 
-        const TestComponent: React.SFC<{ resourceId: string }> = testComponentProps => (
+        const TestComponent: React.SFC<{ id: string }> = testComponentProps => (
             <DataLoaderProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -59,7 +59,7 @@ export class PagedComponentFixture {
                 }}
             >
                 <TestDataLoader
-                    id={testComponentProps.resourceId}
+                    id={testComponentProps.id}
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
                     // tslint:disable-next-line:jsx-no-lambda
@@ -73,7 +73,7 @@ export class PagedComponentFixture {
             </DataLoaderProvider>
         )
 
-        this.root = mount(<TestComponent resourceId={resourceId} />)
+        this.root = mount(<TestComponent id={id} />)
 
         this.component = this.root.find(TestDataLoader)
     }

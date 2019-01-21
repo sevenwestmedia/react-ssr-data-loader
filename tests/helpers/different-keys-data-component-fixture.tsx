@@ -17,7 +17,7 @@ export class DifferentKeysDataComponentFixture {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
-    root: ReactWrapper<{ resourceId: string }, any>
+    root: ReactWrapper<{ id: string }, any>
     component: ReactWrapper<Props<Data, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
@@ -28,8 +28,8 @@ export class DifferentKeysDataComponentFixture {
 
     constructor(
         initialState: DataLoaderState | undefined,
-        resourceId: string,
-        resourceId2: string,
+        id: string,
+        id2: string,
         isServerSideRender: boolean,
         clientLoadOnly = false
     ) {
@@ -41,10 +41,10 @@ export class DifferentKeysDataComponentFixture {
         const TestDataLoader = this.resources.registerResource<Data, { id: string }>(
             resourceType,
             params => {
-                if (params.id === resourceId) {
+                if (params.id === id) {
                     this.loadDataCount1++
                     return this.testDataPromise.promise
-                } else if (params.id === resourceId2) {
+                } else if (params.id === id2) {
                     this.loadDataCount2++
                     return this.testDataPromise2.promise
                 }
@@ -53,7 +53,7 @@ export class DifferentKeysDataComponentFixture {
             }
         )
 
-        const TestComponent: React.SFC<{ resourceId: string; resourceId2: string }> = testProp => (
+        const TestComponent: React.SFC<{ id: string; id2: string }> = testProp => (
             <DataLoaderProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -72,7 +72,7 @@ export class DifferentKeysDataComponentFixture {
             >
                 <div>
                     <TestDataLoader
-                        id={testProp.resourceId}
+                        id={testProp.id}
                         clientLoadOnly={clientLoadOnly}
                         // tslint:disable-next-line:jsx-no-lambda
                         renderData={(props, actions) => {
@@ -83,7 +83,7 @@ export class DifferentKeysDataComponentFixture {
                         }}
                     />
                     <TestDataLoader
-                        id={testProp.resourceId2}
+                        id={testProp.id2}
                         clientLoadOnly={clientLoadOnly}
                         // tslint:disable-next-line:jsx-no-lambda
                         renderData={(props, actions) => {
@@ -96,7 +96,7 @@ export class DifferentKeysDataComponentFixture {
             </DataLoaderProvider>
         )
 
-        this.root = mount(<TestComponent resourceId={resourceId} resourceId2={resourceId2} />)
+        this.root = mount(<TestComponent id={id} id2={id2} />)
 
         this.component = this.root.find(TestDataLoader)
     }

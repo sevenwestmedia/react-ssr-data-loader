@@ -23,7 +23,7 @@ describe('data-loader', () => {
         sut.nextPage()
         await sut.testDataPromise.resolve(['Test2'])
 
-        sut.root.setProps({ resourceId: 'testKey' })
+        sut.root.setProps({ id: 'testKey' })
         sut.assertState()
         await new Promise(resolve => setTimeout(resolve))
 
