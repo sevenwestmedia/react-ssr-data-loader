@@ -319,7 +319,9 @@ export class DataLoaderStoreAndLoader {
 
     private updateParamsHashState(paramsObjectHash: string, newState: LoaderState<any>) {
         this.dataStore[paramsObjectHash] = newState
-        this.paramHashVersion[paramsObjectHash] = this.paramHashVersion[paramsObjectHash] + 1
+
+        this.paramHashVersion[paramsObjectHash] =
+            (this.paramHashVersion[paramsObjectHash] || -1) + 1
         this.onEvent({
             type: 'state-changed',
             state: { ...this.dataStore },
