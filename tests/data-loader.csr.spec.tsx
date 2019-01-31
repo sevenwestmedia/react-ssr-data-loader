@@ -37,7 +37,14 @@ describe('Client side render', () => {
 
         await sut.testDataPromise.reject(new Error('Boom!'))
 
-        sut.assertState()
+        const lastAction = sut.getState().renderProps.lastAction
+        expect(lastAction.success).toBe(false)
+        expect(lastAction.type).toBe('fetch')
+        if (!lastAction.success) {
+            expect(() => {
+                throw lastAction.error
+            }).toThrowError('Boom!')
+        }
     })
 
     it('client render after SSR with data should not fetch data', async () => {

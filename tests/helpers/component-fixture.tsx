@@ -37,7 +37,7 @@ export class ComponentFixture {
     constructor(
         initialState: DataLoaderState | undefined,
         initialId: string,
-        options: FixtureOptions<Data>
+        options: FixtureOptions<Data>,
     ) {
         this.currentState = initialState
         this.testDataResult = options.syncResult
@@ -51,7 +51,7 @@ export class ComponentFixture {
                     return this.testDataResult
                 }
                 return this.testDataPromise.promise
-            }
+            },
         )
 
         const TestComponent: React.SFC<{ id: string }> = ({ id }) => (
@@ -92,14 +92,18 @@ export class ComponentFixture {
     }
 
     assertState() {
-        expect({
+        expect(this.getState()).toMatchSnapshot()
+    }
+
+    getState() {
+        return {
             renderCount: this.renderCount,
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
             loadDataCount: this.loadDataCount,
-            events: this.events
-        }).toMatchSnapshot()
+            events: this.events,
+        }
     }
 
     refreshData() {
