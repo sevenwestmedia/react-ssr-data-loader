@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "Debug test: Current file",
             "program": "${workspaceRoot}/node_modules/.bin/jest",
-            "args": ["${relativeFile}"],
+            "args": ["${relativeFile}", "--runInBand"],
             "cwd": "${workspaceRoot}",
             "sourceMaps": true
         }

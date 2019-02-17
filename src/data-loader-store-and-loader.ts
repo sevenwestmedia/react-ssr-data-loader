@@ -22,9 +22,6 @@ export interface LoadParams {
     [param: string]: any
 }
 
-/** Tracks data loader components */
-export class DataLoaderRegistrar {}
-
 // Some other names
 // DataLoaderDataAccessor
 // DataLoaderCore
@@ -304,6 +301,9 @@ export class DataLoaderStoreAndLoader {
 
     private cleanupDataLoader(previousRenderParamsObjectHash: string, componentInstanceId: string) {
         const consumersForPreviousHash = this.paramHashConsumers[previousRenderParamsObjectHash]
+        if (!consumersForPreviousHash) {
+            return
+        }
         consumersForPreviousHash.splice(consumersForPreviousHash.indexOf(componentInstanceId), 1)
         if (consumersForPreviousHash.length === 0) {
             // We no longer need this data

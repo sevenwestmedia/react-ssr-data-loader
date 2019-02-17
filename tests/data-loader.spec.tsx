@@ -62,7 +62,7 @@ describe('data-loader', () => {
             isServerSideRender: false,
             onEvent: () => {
                 throw new Error('Boom')
-            }
+            },
         })
         await sut.testDataPromise.resolve({ result: 'Test' })
 
@@ -120,7 +120,7 @@ describe('data-loader', () => {
                         return <div>No data!</div>
                     }}
                 />
-            </DataLoaderProvider>
+            </DataLoaderProvider>,
         )
 
         expect(wrapper.html()).toMatchSnapshot()
@@ -154,7 +154,7 @@ describe('data-loader', () => {
                         return <div>No data!</div>
                     }}
                 />
-            </DataLoaderProvider>
+            </DataLoaderProvider>,
         )
 
         expect(wrapper.html()).toMatchSnapshot()
@@ -168,14 +168,14 @@ describe('data-loader', () => {
             isServerSideRender: false,
             unloadDataOnUnmount: false,
             syncResult: {
-                result: 'Result!'
-            }
+                result: 'Result!',
+            },
         })
 
         sut.testDataResult = {
-            result: 'Result2!'
+            result: 'Result2!',
         }
-        sut.root.setProps({ id: 'newData' })
+        sut.setId('newData')
 
         sut.assertState()
     })
