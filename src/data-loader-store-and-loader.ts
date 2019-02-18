@@ -48,13 +48,22 @@ export class DataLoaderStoreAndLoader {
     private dataStore: DataLoaderState = {}
     private stateVersionCounter = 0
     private currentWorkCount = 0
+    private onEvent: (event: DataProviderEvents) => void | Promise<any>
 
     constructor(
-        private onEvent: (event: DataProviderEvents) => void | Promise<any>,
+        onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
         private performLoad: (dataLoadParams: LoadParams) => Promise<any> | any,
         public isServerSideRender: boolean,
     ) {
+        this.onEvent = event => {
+            try {
+                return onEvent(event)
+            } catch (err) {
+                // tslint:disable-next-line:no-console
+                console.error('onEvent handler threw', err)
+            }
+        }
         if (initialState) {
             this.dataStore = initialState
         } else {

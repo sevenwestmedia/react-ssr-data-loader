@@ -7,6 +7,7 @@ import { DataLoaderResources } from '../src/index'
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
+import { processEventLoop } from './helpers/event-loop-helpers'
 
 configure({ adapter: new Adapter() })
 
@@ -47,7 +48,7 @@ describe('data-loader', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.root.unmount()
-        await new Promise(resolve => setTimeout(resolve))
+        await processEventLoop()
 
         sut.assertState()
     })
@@ -124,7 +125,7 @@ describe('data-loader', () => {
         )
 
         expect(wrapper.html()).toMatchSnapshot()
-        await new Promise(resolve => setTimeout(resolve))
+        await processEventLoop()
 
         expect(loadCount).toBe(1)
     })
@@ -158,7 +159,7 @@ describe('data-loader', () => {
         )
 
         expect(wrapper.html()).toMatchSnapshot()
-        await new Promise(resolve => setTimeout(resolve))
+        await processEventLoop()
 
         expect(loadCount).toBe(1)
     })
