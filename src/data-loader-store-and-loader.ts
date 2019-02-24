@@ -264,15 +264,7 @@ export class DataLoaderStoreAndLoader {
                 })
             }
 
-            if (result.success) {
-                this.onEvent({
-                    type: 'end-loading-event',
-                    data: {
-                        resourceType,
-                        resourceLoadParamsHash: paramsObjectHash,
-                    },
-                })
-            } else {
+            if (!result.success) {
                 this.onEvent({
                     type: 'load-error',
                     data: {
@@ -282,6 +274,14 @@ export class DataLoaderStoreAndLoader {
                     },
                 })
             }
+
+            this.onEvent({
+                type: 'end-loading-event',
+                data: {
+                    resourceType,
+                    resourceLoadParamsHash: paramsObjectHash,
+                },
+            })
 
             const currentCount = --this.currentWorkCount
             if (currentCount === 0) {
