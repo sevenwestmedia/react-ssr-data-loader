@@ -25,18 +25,18 @@ export class SharedDataComponentFixture {
         },
         any
     >
-    component: ReactWrapper<Props<Data, any>, any>
+    component: ReactWrapper<Props<Data, any, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data>
-    lastRenderProps2!: LoaderState<Data>
+    lastRenderProps!: LoaderState<Data, any>
+    lastRenderProps2!: LoaderState<Data, any>
 
     constructor(
         initialState: DataLoaderState | undefined,
         id: string,
         isServerSideRender: boolean,
         clientLoadOnly = false,
-        additionalDataLoader = false
+        additionalDataLoader = false,
     ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
@@ -46,7 +46,7 @@ export class SharedDataComponentFixture {
             () => {
                 this.loadDataCount++
                 return this.testDataPromise.promise
-            }
+            },
         )
 
         const TestComponent: React.SFC<{
@@ -115,7 +115,7 @@ export class SharedDataComponentFixture {
                 id={id}
                 unmountLastDataLoader={false}
                 renderAdditionalDataLoader={additionalDataLoader}
-            />
+            />,
         )
 
         this.component = this.root.find(TestDataLoader)
@@ -128,7 +128,7 @@ export class SharedDataComponentFixture {
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps1: this.lastRenderProps,
             renderProps2: this.lastRenderProps2,
-            loadDataCount: this.loadDataCount
+            loadDataCount: this.loadDataCount,
         }).toMatchSnapshot()
     }
 

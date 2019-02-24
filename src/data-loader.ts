@@ -4,30 +4,32 @@ import { ActionResult } from './data-loader-store-and-loader'
 import { LoaderState } from './data-loader-state'
 import cuid from 'cuid'
 
-export type RenderData<T, TActions> = (
-    loaderProps: LoaderState<T>,
-    actions: UserActions<keyof TActions>
+export type RenderData<TData, TActions, TParams> = (
+    loaderProps: LoaderState<TData, TParams>,
+    actions: UserActions<keyof TActions>,
+    params: TParams,
 ) => React.ReactElement<any> | null
 
-export interface Props<T, TActions> {
+export interface Props<T, TActions, TParams> {
     clientLoadOnly?: boolean
-    renderData: RenderData<T, TActions>
+    renderData: RenderData<T, TActions, TParams>
 }
 
 interface State<TInternalState extends object> {
     internalState: TInternalState
 }
 
-export type Return<TResource, TActions, TDataLoaderParams> = React.ComponentClass<
-    Props<TResource, TActions> & TDataLoaderParams
+export type Return<TResource, TActions, TDataLoaderParams, TInternalState> = React.ComponentClass<
+    Props<TResource, TActions, TDataLoaderParams & TInternalState> & TDataLoaderParams
 >
 
-export type DataLoaderAction<TInternalState> = (
-    internalState: TInternalState
-) => ActionResult<TInternalState>
+export type DataLoaderAction<TInternalState, TData, TParams> = (
+    internalState: TInternalState,
+    loaderState: LoaderState<TData, TParams>,
+) => ActionResult<TInternalState> | null
 
-export interface DataLoaderActions<TInternalState> {
-    [actionName: string]: DataLoaderAction<TInternalState>
+export interface DataLoaderActions<TInternalState, TData, TParams> {
+    [actionName: string]: DataLoaderAction<TInternalState, TData, TParams>
 }
 
 export type UserActions<TActions extends string | number | symbol> = {
@@ -38,14 +40,15 @@ export function createTypedDataLoader<
     TResource,
     TDataLoaderParams extends {},
     TInternalState extends {},
-    TActions extends DataLoaderActions<TInternalState>
+    TActions extends DataLoaderActions<TInternalState, TResource, TDataLoaderParams>
 >(
     resourceType: string,
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
-    actions: TActions
-): Return<TResource, TActions, TDataLoaderParams> {
-    type ComponentProps = Props<TResource, TActions> & TDataLoaderParams
+    actions: TActions,
+): Return<TResource, TActions, TDataLoaderParams, TInternalState> {
+    type ComponentProps = Props<TResource, TActions, TDataLoaderParams & TInternalState> &
+        TDataLoaderParams
     type ComponentState = State<TInternalState>
 
     class DataLoader extends React.Component<ComponentProps, ComponentState> {
@@ -59,27 +62,36 @@ export function createTypedDataLoader<
 
         constructor(
             props: ComponentProps,
-            context: React.ContextType<typeof DataLoaderContextComponent>
+            context: React.ContextType<typeof DataLoaderContextComponent>,
         ) {
             super(props, context)
 
             const userActions: any = {}
             Object.keys(actions).forEach(key => {
                 userActions[key] = () => {
-                    const actionResult = actions[key](this.state.internalState)
+                    const currentState = ensureContext(this.context).getDataLoaderState(
+                        this.id,
+                        resourceType,
+                        this.getParams(this.props, this.state.internalState),
+                    )
+                    const actionResult = actions[key](this.state.internalState, currentState)
+                    if (actionResult === null) {
+                        return
+                    }
+
                     // This will trigger loading/resolving of the data for the new internal state
                     ensureContext(this.context).getDataLoaderState(
                         this.id,
                         resourceType,
                         this.getParams(this.props, actionResult.newInternalState),
                         actionResult.keepData,
-                        actionResult.refresh
+                        actionResult.refresh,
                     )
 
                     // We can then set internal state, which will cause a re-render
                     // calling the above method without refreshing/keeping data flags
                     this.setState({
-                        internalState: actionResult.newInternalState
+                        internalState: actionResult.newInternalState,
                     })
                 }
             })
@@ -87,13 +99,13 @@ export function createTypedDataLoader<
             this.id = cuid()
             this.userActions = userActions
             this.state = {
-                internalState: initialInternalState
+                internalState: initialInternalState,
             }
         }
 
         getParams(
             props: ComponentProps,
-            internalState: TInternalState
+            internalState: TInternalState,
         ): TDataLoaderParams & TInternalState {
             const { clientLoadOnly, renderData, ...rest } = props
 
@@ -106,7 +118,7 @@ export function createTypedDataLoader<
                 this.id,
                 resourceType,
                 this.getParams(this.props, this.state.internalState),
-                () => this.forceUpdate()
+                () => this.forceUpdate(),
             )
         }
 
@@ -114,7 +126,7 @@ export function createTypedDataLoader<
             ensureContext(this.context).detach(
                 this.id,
                 resourceType,
-                this.getParams(this.props, this.state.internalState)
+                this.getParams(this.props, this.state.internalState),
             )
         }
 
@@ -124,13 +136,10 @@ export function createTypedDataLoader<
                 return null
             }
 
-            const loaderState = context.getDataLoaderState(
-                this.id,
-                resourceType,
-                this.getParams(this.props, this.state.internalState)
-            )
+            const params = this.getParams(this.props, this.state.internalState)
+            const loaderState = context.getDataLoaderState(this.id, resourceType, params)
 
-            return this.props.renderData(loaderState, this.userActions)
+            return this.props.renderData(loaderState, this.userActions, params)
         }
     }
 

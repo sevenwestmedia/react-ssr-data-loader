@@ -11,6 +11,10 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "none",
     },
@@ -21,6 +25,10 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "none",
     },
@@ -55,11 +63,19 @@ Object {
     "data": Object {
       "dataFromServerSideRender": true,
       "hasData": true,
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Success!",
       },
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "fetch",
     },
@@ -69,11 +85,19 @@ Object {
     "data": Object {
       "dataFromServerSideRender": true,
       "hasData": true,
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Success!",
       },
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "fetch",
     },
@@ -96,6 +120,10 @@ Object {
             "hasData": false,
           },
           "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
             "success": true,
             "type": "none",
           },
@@ -119,6 +147,10 @@ Object {
           },
           "lastAction": Object {
             "error": [Error: Boom!],
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
             "success": false,
             "type": "fetch",
           },
@@ -162,6 +194,10 @@ Object {
     },
     "lastAction": Object {
       "error": [Error: Boom!],
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": false,
       "type": "fetch",
     },
@@ -184,6 +220,10 @@ Object {
             "hasData": false,
           },
           "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
             "success": true,
             "type": "none",
           },
@@ -205,11 +245,19 @@ Object {
           "data": Object {
             "dataFromServerSideRender": true,
             "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
             "result": Object {
               "result": "Success!",
             },
           },
           "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
             "success": true,
             "type": "fetch",
           },
@@ -243,11 +291,19 @@ Object {
     "data": Object {
       "dataFromServerSideRender": true,
       "hasData": true,
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Success!",
       },
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "fetch",
     },
@@ -270,6 +326,10 @@ Object {
             "hasData": false,
           },
           "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
             "success": true,
             "type": "none",
           },
@@ -297,6 +357,10 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "none",
     },

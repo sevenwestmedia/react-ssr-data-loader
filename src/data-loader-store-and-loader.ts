@@ -5,7 +5,7 @@ import { isPromise } from './utils'
 import { getDataState } from './state-helper'
 
 export interface DataLoaderState {
-    [paramsHash: string]: LoaderState<any>
+    [paramsHash: string]: LoaderState<any, any>
 }
 
 export interface ActionResult<TInternalState> {
@@ -125,14 +125,18 @@ export class DataLoaderStoreAndLoader {
             ? this.registeredDataLoaders[componentInstanceId].currentParamsHash
             : undefined
         const paramsObjectHash = objectHash(paramsObject)
+        const stateForParams = this.dataStore[paramsObjectHash]
 
         // Cleanup data which is not needed
-        if (previousRenderParamsObjectHash && paramsObjectHash !== previousRenderParamsObjectHash) {
+        if (
+            previousRenderParamsObjectHash &&
+            paramsObjectHash !== previousRenderParamsObjectHash &&
+            !keepData
+        ) {
             this.cleanupDataLoader(previousRenderParamsObjectHash, componentInstanceId)
         }
 
         // If we have state for the current renders params, return it synchronously
-        const stateForParams = this.dataStore[paramsObjectHash]
         if (stateForParams && !forceRefresh) {
             return stateForParams
         }
@@ -150,8 +154,9 @@ export class DataLoaderStoreAndLoader {
                     type: 'fetch',
                     success: false,
                     error: err,
+                    params: paramsObject,
                 },
-                data: getDataState(keepData, previousRenderParamsObjectHash, this.dataStore),
+                data: getDataState(true, previousRenderParamsObjectHash, this.dataStore),
             })
 
             return this.dataStore[paramsObjectHash]
@@ -169,6 +174,7 @@ export class DataLoaderStoreAndLoader {
                 lastAction: {
                     type: 'none',
                     success: true,
+                    params: paramsObject,
                 },
                 data: getDataState(keepData, previousRenderParamsObjectHash, this.dataStore),
             })
@@ -179,7 +185,13 @@ export class DataLoaderStoreAndLoader {
                     resourceType,
                 },
             })
-            this.monitorLoad(resourceType, paramsObjectHash, result, this.stateVersionCounter)
+            this.monitorLoad(
+                resourceType,
+                paramsObject,
+                paramsObjectHash,
+                result,
+                this.stateVersionCounter,
+            )
         } else {
             // Init state as loaded, nothing async to monitor
             this.updateParamsHashState(paramsObjectHash, {
@@ -187,11 +199,13 @@ export class DataLoaderStoreAndLoader {
                 lastAction: {
                     type: 'fetch',
                     success: true,
+                    params: paramsObject,
                 },
                 data: {
                     hasData: true,
                     dataFromServerSideRender: this.isServerSideRender,
                     result,
+                    params: paramsObject,
                 },
             })
         }
@@ -208,6 +222,7 @@ export class DataLoaderStoreAndLoader {
 
     private monitorLoad(
         resourceType: string,
+        paramsObj: any,
         paramsObjectHash: string,
         work: Promise<any>,
         beginLoadVersion: number,
@@ -233,11 +248,13 @@ export class DataLoaderStoreAndLoader {
                         lastAction: {
                             type: 'fetch',
                             success: true,
+                            params: paramsObj,
                         },
                         data: {
                             hasData: true,
                             dataFromServerSideRender: this.isServerSideRender,
                             result: result.result,
+                            params: paramsObj,
                         },
                     })
                 } else {
@@ -247,6 +264,7 @@ export class DataLoaderStoreAndLoader {
                             type: 'fetch',
                             success: false,
                             error: result.err,
+                            params: paramsObj,
                         },
                         data: currentState.data,
                     })
@@ -326,7 +344,7 @@ export class DataLoaderStoreAndLoader {
         }
     }
 
-    private updateParamsHashState(paramsObjectHash: string, newState: LoaderState<any>) {
+    private updateParamsHashState(paramsObjectHash: string, newState: LoaderState<any, any>) {
         this.dataStore[paramsObjectHash] = newState
 
         this.paramHashVersion[paramsObjectHash] =

@@ -18,11 +18,11 @@ export class DifferentKeysDataComponentFixture {
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ id: string }, any>
-    component: ReactWrapper<Props<Data, any>, any>
+    component: ReactWrapper<Props<Data, any, any>, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data>
-    lastRenderProps2!: LoaderState<Data>
+    lastRenderProps!: LoaderState<Data, any>
+    lastRenderProps2!: LoaderState<Data, any>
     lastRenderActions1!: UserActions<any>
     lastRenderActions2!: UserActions<any>
 
@@ -31,7 +31,7 @@ export class DifferentKeysDataComponentFixture {
         id: string,
         id2: string,
         isServerSideRender: boolean,
-        clientLoadOnly = false
+        clientLoadOnly = false,
     ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
@@ -50,7 +50,7 @@ export class DifferentKeysDataComponentFixture {
                 }
 
                 return Promise.reject("Key doesn't match?")
-            }
+            },
         )
 
         const TestComponent: React.SFC<{ id: string; id2: string }> = testProp => (
@@ -116,7 +116,7 @@ export class DifferentKeysDataComponentFixture {
             renderProps: this.lastRenderProps,
             renderProps2: this.lastRenderProps2,
             loadDataCount1: this.loadDataCount1,
-            loadDataCount2: this.loadDataCount2
+            loadDataCount2: this.loadDataCount2,
         }).toMatchSnapshot()
     }
 

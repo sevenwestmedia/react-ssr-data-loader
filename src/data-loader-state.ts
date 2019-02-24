@@ -1,36 +1,41 @@
-export interface SuccessAction {
+export interface SuccessAction<TParams> {
     type: 'none' | 'fetch'
+    params: TParams
     success: true
 }
 
-export interface FailedAction {
+export interface FailedAction<TParams> {
     type: 'fetch'
+    params: TParams
     success: false
     error: Error
 }
 
-export enum LoaderStatus { // The loader is ________ (the data/resource)
+export enum LoaderStatus {
     /**
      * The loader is inactive -- not performing any action
      */
     Idle = 'Idle',
 
     /**
-     * The loader has been instantiated and is fetching the resource for the first time
+     * The loader is fetching the resource
      */
     Fetching = 'Fetching',
 }
 
-export interface LoaderState<TData> {
+export interface LoaderState<TData, TParams> {
     status: LoaderStatus
-    lastAction: SuccessAction | FailedAction
-    /**
-     * Some kind of sentinel value so that the object doesn't become top heavy ???
-     */
-    data: Data<TData>
+    lastAction: SuccessAction<TParams> | FailedAction<TParams>
+    data: Data<TData, TParams>
 }
 
 // @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
-export type Data<TData> =
-    | { hasData: true; result: TData; dataFromServerSideRender: boolean }
+export type Data<TData, TParams> =
+    | {
+          hasData: true
+          result: TData
+          dataFromServerSideRender: boolean
+          /** The parameters used to load the data */
+          params: TParams
+      }
     | { hasData: false }

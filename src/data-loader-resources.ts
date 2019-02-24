@@ -1,7 +1,8 @@
 import { createTypedDataLoader, DataLoaderActions } from './data-loader'
+import { LoaderStatus } from './data-loader-state'
 
 export type LoadResource<TData, TResourceParameters, TInternalState, TGlobalParameters> = (
-    params: TResourceParameters & TInternalState & TGlobalParameters
+    params: TResourceParameters & TInternalState & TGlobalParameters,
 ) => Promise<TData> | TData
 
 interface Resources {
@@ -33,20 +34,20 @@ export class DataLoaderResources<TGlobalParameters> {
 
     registerResource<TData, TResourceParameters>(
         resourceType: string,
-        loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>
+        loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>,
     ) {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<{}> = {
+        const actions: DataLoaderActions<{}, TData, TResourceParameters> = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,
                     refresh: true,
-                    keepData: true
+                    keepData: true,
                 }
-            }
+            },
         }
         const typedDataLoader = createTypedDataLoader<
             TData,
@@ -67,28 +68,35 @@ export class DataLoaderResources<TGlobalParameters> {
             TResourceParameters & PageComponentProps,
             PageState,
             TGlobalParameters
-        >
+        >,
     ) {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<PageState> = {
+        const actions: DataLoaderActions<
+            PageState,
+            PagedData<TData>,
+            TResourceParameters & PageComponentProps
+        > = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,
                     refresh: true,
-                    keepData: true
+                    keepData: true,
                 }
             },
             // Loads next page of data
-            nextPage(internalState) {
+            nextPage(internalState, state) {
+                if (state.status !== LoaderStatus.Idle) {
+                    return null
+                }
                 return {
                     keepData: false,
                     refresh: false,
-                    newInternalState: { page: internalState.page + 1 }
+                    newInternalState: { page: internalState.page + 1 },
                 }
-            }
+            },
         }
 
         const typedDataLoader = createTypedDataLoader<

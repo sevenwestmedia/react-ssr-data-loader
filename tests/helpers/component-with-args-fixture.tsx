@@ -16,11 +16,11 @@ export class ComponentWithArgsFixture<T extends object> {
     renderCount = 0
     testDataPromise: PromiseCompletionSource<Data>
     root: ReactWrapper<{ id: string } & T, any>
-    component: ReactWrapper<Props<Data, any>, any>
+    component: ReactWrapper<Props<Data, any, any>, any>
     resources: DataLoaderResources<any>
     passedParams!: T
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data>
+    lastRenderProps!: LoaderState<Data, any>
     lastRenderActions!: UserActions<any>
 
     constructor(
@@ -31,7 +31,7 @@ export class ComponentWithArgsFixture<T extends object> {
         // For some reason the typescript compiler is not validating the JSX below properly
         // And is saying this variable is not used
         // tslint:disable-next-line:variable-name
-        _clientLoadOnly = false
+        _clientLoadOnly = false,
     ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
@@ -87,7 +87,7 @@ export class ComponentWithArgsFixture<T extends object> {
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
             loadDataCount: this.loadDataCount,
-            passedParams: this.passedParams
+            passedParams: this.passedParams,
         }).toMatchSnapshot()
     }
 

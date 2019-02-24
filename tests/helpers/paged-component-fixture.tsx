@@ -16,19 +16,20 @@ export class PagedComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps!: LoaderState<DataResource>
+    lastRenderProps!: LoaderState<DataResource, any>
     testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ id: string }, any>
-    component: ReactWrapper<Props<PagedData<DataResource>, any> & PageComponentProps, any>
+    component: ReactWrapper<Props<PagedData<DataResource>, any, any> & PageComponentProps, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
     lastRenderActions!: UserActions<'nextPage' | 'refresh'>
+    lastRenderParams?: any
 
     constructor(
         initialState: DataLoaderState | undefined,
         id: string,
         isServerSideRender: boolean,
-        clientLoadOnly = false
+        clientLoadOnly = false,
     ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
@@ -38,7 +39,7 @@ export class PagedComponentFixture {
             () => {
                 this.loadDataCount++
                 return this.testDataPromise.promise
-            }
+            },
         )
 
         const TestComponent: React.SFC<{ id: string }> = testComponentProps => (
@@ -63,10 +64,11 @@ export class PagedComponentFixture {
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
                     // tslint:disable-next-line:jsx-no-lambda
-                    renderData={(props, actions) => {
+                    renderData={(props, actions, params) => {
                         this.renderCount++
                         this.lastRenderProps = props
                         this.lastRenderActions = actions
+                        this.lastRenderParams = params
                         return null
                     }}
                 />
@@ -94,7 +96,8 @@ export class PagedComponentFixture {
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
-            loadDataCount: this.loadDataCount
+            renderParams: this.lastRenderParams,
+            loadDataCount: this.loadDataCount,
         }).toMatchSnapshot()
     }
 

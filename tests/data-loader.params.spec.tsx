@@ -6,7 +6,7 @@ configure({ adapter: new Adapter() })
 
 describe('data-loader', () => {
     it('can specify arguments for data loader', async () => {
-        const args = { bar: 1 }
+        const args = { bar: 1, id: 'testKey', resourceType: 'testDataType' }
         const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, false)
 
         await sut.testDataPromise.resolve({ result: 'Test' })

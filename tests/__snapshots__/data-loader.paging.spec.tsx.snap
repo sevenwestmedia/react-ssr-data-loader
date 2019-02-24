@@ -7,25 +7,32 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 3,
+  "renderParams": Object {
+    "id": "testKey",
+    "page": 2,
+    "paging": Object {
+      "pageSize": 10,
+    },
+  },
   "renderProps": Object {
     "data": Object {
-      "dataFromServerSideRender": false,
-      "hasData": true,
-      "result": Object {
-        "data": Array [
-          "Test",
-        ],
-        "pageNumber": 1,
-      },
+      "hasData": false,
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "none",
     },
-    "status": "Paging",
+    "status": "Fetching",
   },
 }
 `;
@@ -37,24 +44,42 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
-    "update": [Function],
   },
-  "renderCount": 4,
+  "renderCount": 5,
+  "renderParams": Object {
+    "id": "testKey",
+    "page": 2,
+    "paging": Object {
+      "pageSize": 10,
+    },
+  },
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "result": Object {
-        "data": Array [
-          "Test",
-          "Test2",
-        ],
-        "pageNumber": 2,
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
       },
+      "result": Array [
+        "Test2",
+      ],
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
+      },
       "success": true,
-      "type": "page",
+      "type": "fetch",
     },
     "status": "Idle",
   },
@@ -68,24 +93,42 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
-    "update": [Function],
   },
-  "renderCount": 4,
+  "renderCount": 5,
+  "renderParams": Object {
+    "id": "testKey",
+    "page": 2,
+    "paging": Object {
+      "pageSize": 10,
+    },
+  },
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "result": Object {
-        "data": Array [
-          "Test",
-          "Test2",
-        ],
-        "pageNumber": 2,
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
       },
+      "result": Array [
+        "Test2",
+      ],
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
+      },
       "success": true,
-      "type": "page",
+      "type": "fetch",
     },
     "status": "Idle",
   },
@@ -99,23 +142,42 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 6,
+  "renderParams": Object {
+    "id": "testKey",
+    "page": 2,
+    "paging": Object {
+      "pageSize": 10,
+    },
+  },
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "result": Object {
-        "data": Array [
-          "Test",
-        ],
-        "pageNumber": 1,
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
       },
+      "result": Array [
+        "Test",
+      ],
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
+      },
       "success": true,
-      "type": "refresh",
+      "type": "fetch",
     },
     "status": "Idle",
   },
@@ -129,23 +191,42 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 2,
+  "renderParams": Object {
+    "id": "testKey",
+    "page": 1,
+    "paging": Object {
+      "pageSize": 10,
+    },
+  },
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "result": Object {
-        "data": Array [
-          "Test",
-        ],
-        "pageNumber": 1,
+      "params": Object {
+        "id": "testKey",
+        "page": 1,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
       },
+      "result": Array [
+        "Test",
+      ],
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "page": 1,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
+      },
       "success": true,
-      "type": "initial-fetch",
+      "type": "fetch",
     },
     "status": "Idle",
   },
@@ -159,25 +240,32 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 3,
+  "renderParams": Object {
+    "id": "testKey",
+    "page": 2,
+    "paging": Object {
+      "pageSize": 10,
+    },
+  },
   "renderProps": Object {
     "data": Object {
-      "dataFromServerSideRender": false,
-      "hasData": true,
-      "result": Object {
-        "data": Array [
-          "Test",
-        ],
-        "pageNumber": 1,
-      },
+      "hasData": false,
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "none",
     },
-    "status": "Paging",
+    "status": "Fetching",
   },
 }
 `;
@@ -189,24 +277,42 @@ Object {
   "renderActions": Object {
     "nextPage": [Function],
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 4,
+  "renderParams": Object {
+    "id": "testKey",
+    "page": 2,
+    "paging": Object {
+      "pageSize": 10,
+    },
+  },
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "result": Object {
-        "data": Array [
-          "Test",
-          "Test2",
-        ],
-        "pageNumber": 2,
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
       },
+      "result": Array [
+        "Test2",
+      ],
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "page": 2,
+        "paging": Object {
+          "pageSize": 10,
+        },
+        "resourceType": "testDataType",
+      },
       "success": true,
-      "type": "page",
+      "type": "fetch",
     },
     "status": "Idle",
   },

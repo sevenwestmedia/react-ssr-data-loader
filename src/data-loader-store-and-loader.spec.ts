@@ -11,7 +11,7 @@ describe('get data loader state for asynchronous data load', () => {
     let promiseCompletionSource: Array<PromiseCompletionSource<number>>
     let events: any[]
     let loader: DataLoaderStoreAndLoader
-    let state: LoaderState<any>
+    let state: LoaderState<any, any>
 
     beforeEach(() => {
         promiseCompletionSource = []
@@ -47,69 +47,6 @@ describe('get data loader state for asynchronous data load', () => {
                 expect.objectContaining({ type: 'state-changed' }),
                 expect.objectContaining({ type: 'state-changed' }),
                 expect.objectContaining({ type: 'begin-loading-event' }),
-            ])
-        })
-    })
-
-    describe('when data finishes loading', () => {
-        beforeEach(async () => {
-            promiseCompletionSource[0].resolve(42)
-            await clearEventLoop()
-            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
-        })
-
-        it('is in an idle state', () => {
-            expect(state.status).toBe(LoaderStatus.Idle)
-        })
-
-        it('has the resolved result', () => {
-            expect(state.data.hasData).toBe(true)
-            if (state.data.hasData) {
-                expect(state.data.result).toBe(42)
-            }
-        })
-
-        it('raises end and completed events', () => {
-            expect(events).toEqual([
-                expect.objectContaining({ type: 'state-changed' }),
-                expect.objectContaining({ type: 'state-changed' }),
-                expect.objectContaining({ type: 'begin-loading-event' }),
-                expect.objectContaining({ type: 'state-changed' }),
-                expect.objectContaining({ type: 'end-loading-event' }),
-                expect.objectContaining({ type: 'data-load-completed' }),
-            ])
-        })
-    })
-
-    describe('when data load fails', () => {
-        beforeEach(async () => {
-            promiseCompletionSource[0].reject(new Error('async boom'))
-            await clearEventLoop()
-            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
-        })
-
-        it('is in an idle state', () => {
-            expect(state.status).toBe(LoaderStatus.Idle)
-        })
-
-        it("it's last action failed", () => {
-            expect(state.lastAction.success).toBe(false)
-            if (!state.lastAction.success) {
-                const err = state.lastAction.error
-                expect(() => {
-                    throw err
-                }).toThrowError('async boom')
-            }
-        })
-
-        it('raises end and completed events', () => {
-            expect(events).toEqual([
-                expect.objectContaining({ type: 'state-changed' }),
-                expect.objectContaining({ type: 'state-changed' }),
-                expect.objectContaining({ type: 'begin-loading-event' }),
-                expect.objectContaining({ type: 'state-changed' }),
-                expect.objectContaining({ type: 'load-error' }),
-                expect.objectContaining({ type: 'data-load-completed' }),
             ])
         })
     })
@@ -153,6 +90,114 @@ describe('get data loader state for asynchronous data load', () => {
                     type: 'state-changed',
                     state: {},
                 })
+            })
+        })
+
+        describe('and data finished loading', () => {
+            beforeEach(async () => {
+                promiseCompletionSource[0].resolve(42)
+                await clearEventLoop()
+                state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, {
+                    id: 1,
+                })
+            })
+
+            it('is in an idle state', () => {
+                expect(state.status).toBe(LoaderStatus.Idle)
+            })
+
+            it('has the resolved result', () => {
+                expect(state.data.hasData).toBe(true)
+                if (state.data.hasData) {
+                    expect(state.data.result).toBe(42)
+                }
+            })
+
+            it('raises end and completed events', () => {
+                expect(events).toEqual([
+                    expect.objectContaining({ type: 'state-changed' }),
+                    expect.objectContaining({ type: 'state-changed' }),
+                    expect.objectContaining({ type: 'begin-loading-event' }),
+                    expect.objectContaining({ type: 'state-changed' }),
+                    expect.objectContaining({ type: 'end-loading-event' }),
+                    expect.objectContaining({ type: 'data-load-completed' }),
+                ])
+            })
+
+            describe('then refreshes data', () => {
+                beforeEach(async () => {
+                    loader.getDataLoaderState(
+                        dataLoaderOneId,
+                        registeredResourceType,
+                        { id: 1 },
+                        true,
+                        true,
+                    )
+                    await clearEventLoop()
+                    state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, {
+                        id: 1,
+                    })
+                })
+
+                it('is in an fetching state', () => {
+                    expect(state.status).toBe(LoaderStatus.Fetching)
+                })
+
+                it('it still has data', () => {
+                    expect(state.data.hasData).toBe(true)
+                    if (state.data.hasData) {
+                        expect(state.data.result).toBe(42)
+                    }
+                })
+
+                it('raises end and completed events', () => {
+                    expect(events).toEqual([
+                        expect.objectContaining({ type: 'state-changed' }),
+                        expect.objectContaining({ type: 'state-changed' }),
+                        expect.objectContaining({ type: 'begin-loading-event' }),
+                        expect.objectContaining({ type: 'state-changed' }),
+                        expect.objectContaining({ type: 'end-loading-event' }),
+                        expect.objectContaining({ type: 'data-load-completed' }),
+                        expect.objectContaining({ type: 'state-changed' }),
+                        expect.objectContaining({ type: 'begin-loading-event' }),
+                    ])
+                })
+            })
+        })
+
+        describe('and data load failed', () => {
+            beforeEach(async () => {
+                promiseCompletionSource[0].reject(new Error('async boom'))
+                await clearEventLoop()
+                state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, {
+                    id: 1,
+                })
+            })
+
+            it('is in an idle state', () => {
+                expect(state.status).toBe(LoaderStatus.Idle)
+            })
+
+            it("it's last action failed", () => {
+                expect(state.lastAction.success).toBe(false)
+                if (!state.lastAction.success) {
+                    const err = state.lastAction.error
+                    expect(() => {
+                        throw err
+                    }).toThrowError('async boom')
+                }
+            })
+
+            it('raises end and completed events', () => {
+                expect(events).toEqual([
+                    expect.objectContaining({ type: 'state-changed' }),
+                    expect.objectContaining({ type: 'state-changed' }),
+                    expect.objectContaining({ type: 'begin-loading-event' }),
+                    expect.objectContaining({ type: 'state-changed' }),
+                    expect.objectContaining({ type: 'load-error' }),
+                    expect.objectContaining({ type: 'end-loading-event' }),
+                    expect.objectContaining({ type: 'data-load-completed' }),
+                ])
             })
         })
     })
@@ -202,7 +247,7 @@ describe('get data loader state for synchronous data load', () => {
     const registeredResourceType = 'data'
     let events: any[]
     let loader: DataLoaderStoreAndLoader
-    let state: LoaderState<any>
+    let state: LoaderState<any, any>
 
     describe('and data load will be successful', () => {
         beforeEach(() => {
