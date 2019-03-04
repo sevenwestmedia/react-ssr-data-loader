@@ -27,6 +27,7 @@ export class ComponentWithArgsFixture<T extends object> {
         initialState: DataLoaderState | undefined,
         id: string,
         args: T,
+        cacheKeyProperties: Array<keyof T & string> | undefined,
         isServerSideRender: boolean,
         // For some reason the typescript compiler is not validating the JSX below properly
         // And is saying this variable is not used
@@ -36,44 +37,52 @@ export class ComponentWithArgsFixture<T extends object> {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<Data>()
         this.resources = new DataLoaderResources()
+        // tslint:disable-next-line:no-this-assignment
+        const fixture = this
 
-        const TestDataLoader = this.resources.registerResource(resourceType, params => {
-            this.loadDataCount++
-            this.passedParams = params
-            return this.testDataPromise.promise
-        })
-
-        const TestComponent: React.SFC<{ id: string } & T> = props => (
-            <DataLoaderProvider
-                initialState={initialState}
-                isServerSideRender={isServerSideRender}
-                resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
-                    if (event.type === 'data-load-completed') {
-                        this.loadAllCompletedCalled++
-                    } else if (event.type === 'state-changed') {
-                        this.currentState = event.state
-                    } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
-                        console.info(event.data.error)
-                    }
-                }}
-            >
-                <TestDataLoader
-                    {...props as any}
-                    clientLoadOnly={_clientLoadOnly}
-                    // tslint:disable-next-line:jsx-no-lambda
-                    renderData={(renderProps, actions) => {
-                        this.renderCount++
-                        this.lastRenderProps = renderProps
-                        this.lastRenderActions = actions
-
-                        return null
-                    }}
-                />
-            </DataLoaderProvider>
+        const TestDataLoader = this.resources.registerResource(
+            resourceType,
+            params => {
+                this.loadDataCount++
+                this.passedParams = params
+                return this.testDataPromise.promise
+            },
+            cacheKeyProperties,
         )
+
+        // tslint:disable-next-line:max-classes-per-file
+        class TestComponent extends React.Component<{}, T> {
+            state: T = args
+
+            render() {
+                return (
+                    <DataLoaderProvider
+                        initialState={initialState}
+                        isServerSideRender={isServerSideRender}
+                        resources={fixture.resources}
+                        // tslint:disable-next-line:jsx-no-lambda
+                        onEvent={event => {
+                            if (event.type === 'data-load-completed') {
+                                fixture.loadAllCompletedCalled++
+                            } else if (event.type === 'state-changed') {
+                                fixture.currentState = event.state
+                            }
+                        }}
+                    >
+                        <TestDataLoader
+                            {...this.state as any}
+                            // tslint:disable-next-line:jsx-no-lambda
+                            renderData={(props, actions) => {
+                                fixture.renderCount++
+                                fixture.lastRenderProps = props
+                                fixture.lastRenderActions = actions
+                                return null
+                            }}
+                        />
+                    </DataLoaderProvider>
+                )
+            }
+        }
 
         this.root = mount(<TestComponent id={id} {...args as any} />)
 

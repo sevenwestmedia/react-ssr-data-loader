@@ -28,7 +28,12 @@ describe('get data loader state for asynchronous data load', () => {
             },
             false,
         )
-        state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
+        state = loader.getDataLoaderState(
+            dataLoaderOneId,
+            registeredResourceType,
+            { id: 1 },
+            undefined,
+        )
     })
 
     describe('when not mounted yet', () => {
@@ -57,7 +62,13 @@ describe('get data loader state for asynchronous data load', () => {
         it('it calls update on mount', async () => {
             promiseCompletionSource[0].resolve(0)
             await clearEventLoop()
-            loader.attach(dataLoaderOneId, registeredResourceType, { id: 1 }, () => updateCalled++)
+            loader.attach(
+                dataLoaderOneId,
+                registeredResourceType,
+                { id: 1 },
+                undefined,
+                () => updateCalled++,
+            )
 
             expect(updateCalled).toBe(1)
         })
@@ -66,7 +77,13 @@ describe('get data loader state for asynchronous data load', () => {
     describe('when data loader mounted', () => {
         let updateCalled = 0
         beforeEach(() => {
-            loader.attach(dataLoaderOneId, registeredResourceType, { id: 1 }, () => updateCalled++)
+            loader.attach(
+                dataLoaderOneId,
+                registeredResourceType,
+                { id: 1 },
+                undefined,
+                () => updateCalled++,
+            )
         })
 
         it('update should not be called', () => {
@@ -82,7 +99,7 @@ describe('get data loader state for asynchronous data load', () => {
 
         describe('then unmounts', () => {
             beforeEach(() => {
-                loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 })
+                loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 }, undefined)
             })
 
             it('should remove the state', () => {
@@ -97,9 +114,14 @@ describe('get data loader state for asynchronous data load', () => {
             beforeEach(async () => {
                 promiseCompletionSource[0].resolve(42)
                 await clearEventLoop()
-                state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, {
-                    id: 1,
-                })
+                state = loader.getDataLoaderState(
+                    dataLoaderOneId,
+                    registeredResourceType,
+                    {
+                        id: 1,
+                    },
+                    undefined,
+                )
             })
 
             it('is in an idle state', () => {
@@ -130,13 +152,19 @@ describe('get data loader state for asynchronous data load', () => {
                         dataLoaderOneId,
                         registeredResourceType,
                         { id: 1 },
+                        undefined,
                         true,
                         true,
                     )
                     await clearEventLoop()
-                    state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, {
-                        id: 1,
-                    })
+                    state = loader.getDataLoaderState(
+                        dataLoaderOneId,
+                        registeredResourceType,
+                        {
+                            id: 1,
+                        },
+                        undefined,
+                    )
                 })
 
                 it('is in an fetching state', () => {
@@ -169,9 +197,14 @@ describe('get data loader state for asynchronous data load', () => {
             beforeEach(async () => {
                 promiseCompletionSource[0].reject(new Error('async boom'))
                 await clearEventLoop()
-                state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, {
-                    id: 1,
-                })
+                state = loader.getDataLoaderState(
+                    dataLoaderOneId,
+                    registeredResourceType,
+                    {
+                        id: 1,
+                    },
+                    undefined,
+                )
             })
 
             it('is in an idle state', () => {
@@ -204,7 +237,7 @@ describe('get data loader state for asynchronous data load', () => {
 
     describe('when data loader unmounts before data finishes loading', () => {
         beforeEach(() => {
-            loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 })
+            loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 }, undefined)
         })
 
         it('should remove the state', () => {
@@ -262,7 +295,12 @@ describe('get data loader state for synchronous data load', () => {
                 },
                 false,
             )
-            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
+            state = loader.getDataLoaderState(
+                dataLoaderOneId,
+                registeredResourceType,
+                { id: 1 },
+                undefined,
+            )
         })
 
         describe('when not mounted yet', () => {
@@ -301,7 +339,12 @@ describe('get data loader state for synchronous data load', () => {
                 },
                 false,
             )
-            state = loader.getDataLoaderState(dataLoaderOneId, registeredResourceType, { id: 1 })
+            state = loader.getDataLoaderState(
+                dataLoaderOneId,
+                registeredResourceType,
+                { id: 1 },
+                undefined,
+            )
         })
 
         it('enters a Idle state immediately', () => {

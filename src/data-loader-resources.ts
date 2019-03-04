@@ -35,6 +35,7 @@ export class DataLoaderResources<TGlobalParameters> {
     registerResource<TData, TResourceParameters>(
         resourceType: string,
         loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>,
+        cacheKeyProperties?: Array<keyof TResourceParameters & string>,
     ) {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
@@ -54,7 +55,7 @@ export class DataLoaderResources<TGlobalParameters> {
             TResourceParameters,
             {},
             typeof actions
-        >(resourceType, {}, actions)
+        >(resourceType, {}, actions, cacheKeyProperties)
         this.resources[resourceType] = loadResource
 
         return typedDataLoader
@@ -69,6 +70,7 @@ export class DataLoaderResources<TGlobalParameters> {
             PageState,
             TGlobalParameters
         >,
+        cacheKeyProperties?: Array<keyof TResourceParameters & string>,
     ) {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
@@ -104,7 +106,7 @@ export class DataLoaderResources<TGlobalParameters> {
             PageComponentProps & TResourceParameters,
             PageState,
             typeof actions
-        >(resourceType, { page: 1 }, actions)
+        >(resourceType, { page: 1 }, actions, cacheKeyProperties)
         this.resources[resourceType] = loadResource
 
         return typedDataLoader
