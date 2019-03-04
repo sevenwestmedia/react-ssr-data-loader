@@ -18,7 +18,8 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true,
         "declaration": true,
-        "lib": ["dom", "es5", "es2015.promise"]
+        "lib": ["dom", "es5", "es2015.promise"],
+        "importHelpers": true
     },
     "exclude": ["node_modules"]
 }
