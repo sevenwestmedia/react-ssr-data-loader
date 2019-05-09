@@ -1,17 +1,13 @@
 import React from 'react'
-import { Props } from '../../src/data-loader'
+import { Props, UserActions } from '../../src/data-loader'
 import { DataLoaderProvider } from '../../src/data-provider'
-import {
-    DataLoaderResources,
-    PageActions,
-    PagedData,
-    PageComponentProps
-} from '../../src/data-loader-resources'
-import { DataLoaderState, LoaderState } from '../../src/data-loader-state'
+import { DataLoaderResources, PagedData, PageComponentProps } from '../../src/data-loader-resources'
+import { LoaderState } from '../../src/data-loader-state'
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
 // tslint:disable-next-line:no-empty-interface
 export interface DataResource {}
@@ -20,32 +16,33 @@ export class PagedComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps!: LoaderState<DataResource>
+    lastRenderProps!: LoaderState<DataResource, any>
     testDataPromise: PromiseCompletionSource<DataResource[]>
-    root: ReactWrapper<{ resourceId: string }, any>
-    component: ReactWrapper<Props<PagedData<DataResource>, PageActions> & PageComponentProps, any>
+    root: ReactWrapper<{ id: string }, any>
+    component: ReactWrapper<Props<PagedData<DataResource>, any, any> & PageComponentProps, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderActions!: PageActions
+    lastRenderActions!: UserActions<'nextPage' | 'refresh'>
+    lastRenderParams?: any
 
     constructor(
         initialState: DataLoaderState | undefined,
-        resourceId: string,
+        id: string,
         isServerSideRender: boolean,
-        clientLoadOnly = false
+        clientLoadOnly = false,
     ) {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerPagedResource<DataResource>(
+        const TestDataLoader = this.resources.registerPagedResource<DataResource, { id: string }>(
             'testDataType',
             () => {
                 this.loadDataCount++
                 return this.testDataPromise.promise
-            }
+            },
         )
 
-        const TestComponent: React.SFC<{ resourceId: string }> = testComponentProps => (
+        const TestComponent: React.SFC<{ id: string }> = testComponentProps => (
             <DataLoaderProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
@@ -63,21 +60,22 @@ export class PagedComponentFixture {
                 }}
             >
                 <TestDataLoader
-                    resourceId={testComponentProps.resourceId}
+                    id={testComponentProps.id}
                     paging={{ pageSize: 10 }}
                     clientLoadOnly={clientLoadOnly}
                     // tslint:disable-next-line:jsx-no-lambda
-                    renderData={(props, actions) => {
+                    renderData={(props, actions, params) => {
                         this.renderCount++
                         this.lastRenderProps = props
                         this.lastRenderActions = actions
+                        this.lastRenderParams = params
                         return null
                     }}
                 />
             </DataLoaderProvider>
         )
 
-        this.root = mount(<TestComponent resourceId={resourceId} />)
+        this.root = mount(<TestComponent id={id} />)
 
         this.component = this.root.find(TestDataLoader)
     }
@@ -98,7 +96,8 @@ export class PagedComponentFixture {
             loadAllCompletedCalled: this.loadAllCompletedCalled,
             renderProps: this.lastRenderProps,
             renderActions: this.lastRenderActions,
-            loadDataCount: this.loadDataCount
+            renderParams: this.lastRenderParams,
+            loadDataCount: this.loadDataCount,
         }).toMatchSnapshot()
     }
 

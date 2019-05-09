@@ -1,29 +1,26 @@
-import { DataLoaderState } from './data-loader-state'
+import { DataLoaderState } from './data-loader-store-and-loader'
 
 export interface BeginLoadingEvent {
     type: 'begin-loading-event'
     data: {
-        numberLoading: number
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 export interface EndLoadingEvent {
     type: 'end-loading-event'
 
     data: {
-        numberLoading: number
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 export interface DataLoadCompletedEvent {
     type: 'data-load-completed'
 
     data: {
-        numberLoading: number
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 export interface StateChangedEvent {
@@ -34,10 +31,9 @@ export interface LoadErrorEvent {
     type: 'load-error'
 
     data: {
-        error: Error
-        errorMessage: string
+        error: any
         resourceType: string
-        resourceId: string
+        resourceLoadParamsHash: string
     }
 }
 

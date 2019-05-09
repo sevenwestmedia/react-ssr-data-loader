@@ -4,134 +4,172 @@ exports[`data-loader calling refresh when already refreshing ignores the action 
 Object {
   "events": Array [
     Object {
-      "state": Object {
-        "data": Object {},
-        "loadingCount": 0,
-      },
+      "state": Object {},
       "type": "state-changed",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "hasData": false,
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "none",
-              },
-              "status": "Fetching",
-            },
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "hasData": false,
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
         },
-        "loadingCount": 1,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "initial-fetch",
-              },
-              "status": "Idle",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "fetch",
+          },
+          "status": "Idle",
         },
-        "loadingCount": 0,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "numberLoading": 0,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "none",
-              },
-              "status": "Refreshing",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
         },
-        "loadingCount": 1,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
+        "resourceType": "testDataType",
+      },
+      "type": "begin-loading-event",
+    },
+    Object {
+      "state": Object {
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
+            },
+          },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
+        },
+      },
+      "type": "state-changed",
+    },
+    Object {
+      "data": Object {
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
   ],
-  "existingData": undefined,
   "loadAllCompletedCalled": 1,
-  "loadDataCount": 2,
+  "loadDataCount": 3,
   "renderActions": Object {
     "refresh": [Function],
-    "update": [Function],
   },
-  "renderCount": 3,
+  "renderCount": 4,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Test",
       },
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "none",
     },
-    "status": "Refreshing",
+    "status": "Fetching",
   },
 }
 `;
@@ -140,100 +178,102 @@ exports[`data-loader can refresh data 1`] = `
 Object {
   "events": Array [
     Object {
-      "state": Object {
-        "data": Object {},
-        "loadingCount": 0,
-      },
+      "state": Object {},
       "type": "state-changed",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "hasData": false,
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "none",
-              },
-              "status": "Fetching",
-            },
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "hasData": false,
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
         },
-        "loadingCount": 1,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "initial-fetch",
-              },
-              "status": "Idle",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "fetch",
+          },
+          "status": "Idle",
         },
-        "loadingCount": 0,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "numberLoading": 0,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
     },
   ],
-  "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 1,
   "renderActions": Object {
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Test",
       },
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
-      "type": "initial-fetch",
+      "type": "fetch",
     },
     "status": "Idle",
   },
@@ -244,134 +284,138 @@ exports[`data-loader can refresh data 2`] = `
 Object {
   "events": Array [
     Object {
-      "state": Object {
-        "data": Object {},
-        "loadingCount": 0,
-      },
+      "state": Object {},
       "type": "state-changed",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "hasData": false,
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "none",
-              },
-              "status": "Fetching",
-            },
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "hasData": false,
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
         },
-        "loadingCount": 1,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "initial-fetch",
-              },
-              "status": "Idle",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "fetch",
+          },
+          "status": "Idle",
         },
-        "loadingCount": 0,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "numberLoading": 0,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "none",
-              },
-              "status": "Refreshing",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
         },
-        "loadingCount": 1,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
   ],
-  "existingData": undefined,
   "loadAllCompletedCalled": 1,
   "loadDataCount": 2,
   "renderActions": Object {
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 3,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Test",
       },
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
       "type": "none",
     },
-    "status": "Refreshing",
+    "status": "Fetching",
   },
 }
 `;
@@ -380,172 +424,177 @@ exports[`data-loader can refresh data 3`] = `
 Object {
   "events": Array [
     Object {
-      "state": Object {
-        "data": Object {},
-        "loadingCount": 0,
-      },
+      "state": Object {},
       "type": "state-changed",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "hasData": false,
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "none",
-              },
-              "status": "Fetching",
-            },
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "hasData": false,
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
         },
-        "loadingCount": 1,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "initial-fetch",
-              },
-              "status": "Idle",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "fetch",
+          },
+          "status": "Idle",
         },
-        "loadingCount": 0,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "numberLoading": 0,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "none",
-              },
-              "status": "Refreshing",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "none",
+          },
+          "status": "Fetching",
         },
-        "loadingCount": 1,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
       "state": Object {
-        "data": Object {
-          "testDataType": Object {
-            "testKey": Object {
-              "data": Object {
-                "dataFromServerSideRender": false,
-                "hasData": true,
-                "result": Object {
-                  "result": "Test2",
-                },
-              },
-              "lastAction": Object {
-                "success": true,
-                "type": "refresh",
-              },
-              "status": "Idle",
+        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+          "data": Object {
+            "dataFromServerSideRender": false,
+            "hasData": true,
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "result": Object {
+              "result": "Test2",
             },
           },
+          "lastAction": Object {
+            "params": Object {
+              "id": "testKey",
+              "resourceType": "testDataType",
+            },
+            "success": true,
+            "type": "fetch",
+          },
+          "status": "Idle",
         },
-        "loadingCount": 0,
       },
       "type": "state-changed",
     },
     Object {
       "data": Object {
-        "numberLoading": 1,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "numberLoading": 0,
-        "resourceId": "testKey",
+        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
     },
   ],
-  "existingData": undefined,
   "loadAllCompletedCalled": 2,
   "loadDataCount": 2,
   "renderActions": Object {
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 4,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Test2",
       },
     },
     "lastAction": Object {
+      "params": Object {
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "success": true,
-      "type": "refresh",
+      "type": "fetch",
     },
     "status": "Idle",
   },

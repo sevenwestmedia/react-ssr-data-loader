@@ -6,58 +6,34 @@ Object {
   "loadDataCount": 1,
   "passedParams": Object {
     "bar": 1,
+    "id": "testKey",
+    "resourceType": "testDataType",
   },
   "renderActions": Object {
     "refresh": [Function],
-    "update": [Function],
   },
   "renderCount": 2,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
+      "params": Object {
+        "bar": 1,
+        "id": "testKey",
+        "resourceType": "testDataType",
+      },
       "result": Object {
         "result": "Test",
       },
     },
     "lastAction": Object {
-      "success": true,
-      "type": "initial-fetch",
-    },
-    "status": "Idle",
-  },
-}
-`;
-
-exports[`data-loader existing data is passed when params change 1`] = `
-Object {
-  "result": "Test",
-}
-`;
-
-exports[`data-loader updates data when params change 1`] = `
-Object {
-  "loadAllCompletedCalled": 2,
-  "loadDataCount": 2,
-  "passedParams": Object {
-    "bar": 2,
-  },
-  "renderActions": Object {
-    "refresh": [Function],
-    "update": [Function],
-  },
-  "renderCount": 4,
-  "renderProps": Object {
-    "data": Object {
-      "dataFromServerSideRender": false,
-      "hasData": true,
-      "result": Object {
-        "result": "Test2",
+      "params": Object {
+        "bar": 1,
+        "id": "testKey",
+        "resourceType": "testDataType",
       },
-    },
-    "lastAction": Object {
       "success": true,
-      "type": "update",
+      "type": "fetch",
     },
     "status": "Idle",
   },

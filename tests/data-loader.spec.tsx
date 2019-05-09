@@ -7,6 +7,7 @@ import { DataLoaderResources } from '../src/index'
 // tslint:disable-next-line:no-implicit-dependencies
 import { mount, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
+import { processEventLoop } from './helpers/event-loop-helpers'
 
 configure({ adapter: new Adapter() })
 
@@ -36,7 +37,7 @@ describe('data-loader', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.resetPromise()
-        sut.root.setProps({ resourceId: 'newData' })
+        sut.root.setProps({ id: 'newData' })
         await sut.testDataPromise.resolve({ result: 'Success2!' })
 
         sut.assertState()
@@ -47,7 +48,7 @@ describe('data-loader', () => {
 
         await sut.testDataPromise.resolve({ result: 'Success!' })
         sut.root.unmount()
-        await new Promise(resolve => setTimeout(resolve))
+        await processEventLoop()
 
         sut.assertState()
     })
@@ -62,7 +63,7 @@ describe('data-loader', () => {
             isServerSideRender: false,
             onEvent: () => {
                 throw new Error('Boom')
-            }
+            },
         })
         await sut.testDataPromise.resolve({ result: 'Test' })
 
@@ -86,23 +87,6 @@ describe('data-loader', () => {
         expect(sut.loadAllCompletedCalled).toBe(1)
     })
 
-    it('can support preserving data on unmount', async () => {
-        let sut = new ComponentFixture(undefined, 'testKey', {
-            isServerSideRender: false,
-            unloadDataOnUnmount: false
-        })
-        await sut.testDataPromise.resolve({ result: 'Test' })
-        await sut.unmount()
-
-        sut.assertState()
-        // Check we can re-mount the existing data
-        sut = new ComponentFixture(sut.currentState, 'testKey', {
-            isServerSideRender: false,
-            unloadDataOnUnmount: false
-        })
-        sut.assertState()
-    })
-
     it('throws when the same resource is registered multiple times', () => {
         const resources = new DataLoaderResources()
 
@@ -120,13 +104,13 @@ describe('data-loader', () => {
     it('resource can resolve synchronously', async () => {
         const resources = new DataLoaderResources()
 
-        const LoadTest = resources.registerResource('test', () => 'Result!')
+        const LoadTest = resources.registerResource<string, { id: string }>('test', () => 'Result!')
         let loadCount = 0
 
         const wrapper = mount(
             <DataLoaderProvider resources={resources}>
                 <LoadTest
-                    resourceId="Test!"
+                    id="Test!"
                     // tslint:disable-next-line:jsx-no-lambda
                     renderData={renderProps => {
                         loadCount++
@@ -137,11 +121,11 @@ describe('data-loader', () => {
                         return <div>No data!</div>
                     }}
                 />
-            </DataLoaderProvider>
+            </DataLoaderProvider>,
         )
 
         expect(wrapper.html()).toMatchSnapshot()
-        await new Promise(resolve => setTimeout(resolve))
+        await processEventLoop()
 
         expect(loadCount).toBe(1)
     })
@@ -149,7 +133,7 @@ describe('data-loader', () => {
     it('data loader handles synchronous throw', async () => {
         const resources = new DataLoaderResources()
 
-        const LoadTest = resources.registerResource('test', () => {
+        const LoadTest = resources.registerResource<string, { id: string }>('test', () => {
             throw new Error('Synchronous fail')
         })
         let loadCount = 0
@@ -157,7 +141,7 @@ describe('data-loader', () => {
         const wrapper = mount(
             <DataLoaderProvider resources={resources}>
                 <LoadTest
-                    resourceId="Test!"
+                    id="Test!"
                     // tslint:disable-next-line:jsx-no-lambda
                     renderData={renderProps => {
                         loadCount++
@@ -171,11 +155,11 @@ describe('data-loader', () => {
                         return <div>No data!</div>
                     }}
                 />
-            </DataLoaderProvider>
+            </DataLoaderProvider>,
         )
 
         expect(wrapper.html()).toMatchSnapshot()
-        await new Promise(resolve => setTimeout(resolve))
+        await processEventLoop()
 
         expect(loadCount).toBe(1)
     })
@@ -185,14 +169,14 @@ describe('data-loader', () => {
             isServerSideRender: false,
             unloadDataOnUnmount: false,
             syncResult: {
-                result: 'Result!'
-            }
+                result: 'Result!',
+            },
         })
 
         sut.testDataResult = {
-            result: 'Result2!'
+            result: 'Result2!',
         }
-        sut.root.setProps({ resourceId: 'newData' })
+        sut.setId('newData')
 
         sut.assertState()
     })
