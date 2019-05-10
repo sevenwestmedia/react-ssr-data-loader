@@ -17,21 +17,11 @@ Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "params": Object {
-        "bar": 1,
-        "id": "testKey",
-        "resourceType": "testDataType",
-      },
       "result": Object {
         "result": "Test",
       },
     },
     "lastAction": Object {
-      "params": Object {
-        "bar": 1,
-        "id": "testKey",
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "fetch",
     },

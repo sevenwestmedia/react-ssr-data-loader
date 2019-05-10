@@ -21,14 +21,6 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "none",
     },
@@ -57,27 +49,11 @@ Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "result": Array [
         "Test2",
       ],
     },
     "lastAction": Object {
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "fetch",
     },
@@ -106,27 +82,11 @@ Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "result": Array [
         "Test2",
       ],
     },
     "lastAction": Object {
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "fetch",
     },
@@ -155,27 +115,11 @@ Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "result": Array [
         "Test",
       ],
     },
     "lastAction": Object {
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "fetch",
     },
@@ -204,27 +148,11 @@ Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "params": Object {
-        "id": "testKey",
-        "page": 1,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "result": Array [
         "Test",
       ],
     },
     "lastAction": Object {
-      "params": Object {
-        "id": "testKey",
-        "page": 1,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "fetch",
     },
@@ -254,14 +182,6 @@ Object {
       "hasData": false,
     },
     "lastAction": Object {
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "none",
     },
@@ -290,27 +210,11 @@ Object {
     "data": Object {
       "dataFromServerSideRender": false,
       "hasData": true,
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "result": Array [
         "Test2",
       ],
     },
     "lastAction": Object {
-      "params": Object {
-        "id": "testKey",
-        "page": 2,
-        "paging": Object {
-          "pageSize": 10,
-        },
-        "resourceType": "testDataType",
-      },
       "success": true,
       "type": "fetch",
     },

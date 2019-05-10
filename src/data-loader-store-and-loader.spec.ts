@@ -11,7 +11,7 @@ describe('get data loader state for asynchronous data load', () => {
     let promiseCompletionSource: Array<PromiseCompletionSource<number>>
     let events: any[]
     let loader: DataLoaderStoreAndLoader
-    let state: LoaderState<any, any>
+    let state: LoaderState<any>
 
     beforeEach(() => {
         promiseCompletionSource = []
@@ -280,7 +280,7 @@ describe('get data loader state for synchronous data load', () => {
     const registeredResourceType = 'data'
     let events: any[]
     let loader: DataLoaderStoreAndLoader
-    let state: LoaderState<any, any>
+    let state: LoaderState<any>
 
     describe('and data load will be successful', () => {
         beforeEach(() => {

@@ -28,10 +28,10 @@ export class ComponentFixture {
     /** Used instead of the promise to trigger sync data load */
     testDataResult?: Data
     testDataPromise: PromiseCompletionSource<Data>
-    component: ReactWrapper<Props<Data, any, any>, any>
+    component: ReactWrapper<Props<Data, any, { id: string }> & { id: string }, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data, any>
+    lastRenderProps!: LoaderState<Data>
     lastRenderActions!: UserActions<any>
     events: any[] = []
 

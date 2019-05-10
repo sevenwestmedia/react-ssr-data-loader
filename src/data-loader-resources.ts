@@ -24,7 +24,7 @@ export interface Paging {
 export interface PageComponentProps {
     paging: Paging
 }
-interface PageState {
+export interface PageState {
     page: number
 }
 
@@ -41,7 +41,7 @@ export class DataLoaderResources<TGlobalParameters> {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<{}, TData, TResourceParameters> = {
+        const actions: DataLoaderActions<{}, TData> = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,
@@ -76,11 +76,7 @@ export class DataLoaderResources<TGlobalParameters> {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<
-            PageState,
-            PagedData<TData>,
-            TResourceParameters & PageComponentProps
-        > = {
+        const actions: DataLoaderActions<PageState, PagedData<TData>> = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,

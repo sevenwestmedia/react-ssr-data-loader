@@ -1,7 +1,12 @@
 import React from 'react'
 import { Props, UserActions } from '../../src/data-loader'
 import { DataLoaderProvider } from '../../src/data-provider'
-import { DataLoaderResources, PagedData, PageComponentProps } from '../../src/data-loader-resources'
+import {
+    DataLoaderResources,
+    PagedData,
+    PageComponentProps,
+    PageState,
+} from '../../src/data-loader-resources'
 import { LoaderState } from '../../src/data-loader-state'
 
 // tslint:disable-next-line:no-implicit-dependencies
@@ -16,10 +21,14 @@ export class PagedComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
-    lastRenderProps!: LoaderState<DataResource, any>
+    lastRenderProps!: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ id: string }, any>
-    component: ReactWrapper<Props<PagedData<DataResource>, any, any> & PageComponentProps, any>
+    component: ReactWrapper<
+        Props<PagedData<DataResource>, any, PageComponentProps & { id: string } & PageState> &
+            PageComponentProps & { id: string },
+        any
+    >
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
     lastRenderActions!: UserActions<'nextPage' | 'refresh'>

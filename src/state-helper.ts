@@ -5,7 +5,7 @@ export function getDataState(
     keepData: boolean,
     previousRenderParamsHash: string | undefined,
     dataLoaderState: DataLoaderState,
-): Data<any, any> {
+): Data<any> {
     if (previousRenderParamsHash && dataLoaderState[previousRenderParamsHash] && keepData) {
         return dataLoaderState[previousRenderParamsHash].data
     }

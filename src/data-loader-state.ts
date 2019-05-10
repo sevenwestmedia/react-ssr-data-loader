@@ -1,12 +1,10 @@
-export interface SuccessAction<TParams> {
+export interface SuccessAction {
     type: 'none' | 'fetch'
-    params: TParams
     success: true
 }
 
-export interface FailedAction<TParams> {
+export interface FailedAction {
     type: 'fetch'
-    params: TParams
     success: false
     error: Error
 }
@@ -23,19 +21,17 @@ export enum LoaderStatus {
     Fetching = 'Fetching',
 }
 
-export interface LoaderState<TData, TParams> {
+export interface LoaderState<TData> {
     status: LoaderStatus
-    lastAction: SuccessAction<TParams> | FailedAction<TParams>
-    data: Data<TData, TParams>
+    lastAction: SuccessAction | FailedAction
+    data: Data<TData>
 }
 
 // @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
-export type Data<TData, TParams> =
+export type Data<TData> =
     | {
           hasData: true
           result: TData
           dataFromServerSideRender: boolean
-          /** The parameters used to load the data */
-          params: TParams
       }
     | { hasData: false }
