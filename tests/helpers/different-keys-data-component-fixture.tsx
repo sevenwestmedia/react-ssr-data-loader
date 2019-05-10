@@ -18,11 +18,11 @@ export class DifferentKeysDataComponentFixture {
     testDataPromise: PromiseCompletionSource<Data>
     testDataPromise2: PromiseCompletionSource<Data>
     root: ReactWrapper<{ id: string }, any>
-    component: ReactWrapper<Props<Data, any, any>, any>
+    component: ReactWrapper<Props<Data, any, { id: string }> & { id: string }, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data, any>
-    lastRenderProps2!: LoaderState<Data, any>
+    lastRenderProps!: LoaderState<Data>
+    lastRenderProps2!: LoaderState<Data>
     lastRenderActions1!: UserActions<any>
     lastRenderActions2!: UserActions<any>
 

@@ -5,7 +5,7 @@ import { LoaderState } from './data-loader-state'
 import cuid from 'cuid'
 
 export type RenderData<TData, TActions, TParams> = (
-    loaderProps: LoaderState<TData, TParams>,
+    loaderProps: LoaderState<TData>,
     actions: UserActions<keyof TActions>,
     params: TParams,
 ) => React.ReactElement<any> | null
@@ -23,13 +23,13 @@ export type Return<TResource, TActions, TDataLoaderParams, TInternalState> = Rea
     Props<TResource, TActions, TDataLoaderParams & TInternalState> & TDataLoaderParams
 >
 
-export type DataLoaderAction<TInternalState, TData, TParams> = (
+export type DataLoaderAction<TInternalState, TData> = (
     internalState: TInternalState,
-    loaderState: LoaderState<TData, TParams>,
+    loaderState: LoaderState<TData>,
 ) => ActionResult<TInternalState> | null
 
-export interface DataLoaderActions<TInternalState, TData, TParams> {
-    [actionName: string]: DataLoaderAction<TInternalState, TData, TParams>
+export interface DataLoaderActions<TInternalState, TData> {
+    [actionName: string]: DataLoaderAction<TInternalState, TData>
 }
 
 export type UserActions<TActions extends string | number | symbol> = {
@@ -40,7 +40,7 @@ export function createTypedDataLoader<
     TResource,
     TDataLoaderParams extends {},
     TInternalState extends {},
-    TActions extends DataLoaderActions<TInternalState, TResource, TDataLoaderParams>
+    TActions extends DataLoaderActions<TInternalState, TResource>
 >(
     resourceType: string,
     initialInternalState: TInternalState,

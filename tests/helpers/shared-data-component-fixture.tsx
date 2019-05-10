@@ -25,11 +25,22 @@ export class SharedDataComponentFixture {
         },
         any
     >
-    component: ReactWrapper<Props<Data, any, any>, any>
+    component: ReactWrapper<
+        Props<
+            Data,
+            any,
+            {
+                id: string
+            }
+        > & {
+            id: string
+        },
+        any
+    >
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data, any>
-    lastRenderProps2!: LoaderState<Data, any>
+    lastRenderProps!: LoaderState<Data>
+    lastRenderProps2!: LoaderState<Data>
 
     constructor(
         initialState: DataLoaderState | undefined,

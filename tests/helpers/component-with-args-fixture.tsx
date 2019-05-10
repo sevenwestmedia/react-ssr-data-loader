@@ -20,7 +20,7 @@ export class ComponentWithArgsFixture<T extends object> {
     resources: DataLoaderResources<any>
     passedParams!: T
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data, any>
+    lastRenderProps!: LoaderState<Data>
     lastRenderActions!: UserActions<any>
 
     constructor(
