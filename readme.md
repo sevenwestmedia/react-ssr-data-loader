@@ -1,123 +1,201 @@
-# React-Redux Data Loader
+# React SSR Data Loader
 
-Redux is great for storing data which lives for the lifetime of the application but falls down
-when the site is page based and redux is being used to transfer data for server side renders.
+This library makes declaritive data loading in React easy with full server side rendering support. It is also fully type safe for those using TypeScript.
 
-This component is a child as function component which takes care of correctly loading data, including:
+## Why?
 
-* Ensuring data is not loaded again directly after server side rendering
-* Removing the data from memory once the component is unmounted (optionally)
-* Track loading states so you can focus on rendering based on the status
-* Refreshing data
-* Paging data
+Server side rendering without data loading is easy. When you need to load data on the server, transfer it to the client and hydrate it becomes much harder. Many libraries which solve this are all in, for example Next.JS. This library is standalone and can be dropped into an existing project.
 
-## Notes
+## Getting started
 
-* Data loading arguments are not taken into account when checking to see if the data is already loaded
-  * This means if you use two data loaders with the same type and key but different arguments the second data loader will still use the data from the first.
-  * This will change in a future version
+These steps show how you would load a blog post using the data loader.
 
-## Usage
+### 1. Create a `DataLoaderResources`
 
-The samples below are for TypeScript
+```ts
+import { DataLoaderResources } from 'react-ssr-data-loader'
 
-First you need a data provider at the top level
-
-```tsx
-import { DataLoaderResources, DataProvider } from 'redux-data-loader'
-
-// Initialise the resources, you pass this to the DataProvider
 const resources = new DataLoaderResources()
+```
 
-// Step 1, register a resource, this will return you a data loader React Component
-export const TestDataLoader = this.resources.registerResource(
-    'testDataType',
-    (dataKey: string) => Promise.resolve(['data']
-)
+This is the entry point to the library, you can register `resources` (types of data you want to load).
 
-const Root: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
-    <DataProvider resources={this.resources}>
-        <App />
-    </DataProvider>
+### 2. Register a resource
+
+```ts
+// TypeScript
+
+interface Blog {
+    id: string
+
+    heading: string
+
+    /** Array of paragraphs */
+    content: string[]
+}
+interface BlogLoadArguments {
+    id: string
+}
+
+/** Register the resource **/
+// Generic arguments are specifying the data type & the load arguments
+// The function parameters are the resource type (should be unique for each resource), and a function to load the data
+const BlogDataLoader = resources.registerResource<Blog, BlogLoadArguments>('blog', ({ id }) => {
+    // Should do error handling etc here
+    return fetch(`/api/${id}`)
+        .then(checkStatus)
+        .then(res => res.json())
+})
+
+// JavaScript
+const BlogDataLoader = resources.registerResource('blog', ({ id }) =>
+    fetch(`/api/${id}`)
+        .then(checkStatus)
+        .then(res => res.json()),
 )
 ```
 
-```tsx
-import { TestDataLoader } from './root'
+### 3. Use the Data loader component
 
-// Use it
-<TestDataLoader
-    dataKey={dataKey}
-    clientLoadOnly={clientLoadOnly}
-    renderData={(props) => {
-        // Props has properties like isLoaded, isError and when loaded successfully
-        // It will have the data and additional actions
-    }
-/>
+```tsx
+import { DataProvider } from 'react-ssr-data-loader'
+
+// Wrap your application in a DataProvider, passing your resources
+<DataProvider resources={resources}>
+
+    {/* Example using React router (this is optional, this library is independent) */}
+    <Route
+        path="/blog/:id"
+        component={BlogPage}
+    />
+
+</DataProvider>
+
+const BlogPage: React.FC =({ match }) => (
+    // The BlogDataLoader props are BlogLoadArguments + a `renderData` function
+    <BlogDataLoader
+        id={match.params.id}
+        renderData={(params) => {
+            // Handle rendering failure
+            if (!params.lastAction.success) {
+                console.log('Failed to load blog', params.lastAction.error)
+
+                return <div>Failed to load</div>
+            }
+
+            if (params.data.hasData) {
+                // params.data.result is type 'Blog'
+                <BlogArticle blog={params.data.result} />
+            }
+
+            return <div>Loading...</div>
+        }
+    />
+)
 ```
 
-### Transferring data from server to client
+That's it, the data loader will take care of loading the data when the params change automatically.
 
-In server side rendering scenarios you need to transfer the loaded state to the client
+## Server side rendering
 
-You can do this with a similar approach to when using Redux.
+To enable server side rendering there are a few components. The implementation will change depending on how you are doing your server side rendering, the data loader exposes events to enable it to work with most other libraries.
+
+### 1. Tracking data loads
+
+This is just one way you could do this, but this approach has worked pretty well for us.
 
 ```tsx
-// On server
-let state: any
+import serializeJavaScript from 'serialize-javascript'
+import { PromiseCompletionSource } from 'promise-completion-source'
+import { DataProvider, DataLoaderState } from 'react-ssr-data-loader'
 
-const Root: React.SFC = () => (
+// This object contains a promise, and ways to trigger completion.
+const promiseCompletionSource = new PromiseCompletionSource()
+let loadTriggered = false
+let state: DataLoaderState | undefined
+
+let rendered = ReactDOMServer.renderToString(
     <DataProvider
+        isServerSideRender={true}
         resources={resources}
-        onEvent={e => {
+        onEvent={event => {
+            if (event.type === 'begin-loading-event') {
+                // A data load event has been triggered
+                loadTriggered = true
+            }
+            if (event.type === 'data-load-completed') {
+                // Data loading done, complete the promise
+                promiseCompletionSource.resolve()
+            }
+
+            // Whenever the internal data loader state changes,
+            // capture it, you will need it later (it contains your data!)
             if (event.type === 'state-changed') {
                 state = event.state
-                return
             }
         }}
     >
         <App />
-    </DataProvider>
+    </DataProvider>,
 )
 
-// Serialise state to global in your HTML response
+if (loadTriggered) {
+    // Await the promise, it will wait until data loading has completed
+    await promiseCompletionSource.promise
 
-/// On Client
-const Root: React.SFC<{ dataKey: string }> = ({ dataKey }) => (
-    <DataProvider resources={this.resources} initialState={DATA_LOADER_INITIAL_STATE}>
-        <App />
-    </DataProvider>
-)
+    // now all the data has been loaded, just render again
+    rendered = ReactDOMServer.renderToString(
+        <DataProvider
+            // Remember to pass the data from the first render/data load
+            initialState={state}
+            isServerSideRender={true}
+            resources={resources}
+        >
+            <App />
+        </DataProvider>,
+    )
+}
+
+// Return the rendered result and the loaded server state to the client
+// This example doesn't include wrapping the rendered markup with the full index.html
+
+// NOTE: we are using the serialiseJavascript library, because it handles a bunch of scenarios JSON.stringify doesn't
+res.send(`
+<script>window.INITIAL_STATE = ${serializeJavascript(state)}</script>
+<div id="root">${rendered}</div>
+`)
 ```
 
-### Paged data
+### 2. Hydrate on the client
 
-Just register a paged resource, you will get type safety the whole way down.
-
-To load the next page just use `props.actions.nextPage()` in the renderData callback
+The hard part is done, to hydrate on the client we just pass the INITIAL_STATE to the DataProvider
 
 ```tsx
-export const TestDataLoader = this.resources.registerPagedResource(
-    'testDataType',
-    (dataKey: string, pageNumber: number) => Promise.resolve([`page${pageNumber}`]
+import { DataProvider } from 'react-ssr-data-loader'
+
+React.hydrate(
+    <DataProvider resources={resources} initialState={window.INITIAL_STATE}>
+        <App />
+    </DataProvider>,
+    document.getElementById('root'),
 )
 ```
+
+This will hydrate your app with all the data which was loaded on the server directly loaded in the the client.
 
 ### How it works
 
 When you register `resources` they return a DataLoader, a fully type-safe React component which allows you to get at that data type.
 
-Multiple of these DataLoaders can be used in a single page, they will take care of only fetching that resource once and sharing the data between the data-loaders.
+Multiple of these DataLoaders can be used in a single page, they will take care of only fetching that resource once and sharing the data between the data-loaders when the parameters match.
 
 The `DataProvider` is the component which is responsible for actually fetching the data, when `DataLoader`s are mounted the register themselves with the data provider so it can notify them when any data relevent to them is updated. This means DataLoaders only re-render themselves when the data they are interested in is updated.
 
-### TODOS
+## More info
 
-* Gracefully handle if no data loader keys are present
-* Add logging hooks
+### General approaches to data loading in SSR
 
-### Things to consider/discuss
+There are two main approaches for loading data with server side rendering
 
-* Should renderProps/actions be the same object?
-  * If so, how do we ensure shallow compare works on state?
-* Should we version the state, making it easy to shallow compare/give react hints
+1. Walk the React component tree and allow components to statically declare what data they need. The server can then load the data before rendering. This approach is not really idiomatic React because it breaks encapsulation
+2. Perform the SSR, then track any data loading requests which are triggered. Once complete, do another SSR with the data loaded.
