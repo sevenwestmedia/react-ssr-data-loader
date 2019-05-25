@@ -1,10 +1,10 @@
 # React SSR Data Loader
 
-This library makes declaritive data loading in React easy with full server side rendering support. It is also fully type safe for those using TypeScript.
+​​This library will help with declarative data loading in React - with full server side rendering support!
 
 ## Why?
 
-Server side rendering without data loading is easy. When you need to load data on the server, transfer it to the client and hydrate it becomes much harder. Many libraries which solve this are all in, for example Next.JS. This library is standalone and can be dropped into an existing project.
+When you need to load data on the server, transfer it to the client and hydrate it Server Side Rendering becomes a lot more difficult. Many libraries which currently solve this problem are all in (e.g. Next.JS). Our goal was to make a standalone solution that can be dropped into an existing project.
 
 ## Getting started
 
@@ -80,7 +80,7 @@ const BlogPage: React.FC =({ match }) => (
             if (!params.lastAction.success) {
                 console.log('Failed to load blog', params.lastAction.error)
 
-                return <div>Failed to load</div>
+                return <p>Failed to load</p>
             }
 
             if (params.data.hasData) {
@@ -88,7 +88,7 @@ const BlogPage: React.FC =({ match }) => (
                 <BlogArticle blog={params.data.result} />
             }
 
-            return <div>Loading...</div>
+            return <p>Loading...</p>
         }
     />
 )
@@ -181,15 +181,15 @@ React.hydrate(
 )
 ```
 
-This will hydrate your app with all the data which was loaded on the server directly loaded in the the client.
+This will hydrate your app with all the data that was loaded on the server into the client.
 
 ### How it works
 
 When you register `resources` they return a DataLoader, a fully type-safe React component which allows you to get at that data type.
 
-Multiple of these DataLoaders can be used in a single page, they will take care of only fetching that resource once and sharing the data between the data-loaders when the parameters match.
+You can load multiple DataLoaders in a single page. Each `DataLoader` will fetch the resource once, sharing the data between data-loaders when the parameters match.
 
-The `DataProvider` is the component which is responsible for actually fetching the data, when `DataLoader`s are mounted the register themselves with the data provider so it can notify them when any data relevent to them is updated. This means DataLoaders only re-render themselves when the data they are interested in is updated.
+​​The `DataProvider` component  is responsible for fetching the data. When `DataLoader`s are mounted they register with the data provider so it can notify the `DataLoader`s when any relevant data is updated. This means DataLoaders only re-render when the data they are interested in is updated.
 
 ## More info
 
