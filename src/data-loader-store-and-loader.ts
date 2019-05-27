@@ -1,4 +1,3 @@
-import objectHash from 'object-hash'
 import { DataProviderEvents } from './events'
 import { LoaderState, LoaderStatus } from './data-loader-state'
 import { isPromise } from './utils'
@@ -21,6 +20,9 @@ export interface LoadParams {
     resourceType: string
     [param: string]: any
 }
+
+/** Takes an object and produces a consistent hash */
+export type ObjectHash = (obj: object) => string
 
 // Some other names
 // DataLoaderDataAccessor
@@ -54,6 +56,7 @@ export class DataLoaderStoreAndLoader {
         onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
         private performLoad: (dataLoadParams: LoadParams) => Promise<any> | any,
+        private objectHash: ObjectHash,
         public isServerSideRender: boolean,
     ) {
         this.onEvent = event => {
@@ -84,7 +87,7 @@ export class DataLoaderStoreAndLoader {
               }, {})
             : dataLoadParams
 
-        return objectHash(cacheParams)
+        return this.objectHash(cacheParams)
     }
 
     attach(

@@ -2,7 +2,11 @@ import React from 'react'
 import { DataLoaderResources } from './data-loader-resources'
 import { DataProviderEvents } from './events'
 import { DataLoaderContextComponent } from './data-loader-context'
-import { DataLoaderStoreAndLoader, DataLoaderState } from './data-loader-store-and-loader'
+import {
+    DataLoaderStoreAndLoader,
+    DataLoaderState,
+    ObjectHash,
+} from './data-loader-store-and-loader'
 
 export interface Props {
     initialState?: DataLoaderState
@@ -10,6 +14,8 @@ export interface Props {
     isServerSideRender?: boolean
     resources: DataLoaderResources<any>
     globalProps?: object
+    /** Override the object hasing function */
+    objectHash?: ObjectHash
 }
 
 export class DataLoaderProvider extends React.Component<Props> {
@@ -30,10 +36,11 @@ export class DataLoaderProvider extends React.Component<Props> {
 
                 return dataLoader({
                     ...this.props.globalProps,
-                    ...params
+                    ...params,
                 })
             },
-            this.props.isServerSideRender || false
+            this.props.objectHash || require('hash-sum'),
+            this.props.isServerSideRender || false,
         )
     }
 
