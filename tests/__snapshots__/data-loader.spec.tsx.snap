@@ -118,7 +118,7 @@ Object {
     },
     Object {
       "state": Object {
-        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+        "247cd170": Object {
           "data": Object {
             "hasData": false,
           },
@@ -133,14 +133,14 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
+        "resourceLoadParamsHash": "247cd170",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
       "state": Object {
-        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+        "247cd170": Object {
           "data": Object {
             "dataFromServerSideRender": false,
             "hasData": true,
@@ -159,14 +159,14 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
+        "resourceLoadParamsHash": "247cd170",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
+        "resourceLoadParamsHash": "247cd170",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
@@ -215,7 +215,7 @@ Object {
     },
     Object {
       "state": Object {
-        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+        "247cd170": Object {
           "data": Object {
             "hasData": false,
           },
@@ -230,7 +230,7 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
+        "resourceLoadParamsHash": "247cd170",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
@@ -241,14 +241,14 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
+        "resourceLoadParamsHash": "247cd170",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "fc7e58063ef49874aea8e2210fc7a6a2f9836f52",
+        "resourceLoadParamsHash": "247cd170",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
@@ -317,7 +317,7 @@ Object {
     },
     Object {
       "state": Object {
-        "fc7e58063ef49874aea8e2210fc7a6a2f9836f52": Object {
+        "247cd170": Object {
           "data": Object {
             "dataFromServerSideRender": false,
             "hasData": true,
@@ -340,7 +340,7 @@ Object {
     },
     Object {
       "state": Object {
-        "b85e504b06b7283a19328a521797e110892ab0b4": Object {
+        "26d41825": Object {
           "data": Object {
             "dataFromServerSideRender": false,
             "hasData": true,
