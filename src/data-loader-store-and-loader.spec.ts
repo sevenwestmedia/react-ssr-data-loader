@@ -1,6 +1,7 @@
 import { DataLoaderStoreAndLoader } from './data-loader-store-and-loader'
 import { LoaderStatus, LoaderState } from './data-loader-state'
 import { PromiseCompletionSource } from 'promise-completion-source'
+import hashSum from 'hash-sum'
 
 // These are internal tests, if implementation changes they can be deleted
 
@@ -26,6 +27,7 @@ describe('get data loader state for asynchronous data load', () => {
                 promiseCompletionSource.push(pcs)
                 return pcs.promise
             },
+            hashSum,
             false,
         )
         state = loader.getDataLoaderState(
@@ -293,6 +295,7 @@ describe('get data loader state for synchronous data load', () => {
                 () => {
                     return 42
                 },
+                hashSum,
                 false,
             )
             state = loader.getDataLoaderState(
@@ -337,6 +340,7 @@ describe('get data loader state for synchronous data load', () => {
                 () => {
                     throw new Error('sync data load fail')
                 },
+                hashSum,
                 false,
             )
             state = loader.getDataLoaderState(

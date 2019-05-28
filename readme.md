@@ -189,7 +189,13 @@ When you register `resources` they return a DataLoader, a fully type-safe React 
 
 You can load multiple DataLoaders in a single page. Each `DataLoader` will fetch the resource once, sharing the data between data-loaders when the parameters match.
 
-​​The `DataProvider` component  is responsible for fetching the data. When `DataLoader`s are mounted they register with the data provider so it can notify the `DataLoader`s when any relevant data is updated. This means DataLoaders only re-render when the data they are interested in is updated.
+​​The `DataProvider` component is responsible for fetching the data. When `DataLoader`s are mounted they register with the data provider so it can notify the `DataLoader`s when any relevant data is updated. This means DataLoaders only re-render when the data they are interested in is updated.
+
+### Params hashing
+
+Behind the scenes the data loader uses a library called `hash-sum` to create hashes of the parameter object. You can control which of the data loader params are taken into account by specifying the cache keys (similar to React hooks).
+
+You can override the hashing function on the DataProvider if you have issues with the inbuilt library.
 
 ## More info
 
