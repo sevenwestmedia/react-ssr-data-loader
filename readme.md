@@ -193,7 +193,9 @@ You can load multiple DataLoaders in a single page. Each `DataLoader` will fetch
 
 ### Params hashing
 
-Behind the scenes the data loader uses a library called `hash-sum` to create hashes of the parameter object. You can override it on the DataProvider
+Behind the scenes the data loader uses a library called `hash-sum` to create hashes of the parameter object. You can control which of the data loader params are taken into account by specifying the cache keys (similar to React hooks).
+
+You can override the hashing function on the DataProvider if you have issues with the inbuilt library.
 
 ## More info
 

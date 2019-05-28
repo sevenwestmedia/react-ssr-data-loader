@@ -14,7 +14,7 @@ export interface Props {
     isServerSideRender?: boolean
     resources: DataLoaderResources<any>
     globalProps?: object
-    /** Override the object hasing function */
+    /** Override the object hashing function */
     objectHash?: ObjectHash
 }
 
@@ -26,7 +26,7 @@ export class DataLoaderProvider extends React.Component<Props> {
 
         this.dataLoader = new DataLoaderStoreAndLoader(
             // tslint:disable-next-line:no-empty
-            this.props.onEvent || (() => {}),
+            this.props.onEvent || (() => { }),
             this.props.initialState,
             params => {
                 const dataLoader = this.props.resources.getResourceLoader(params.resourceType)
