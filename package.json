@@ -3,11 +3,11 @@
     "version": "0.4.0",
     "main": "dist/index.js",
     "typings": "dist/",
-    "repository": {},
+    "repository": "https://github.com/sevenwestmedia/react-ssr-data-loader",
     "license": "MIT",
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
-        "lint": "tslint 'src/**/*.ts' --project ./tsconfig.json -e '**/*.d.ts'",
+        "lint": "eslint --ext .js,.ts .",
         "lint:prettier": "prettier --write \"./src/**/*.ts\" \"./src/**/*.tsx\"",
         "test": "jest",
         "test:watch": "jest --watch",
@@ -46,6 +46,7 @@
         "@types/react-dom": "^16.8.2",
         "enzyme": "^3.8.0",
         "enzyme-adapter-react-16": "^1.8.0",
+        "eslint-config-wanews-base": "^1.0.0",
         "jest": "^24.8.0",
         "license-checker": "^24.1.0",
         "prettier": "^1.17.0",
@@ -53,12 +54,8 @@
         "react-dom": "^16.8.3",
         "source-map-loader": "^0.2.4",
         "ts-jest": "^24.0.2",
-        "tslint": "^5.16.0",
-        "tslint-config-prettier": "^1.18.0",
-        "tslint-eslint-rules": "^5.4.0",
-        "tslint-react": "^4.0.0",
+        "tslib": "^1.9.3",
         "typescript": "^3.3.3333",
-        "typescript-log": "^1.1.0",
-        "tslib": "^1.9.3"
+        "typescript-log": "^1.1.0"
     }
 }
