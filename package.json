@@ -1,12 +1,15 @@
 {
     "name": "react-ssr-data-loader",
     "version": "0.4.0",
-    "main": "dist/index.js",
-    "typings": "dist/",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "sideEffects": false,
     "repository": "https://github.com/sevenwestmedia/react-ssr-data-loader",
     "license": "MIT",
     "scripts": {
-        "build": "tsc -p tsconfig.build.json",
+        "build:cjs": "tsc -p tsconfig.build.json --outDir ./dist/cjs",
+        "build:esm": "tsc -p tsconfig.build.json --module es2015  --outDir ./dist/esm",
+        "build": "yarn build:cjs && yarn build:esm",
         "lint": "eslint --ext .js,.ts .",
         "lint:prettier": "prettier --write \"./src/**/*.ts\" \"./src/**/*.tsx\"",
         "test": "jest",
