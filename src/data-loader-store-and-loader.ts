@@ -1,6 +1,6 @@
+import isPromise from 'is-promise'
 import { DataProviderEvents } from './events'
 import { LoaderState, LoaderStatus } from './data-loader-state'
-import { isPromise } from './utils'
 import { getDataState } from './state-helper'
 
 export interface DataLoaderState {
@@ -235,7 +235,7 @@ export class DataLoaderStoreAndLoader {
     private monitorLoad(
         resourceType: string,
         paramsObjectHash: string,
-        work: Promise<any>,
+        work: PromiseLike<any>,
         beginLoadVersion: number,
     ) {
         this.currentWorkCount++
