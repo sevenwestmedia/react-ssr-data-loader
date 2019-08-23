@@ -110,6 +110,7 @@ export function createTypedDataLoader<
             props: ComponentProps,
             internalState: TInternalState,
         ): TDataLoaderParams & TInternalState {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { clientLoadOnly, renderData, ...rest } = props
 
             // Need to figure out why we need the casts here

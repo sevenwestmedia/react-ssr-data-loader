@@ -63,7 +63,7 @@ export class DataLoaderStoreAndLoader {
             try {
                 return onEvent(event)
             } catch (err) {
-                // tslint:disable-next-line:no-console
+                // eslint-disable-next-line no-console
                 console.error('onEvent handler threw', err)
             }
         }

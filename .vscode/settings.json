@@ -3,5 +3,6 @@
         "**/node_modules": true,
         "**/dist": true
     },
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "eslint.validate": ["javascript", { "language": "typescript", "autoFix": true }]
 }
