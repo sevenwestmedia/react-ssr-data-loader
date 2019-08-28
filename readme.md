@@ -1,7 +1,7 @@
 # React SSR Data Loader
 
 [![npm](https://img.shields.io/npm/v/react-ssr-data-loader)](https://www.npmjs.com/package/react-ssr-data-loader)
-[![Build Status](https://travis-ci.com/sevenwestmedia/react-ssr-data-loader.svg?branch=master)](https://travis-ci.com/sevenwestmedia/react-ssr-data-loader)
+[![Build Status](https://travis-ci.com/sevenwestmedia/react-ssr-data-loader.svg?branch=master)](https://travis-ci.com/sevenwestmedia/react-ssr-data-loader) [![Greenkeeper badge](https://badges.greenkeeper.io/sevenwestmedia/react-ssr-data-loader.svg)](https://greenkeeper.io/)
 
 ​​This library will help with declarative data loading in React - with full server side rendering support!
 

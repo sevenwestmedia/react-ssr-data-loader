@@ -118,7 +118,7 @@ Object {
     },
     Object {
       "state": Object {
-        "247cd170": Object {
+        "59edd2a8": Object {
           "data": Object {
             "hasData": false,
           },
@@ -133,14 +133,14 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "247cd170",
+        "resourceLoadParamsHash": "59edd2a8",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
     },
     Object {
       "state": Object {
-        "247cd170": Object {
+        "59edd2a8": Object {
           "data": Object {
             "dataFromServerSideRender": false,
             "hasData": true,
@@ -159,14 +159,14 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "247cd170",
+        "resourceLoadParamsHash": "59edd2a8",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "247cd170",
+        "resourceLoadParamsHash": "59edd2a8",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
@@ -215,7 +215,7 @@ Object {
     },
     Object {
       "state": Object {
-        "247cd170": Object {
+        "59edd2a8": Object {
           "data": Object {
             "hasData": false,
           },
@@ -230,7 +230,7 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "247cd170",
+        "resourceLoadParamsHash": "59edd2a8",
         "resourceType": "testDataType",
       },
       "type": "begin-loading-event",
@@ -241,14 +241,14 @@ Object {
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "247cd170",
+        "resourceLoadParamsHash": "59edd2a8",
         "resourceType": "testDataType",
       },
       "type": "end-loading-event",
     },
     Object {
       "data": Object {
-        "resourceLoadParamsHash": "247cd170",
+        "resourceLoadParamsHash": "59edd2a8",
         "resourceType": "testDataType",
       },
       "type": "data-load-completed",
@@ -317,7 +317,7 @@ Object {
     },
     Object {
       "state": Object {
-        "247cd170": Object {
+        "59edd2a8": Object {
           "data": Object {
             "dataFromServerSideRender": false,
             "hasData": true,
@@ -340,7 +340,7 @@ Object {
     },
     Object {
       "state": Object {
-        "26d41825": Object {
+        "44f8a95a": Object {
           "data": Object {
             "dataFromServerSideRender": false,
             "hasData": true,
