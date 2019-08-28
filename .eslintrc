@@ -3,7 +3,7 @@
     "rules": {
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/explicit-member-accessibility": 0,
-        "@typescript-eslint/array-type": [1, "array-simple"],
+        "@typescript-eslint/array-type": [1, { "default": "array-simple" }],
         "@typescript-eslint/no-parameter-properties": 0
     }
 }

@@ -17,9 +17,9 @@
         "jsx": "react",
         "noUnusedParameters": true,
         "noUnusedLocals": true,
-        "declaration": true,
         "lib": ["dom", "es5", "es2015.promise"],
-        "importHelpers": true
+        "importHelpers": true,
+        "noEmitHelpers": true
     },
     "exclude": ["node_modules", "dist"]
 }
