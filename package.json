@@ -32,7 +32,7 @@
     "dependencies": {
         "cuid": "^2.1.6",
         "is-promise": "^2.1.0",
-        "hash-sum": "^1.0.2",
+        "hash-sum": "^2.0.0",
         "promise-completion-source": "^1.0.0"
     },
     "peerDependencies": {
@@ -51,9 +51,9 @@
         "@types/react-dom": "^16.8.2",
         "enzyme": "^3.8.0",
         "enzyme-adapter-react-16": "^1.8.0",
-        "eslint-config-wanews-base": "^1.0.0",
+        "eslint-config-wanews-base": "^2.0.0",
         "jest": "^24.8.0",
-        "license-checker": "^24.1.0",
+        "license-checker": "^25.0.1",
         "prettier": "^1.17.0",
         "react": "^16.8.3",
         "react-dom": "^16.8.3",
