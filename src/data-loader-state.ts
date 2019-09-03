@@ -9,7 +9,7 @@ export interface FailedAction {
     error: Error
 }
 
-export enum LoaderStatus {
+export const enum LoaderStatus {
     /**
      * The loader is inactive -- not performing any action
      */
