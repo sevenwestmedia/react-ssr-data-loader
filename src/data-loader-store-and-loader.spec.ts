@@ -64,13 +64,7 @@ describe('get data loader state for asynchronous data load', () => {
         it('it calls update on mount', async () => {
             promiseCompletionSource[0].resolve(0)
             await clearEventLoop()
-            loader.attach(
-                dataLoaderOneId,
-                registeredResourceType,
-                { id: 1 },
-                undefined,
-                () => updateCalled++,
-            )
+            loader.attach(dataLoaderOneId, registeredResourceType, { id: 1 }, () => updateCalled++)
 
             expect(updateCalled).toBe(1)
         })
@@ -79,13 +73,7 @@ describe('get data loader state for asynchronous data load', () => {
     describe('when data loader mounted', () => {
         let updateCalled = 0
         beforeEach(() => {
-            loader.attach(
-                dataLoaderOneId,
-                registeredResourceType,
-                { id: 1 },
-                undefined,
-                () => updateCalled++,
-            )
+            loader.attach(dataLoaderOneId, registeredResourceType, { id: 1 }, () => updateCalled++)
         })
 
         it('update should not be called', () => {
@@ -101,7 +89,7 @@ describe('get data loader state for asynchronous data load', () => {
 
         describe('then unmounts', () => {
             beforeEach(() => {
-                loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 }, undefined)
+                loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 })
             })
 
             it('should remove the state', () => {
@@ -154,7 +142,6 @@ describe('get data loader state for asynchronous data load', () => {
                         dataLoaderOneId,
                         registeredResourceType,
                         { id: 1 },
-                        undefined,
                         true,
                         true,
                     )
@@ -239,7 +226,7 @@ describe('get data loader state for asynchronous data load', () => {
 
     describe('when data loader unmounts before data finishes loading', () => {
         beforeEach(() => {
-            loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 }, undefined)
+            loader.detach(dataLoaderOneId, registeredResourceType, { id: 1 })
         })
 
         it('should remove the state', () => {

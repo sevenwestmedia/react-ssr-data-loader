@@ -19,21 +19,12 @@ export interface ActionResult<TInternalState> {
 export interface LoadParams {
     resourceType: string
 
-    /** This is the key the data loader uses for looking up the data */
-    paramsCacheKey: string
-
     [param: string]: any
 }
 
 /** Takes an object and produces a consistent hash */
 export type ObjectHash = (obj: object) => string
 
-// Some other names
-// DataLoaderDataAccessor
-// DataLoaderCore
-// DataLoaderSmurf
-// ?
-// tslint:disable-next-line:max-classes-per-file
 export class DataLoaderStoreAndLoader {
     private requiresUpdateOnMount: string[] = []
 
@@ -59,8 +50,13 @@ export class DataLoaderStoreAndLoader {
     constructor(
         onEvent: (event: DataProviderEvents) => void | Promise<any>,
         initialState: DataLoaderState | undefined,
-        private performLoad: (dataLoadParams: LoadParams) => Promise<any> | any,
-        private objectHash: ObjectHash,
+        private performLoad: (
+            dataLoadParams: LoadParams & {
+                /** This is the key the data loader uses for looking up the data */
+                paramsCacheKey: string
+            },
+        ) => Promise<any> | any,
+        private createParamsHash: (resourceType: string, dataLoadParams: object) => string,
         public isServerSideRender: boolean,
     ) {
         this.onEvent = event => {
@@ -82,27 +78,13 @@ export class DataLoaderStoreAndLoader {
         }
     }
 
-    createHash(dataLoadParams: object, cacheKeyProperties: string[] | undefined) {
-        const cacheParams = cacheKeyProperties
-            ? // ensure resourceType is always included in the cache key
-              cacheKeyProperties.concat('resourceType').reduce<any>((acc, val) => {
-                  acc[val] = (dataLoadParams as any)[val]
-                  return acc
-              }, {})
-            : dataLoadParams
-
-        return this.objectHash(cacheParams)
-    }
-
     attach(
         componentInstanceId: string,
         resourceType: string,
         dataLoadParams: object,
-        cacheKeyProperties: string[] | undefined,
         update: () => void,
     ): void {
-        const paramsObject = this.getParamsObject(resourceType, dataLoadParams)
-        const paramsObjectHash = this.createHash(paramsObject, cacheKeyProperties)
+        const paramsObjectHash = this.createParamsHash(resourceType, dataLoadParams)
 
         this.registerDataLoaderHash(paramsObjectHash, componentInstanceId)
         this.registeredDataLoaders[componentInstanceId] = {
@@ -122,14 +104,8 @@ export class DataLoaderStoreAndLoader {
     }
 
     // Returns true when data needs to be unloaded from redux
-    detach(
-        componentInstanceId: string,
-        resourceType: string,
-        dataLoadParams: object,
-        cacheKeyProperties: string[] | undefined,
-    ) {
-        const paramsObject = this.getParamsObject(resourceType, dataLoadParams)
-        const paramsObjectHash = this.createHash(paramsObject, cacheKeyProperties)
+    detach(componentInstanceId: string, resourceType: string, dataLoadParams: object) {
+        const paramsObjectHash = this.createParamsHash(resourceType, dataLoadParams)
         this.cleanupDataLoader(paramsObjectHash, componentInstanceId)
         delete this.registeredDataLoaders[componentInstanceId]
     }
@@ -139,18 +115,15 @@ export class DataLoaderStoreAndLoader {
         componentInstanceId: string,
         resourceType: string,
         dataLoadParams: object,
-        cacheKeyProperties: string[] | undefined,
         keepData = false,
         forceRefresh = false,
     ) {
-        const paramsObject = this.getParamsObject(resourceType, dataLoadParams)
-
         // Initial render (before mount) and SSR will not be registered, we can safely fall back to
         // undefined in both these instances
         const previousRenderParamsObjectHash = this.registeredDataLoaders[componentInstanceId]
             ? this.registeredDataLoaders[componentInstanceId].currentParamsHash
             : undefined
-        const paramsObjectHash = this.createHash(paramsObject, cacheKeyProperties)
+        const paramsObjectHash = this.createParamsHash(resourceType, dataLoadParams)
         const stateForParams = this.dataStore[paramsObjectHash]
 
         // Cleanup data which is not needed
@@ -172,7 +145,11 @@ export class DataLoaderStoreAndLoader {
 
         let result: any
         try {
-            result = this.performLoad({ ...paramsObject, paramsCacheKey: paramsObjectHash })
+            result = this.performLoad({
+                ...dataLoadParams,
+                resourceType,
+                paramsCacheKey: paramsObjectHash,
+            })
         } catch (err) {
             this.updateParamsHashState(paramsObjectHash, {
                 status: LoaderStatus.Idle,
@@ -227,13 +204,6 @@ export class DataLoaderStoreAndLoader {
         }
 
         return this.dataStore[paramsObjectHash]
-    }
-
-    private getParamsObject(resourceType: string, dataLoadParams: object) {
-        return {
-            resourceType,
-            ...dataLoadParams,
-        }
     }
 
     private monitorLoad(

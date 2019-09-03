@@ -46,7 +46,6 @@ export function createTypedDataLoader<
     initialInternalState: TInternalState,
     /** Callback to provide additional actions */
     actions: TActions,
-    cacheKeyProperties: Array<keyof TDataLoaderParams & string> | undefined,
 ): Return<TResource, TActions, TDataLoaderParams, TInternalState> {
     type ComponentProps = Props<TResource, TActions, TDataLoaderParams & TInternalState> &
         TDataLoaderParams
@@ -74,7 +73,6 @@ export function createTypedDataLoader<
                         this.id,
                         resourceType,
                         this.getParams(this.props, this.state.internalState),
-                        cacheKeyProperties,
                     )
                     const actionResult = actions[key](this.state.internalState, currentState)
                     if (actionResult === null) {
@@ -86,7 +84,6 @@ export function createTypedDataLoader<
                         this.id,
                         resourceType,
                         this.getParams(this.props, actionResult.newInternalState),
-                        cacheKeyProperties,
                         actionResult.keepData,
                         actionResult.refresh,
                     )
@@ -122,7 +119,6 @@ export function createTypedDataLoader<
                 this.id,
                 resourceType,
                 this.getParams(this.props, this.state.internalState),
-                cacheKeyProperties,
                 () => this.forceUpdate(),
             )
         }
@@ -132,7 +128,6 @@ export function createTypedDataLoader<
                 this.id,
                 resourceType,
                 this.getParams(this.props, this.state.internalState),
-                cacheKeyProperties,
             )
         }
 
@@ -143,12 +138,7 @@ export function createTypedDataLoader<
             }
 
             const params = this.getParams(this.props, this.state.internalState)
-            const loaderState = context.getDataLoaderState(
-                this.id,
-                resourceType,
-                params,
-                cacheKeyProperties,
-            )
+            const loaderState = context.getDataLoaderState(this.id, resourceType, params)
 
             return this.props.renderData(loaderState, this.userActions, params)
         }
