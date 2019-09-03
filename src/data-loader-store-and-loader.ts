@@ -18,6 +18,10 @@ export interface ActionResult<TInternalState> {
 
 export interface LoadParams {
     resourceType: string
+
+    /** This is the key the data loader uses for looking up the data */
+    paramsCacheKey: string
+
     [param: string]: any
 }
 
@@ -168,7 +172,7 @@ export class DataLoaderStoreAndLoader {
 
         let result: any
         try {
-            result = this.performLoad(paramsObject)
+            result = this.performLoad({ ...paramsObject, paramsCacheKey: paramsObjectHash })
         } catch (err) {
             this.updateParamsHashState(paramsObjectHash, {
                 status: LoaderStatus.Idle,
