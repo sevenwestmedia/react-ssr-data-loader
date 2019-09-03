@@ -14,11 +14,7 @@ export type LoadResource<TData, TResourceParameters, TInternalState, TGlobalPara
 
 export interface RegisteredResource {
     loadResource: LoadResource<any, any, any, any>
-    cacheKeyProperties?: string[]
-}
-
-interface Resources {
-    [dataType: string]: RegisteredResource
+    cacheKeyProperties?: Array<keyof any>
 }
 
 export interface PagedData<Data> {
@@ -42,7 +38,7 @@ export interface PageState {
 
 /** TGlobalParameters is provided through the data provider, and accessible in all data load function */
 export class DataLoaderResources<TGlobalParameters> {
-    private resources: Resources = {}
+    private resources: Record<keyof any, RegisteredResource> = {}
 
     constructor(
         /** Override the object hashing function */
@@ -52,7 +48,7 @@ export class DataLoaderResources<TGlobalParameters> {
     registerResource<TData, TResourceParameters>(
         resourceType: string,
         loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>,
-        cacheKeyProperties?: Array<keyof TResourceParameters & string>,
+        cacheKeyProperties?: Array<keyof TResourceParameters>,
     ) {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)

@@ -8,7 +8,7 @@ export type RenderData<TData, TActions, TParams> = (
     loaderProps: LoaderState<TData>,
     actions: UserActions<keyof TActions>,
     params: TParams,
-) => React.ReactElement<any> | null
+) => React.ReactElement<any> | false | null
 
 export interface Props<T, TActions, TParams> {
     clientLoadOnly?: boolean

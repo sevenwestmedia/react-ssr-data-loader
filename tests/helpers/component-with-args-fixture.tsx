@@ -10,7 +10,7 @@ import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
 import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
-export class ComponentWithArgsFixture<T extends object> {
+export class ComponentWithArgsFixture<T extends Record<string, any>> {
     loadAllCompletedCalled = 0
     loadDataCount = 0
     renderCount = 0
@@ -27,7 +27,7 @@ export class ComponentWithArgsFixture<T extends object> {
         initialState: DataLoaderState | undefined,
         id: string,
         args: T,
-        cacheKeyProperties: Array<keyof T & string> | undefined,
+        cacheKeyProperties: Array<keyof T> | undefined,
         isServerSideRender: boolean,
         // For some reason the typescript compiler is not validating the JSX below properly
         // And is saying this variable is not used
@@ -42,7 +42,7 @@ export class ComponentWithArgsFixture<T extends object> {
 
         const TestDataLoader = this.resources.registerResource(
             resourceType,
-            params => {
+            (params: T) => {
                 this.loadDataCount++
                 this.passedParams = params
                 return this.testDataPromise.promise
@@ -60,7 +60,6 @@ export class ComponentWithArgsFixture<T extends object> {
                         initialState={initialState}
                         isServerSideRender={isServerSideRender}
                         resources={fixture.resources}
-                        // tslint:disable-next-line:jsx-no-lambda
                         onEvent={event => {
                             if (event.type === 'data-load-completed') {
                                 fixture.loadAllCompletedCalled++
@@ -70,9 +69,8 @@ export class ComponentWithArgsFixture<T extends object> {
                         }}
                     >
                         <TestDataLoader
-                            {...this.state as any}
-                            // tslint:disable-next-line:jsx-no-lambda
-                            renderData={(props, actions) => {
+                            {...this.state}
+                            renderData={(props: any, actions: any) => {
                                 fixture.renderCount++
                                 fixture.lastRenderProps = props
                                 fixture.lastRenderActions = actions
@@ -84,9 +82,9 @@ export class ComponentWithArgsFixture<T extends object> {
             }
         }
 
-        this.root = mount(<TestComponent id={id} {...args as any} />)
+        this.root = mount(<TestComponent id={id} {...(args as any)} />)
 
-        this.component = this.root.find(TestDataLoader)
+        this.component = this.root.find(TestDataLoader) as any
     }
 
     assertState() {
