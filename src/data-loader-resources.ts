@@ -1,5 +1,6 @@
 import { createTypedDataLoader, DataLoaderActions } from './data-loader'
 import { LoaderStatus } from './data-loader-state'
+import { ObjectHash } from './data-loader-store-and-loader'
 
 export type LoadResource<TData, TResourceParameters, TInternalState, TGlobalParameters> = (
     params: {
@@ -11,8 +12,9 @@ export type LoadResource<TData, TResourceParameters, TInternalState, TGlobalPara
         TGlobalParameters,
 ) => Promise<TData> | TData
 
-interface Resources {
-    [dataType: string]: LoadResource<any, any, any, any>
+export interface RegisteredResource {
+    loadResource: LoadResource<any, any, any, any>
+    cacheKeyProperties?: Array<keyof any>
 }
 
 export interface PagedData<Data> {
@@ -36,12 +38,17 @@ export interface PageState {
 
 /** TGlobalParameters is provided through the data provider, and accessible in all data load function */
 export class DataLoaderResources<TGlobalParameters> {
-    private resources: Resources = {}
+    private resources: Record<keyof any, RegisteredResource> = {}
+
+    constructor(
+        /** Override the object hashing function */
+        private objectHash: ObjectHash = require('hash-sum'),
+    ) {}
 
     registerResource<TData, TResourceParameters>(
         resourceType: string,
         loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>,
-        cacheKeyProperties?: Array<keyof TResourceParameters & string>,
+        cacheKeyProperties?: Array<keyof TResourceParameters>,
     ) {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
@@ -61,8 +68,11 @@ export class DataLoaderResources<TGlobalParameters> {
             TResourceParameters,
             {},
             typeof actions
-        >(resourceType, {}, actions, cacheKeyProperties)
-        this.resources[resourceType] = loadResource
+        >(resourceType, {}, actions)
+        this.resources[resourceType] = {
+            loadResource,
+            cacheKeyProperties,
+        }
 
         return typedDataLoader
     }
@@ -108,13 +118,31 @@ export class DataLoaderResources<TGlobalParameters> {
             PageComponentProps & TResourceParameters,
             PageState,
             typeof actions
-        >(resourceType, { page: 1 }, actions, cacheKeyProperties)
-        this.resources[resourceType] = loadResource
+        >(resourceType, { page: 1 }, actions)
+        this.resources[resourceType] = {
+            loadResource,
+            cacheKeyProperties,
+        }
 
         return typedDataLoader
     }
 
-    getResourceLoader(dataType: any): LoadResource<any, any, any, any> {
+    getResourceLoader(dataType: string): RegisteredResource {
         return this.resources[dataType]
+    }
+
+    generateCacheKey(resourceType: string, dataLoadParams: object): string {
+        const { cacheKeyProperties } = this.resources[resourceType]
+        const cacheObj = { ...dataLoadParams, resourceType }
+
+        const cacheParams = cacheKeyProperties
+            ? // ensure resourceType is always included in the cache key
+              cacheKeyProperties.concat('resourceType').reduce<any>((acc, val) => {
+                  acc[val] = (cacheObj as any)[val]
+                  return acc
+              }, {})
+            : cacheObj
+
+        return this.objectHash(cacheParams)
     }
 }

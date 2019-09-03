@@ -13,6 +13,9 @@ describe('data-loader', () => {
         await sut.testDataPromise.resolve({ result: 'Test' })
 
         expect(sut.passedParams).toEqual({ ...args, paramsCacheKey: '7a4496e0' })
+        expect(sut.resources.generateCacheKey('testDataType', args)).toBe('7a4496e0')
+        const keys = Object.keys(sut.getState() || {})
+        expect(keys).toContain('7a4496e0')
         sut.assertState()
     })
 

@@ -2,11 +2,7 @@ import React from 'react'
 import { DataLoaderResources } from './data-loader-resources'
 import { DataProviderEvents } from './events'
 import { DataLoaderContextComponent } from './data-loader-context'
-import {
-    DataLoaderStoreAndLoader,
-    DataLoaderState,
-    ObjectHash,
-} from './data-loader-store-and-loader'
+import { DataLoaderStoreAndLoader, DataLoaderState } from './data-loader-store-and-loader'
 
 export interface Props {
     initialState?: DataLoaderState
@@ -14,41 +10,36 @@ export interface Props {
     isServerSideRender?: boolean
     resources: DataLoaderResources<any>
     globalProps?: object
-    /** Override the object hashing function */
-    objectHash?: ObjectHash
 }
 
-export class DataLoaderProvider extends React.Component<Props> {
-    private dataLoader: DataLoaderStoreAndLoader
-
-    constructor(props: Props) {
-        super(props)
-
-        this.dataLoader = new DataLoaderStoreAndLoader(
+export const DataLoaderProvider: React.FC<Props> = props => {
+    const [dataLoader] = React.useState(() => {
+        return new DataLoaderStoreAndLoader(
             // tslint:disable-next-line:no-empty
-            this.props.onEvent || (() => { }),
-            this.props.initialState,
+            props.onEvent || (() => {}),
+            props.initialState,
             params => {
-                const dataLoader = this.props.resources.getResourceLoader(params.resourceType)
+                const dataLoader = props.resources.getResourceLoader(params.resourceType)
                 if (!dataLoader) {
                     return Promise.reject(`No data loader present for ${params.resourceType}`)
                 }
 
-                return dataLoader({
-                    ...this.props.globalProps,
+                return dataLoader.loadResource({
+                    ...props.globalProps,
                     ...params,
                 })
             },
-            this.props.objectHash || require('hash-sum'),
-            this.props.isServerSideRender || false,
+            (resourceType, dataLoadParams) => {
+                return props.resources.generateCacheKey(resourceType, dataLoadParams)
+            },
+            props.isServerSideRender || false,
         )
-    }
+    })
 
-    render() {
-        return (
-            <DataLoaderContextComponent.Provider value={this.dataLoader}>
-                {this.props.children}
-            </DataLoaderContextComponent.Provider>
-        )
-    }
+    return (
+        <DataLoaderContextComponent.Provider value={dataLoader}>
+            {props.children}
+        </DataLoaderContextComponent.Provider>
+    )
 }
+DataLoaderProvider.displayName = 'DataLoaderProvider'
