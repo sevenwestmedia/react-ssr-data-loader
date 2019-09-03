@@ -2,7 +2,13 @@ import { createTypedDataLoader, DataLoaderActions } from './data-loader'
 import { LoaderStatus } from './data-loader-state'
 
 export type LoadResource<TData, TResourceParameters, TInternalState, TGlobalParameters> = (
-    params: { resourceType: string } & TResourceParameters & TInternalState & TGlobalParameters,
+    params: {
+        resourceType: string
+        /** This is the key the data loader uses for looking up the data */
+        paramsCacheKey: string
+    } & TResourceParameters &
+        TInternalState &
+        TGlobalParameters,
 ) => Promise<TData> | TData
 
 interface Resources {
