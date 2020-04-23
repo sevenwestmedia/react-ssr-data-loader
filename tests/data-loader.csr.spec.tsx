@@ -1,7 +1,8 @@
-import { ComponentFixture } from './helpers/component-fixture'
 import Adapter from 'enzyme-adapter-react-16'
+import { ComponentFixture } from './helpers/component-fixture'
 import { configure } from 'enzyme'
 import { processEventLoop } from './helpers/event-loop-helpers'
+import { act } from 'react-dom/test-utils'
 
 configure({ adapter: new Adapter() })
 
@@ -15,9 +16,11 @@ describe('Client side render', () => {
     it('should pass loaded data once promise resolves', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
 
-        await sut.testDataPromise.resolve({
-            result: 'Success resolved!',
-        })
+        await act(() =>
+            sut.testDataPromise.resolve({
+                result: 'Success resolved!',
+            }),
+        )
 
         sut.assertState()
     })
@@ -25,11 +28,13 @@ describe('Client side render', () => {
     it('loads data when props change', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
 
-        await sut.testDataPromise.resolve({ result: 'Success props change!' })
-        sut.resetPromise()
-        sut.setId('newData')
-        await processEventLoop()
-        await sut.testDataPromise.resolve({ result: 'Success props change 2!' })
+        await act(async () => {
+            await sut.testDataPromise.resolve({ result: 'Success props change!' })
+            sut.resetPromise()
+            sut.setId('newData')
+            await processEventLoop()
+            await sut.testDataPromise.resolve({ result: 'Success props change 2!' })
+        })
 
         sut.assertState()
     })
@@ -37,7 +42,7 @@ describe('Client side render', () => {
     it('should pass failure when data load fails', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
 
-        await sut.testDataPromise.reject(new Error('Boom!'))
+        await act(() => sut.testDataPromise.reject(new Error('Boom!')))
 
         const lastAction = sut.getState().renderProps.lastAction
         expect(lastAction.success).toBe(false)
@@ -51,7 +56,8 @@ describe('Client side render', () => {
 
     it('client render after SSR with data should not fetch data', async () => {
         let sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: true })
-        await sut.testDataPromise.resolve({ result: 'Success from server!' })
+
+        await act(() => sut.testDataPromise.resolve({ result: 'Success from server!' }))
 
         sut = new ComponentFixture(sut.currentState, 'testKey', { isServerSideRender: false })
 
@@ -60,9 +66,11 @@ describe('Client side render', () => {
 
     it('should remove data from redux when unmounted', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
-        await sut.testDataPromise.resolve({ result: 'Success removed!' })
 
-        await sut.unmount()
+        await act(async () => {
+            await sut.testDataPromise.resolve({ result: 'Success removed!' })
+            await sut.unmount()
+        })
 
         const lastEvent = sut.events[sut.events.length - 1]
         expect(lastEvent).toEqual({ state: {}, type: 'state-changed' })
@@ -71,8 +79,10 @@ describe('Client side render', () => {
     it('should ignore completion once component is unmounted', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
 
-        await sut.unmount()
-        await sut.testDataPromise.resolve({ result: 'Success unmounted!' })
+        await act(async () => {
+            await sut.unmount()
+            await sut.testDataPromise.resolve({ result: 'Success unmounted!' })
+        })
 
         expect(sut.events).toEqual([
             { state: {}, type: 'state-changed' },

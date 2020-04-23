@@ -1,9 +1,8 @@
 # React SSR Data Loader
 
-[![npm](https://img.shields.io/npm/v/react-ssr-data-loader)](https://www.npmjs.com/package/react-ssr-data-loader)
-[![Build Status](https://travis-ci.com/sevenwestmedia/react-ssr-data-loader.svg?branch=master)](https://travis-ci.com/sevenwestmedia/react-ssr-data-loader) [![Greenkeeper badge](https://badges.greenkeeper.io/sevenwestmedia/react-ssr-data-loader.svg)](https://greenkeeper.io/)
-
 ​​This library will help with declarative data loading in React - with full server side rendering support!
+
+[![npm](https://img.shields.io/npm/v/react-ssr-data-loader)](https://www.npmjs.com/package/react-ssr-data-loader)
 
 ## Why?
 
@@ -43,19 +42,12 @@ interface BlogLoadArguments {
 /** Register the resource **/
 // Generic arguments are specifying the data type & the load arguments
 // The function parameters are the resource type (should be unique for each resource), and a function to load the data
-const BlogDataLoader = resources.registerResource<Blog, BlogLoadArguments>('blog', ({ id }) => {
+const useBlog = resources.registerResource<Blog, BlogLoadArguments>('blog', ({ id }) => {
     // Should do error handling etc here
     return fetch(`/api/${id}`)
         .then(checkStatus)
-        .then(res => res.json())
+        .then((res) => res.json())
 })
-
-// JavaScript
-const BlogDataLoader = resources.registerResource('blog', ({ id }) =>
-    fetch(`/api/${id}`)
-        .then(checkStatus)
-        .then(res => res.json()),
-)
 ```
 
 ### 3. Use the Data loader component
@@ -64,37 +56,28 @@ const BlogDataLoader = resources.registerResource('blog', ({ id }) =>
 import { DataProvider } from 'react-ssr-data-loader'
 
 // Wrap your application in a DataProvider, passing your resources
-<DataProvider resources={resources}>
-
+;<DataProvider resources={resources}>
     {/* Example using React router (this is optional, this library is independent) */}
-    <Route
-        path="/blog/:id"
-        component={BlogPage}
-    />
-
+    <Route path="/blog/:id" component={BlogPage} />
 </DataProvider>
 
-const BlogPage: React.FC =({ match }) => (
-    // The BlogDataLoader props are BlogLoadArguments + a `renderData` function
-    <BlogDataLoader
-        id={match.params.id}
-        renderData={(params) => {
-            // Handle rendering failure
-            if (!params.lastAction.success) {
-                console.log('Failed to load blog', params.lastAction.error)
+const BlogPage: React.FC = ({ match }) => {
+    const { lastAction, actions, data, params, status } = useBlog({ id: 'match.params.id' })
 
-                return <p>Failed to load</p>
-            }
+    // Handle rendering failure
+    if (!lastAction.success) {
+        console.log('Failed to load blog', lastAction.error)
 
-            if (params.data.hasData) {
-                // params.data.result is type 'Blog'
-                <BlogArticle blog={params.data.result} />
-            }
+        return <p>Failed to load</p>
+    }
 
-            return <p>Loading...</p>
-        }
-    />
-)
+    if (data.hasData) {
+        // params.data.result is type 'Blog'
+        return <BlogArticle blog={data.result} />
+    }
+
+    return <p>Loading...</p>
+}
 ```
 
 That's it, the data loader will take care of loading the data when the params change automatically.
@@ -121,7 +104,7 @@ let rendered = ReactDOMServer.renderToString(
     <DataProvider
         isServerSideRender={true}
         resources={resources}
-        onEvent={event => {
+        onEvent={(event) => {
             if (event.type === 'begin-loading-event') {
                 // A data load event has been triggered
                 loadTriggered = true
@@ -199,6 +182,26 @@ You can load multiple DataLoaders in a single page. Each `DataLoader` will fetch
 Behind the scenes the data loader uses a library called `hash-sum` to create hashes of the parameter object. You can control which of the data loader params are taken into account by specifying the cache keys (similar to React hooks).
 
 You can override the hashing function on the DataProvider if you have issues with the inbuilt library.
+
+## API
+
+### Resources
+
+```ts
+class Resources<Services> {
+    contructor() {}
+}
+```
+
+Resources are defined statically for your application, but often `services` are per request for say server side rendering.
+
+If you need to pass config, or any other application level information which is scoped, you can define the `Services` type. It needs to be passed as a prop to the `DataProvider`
+
+### DataProvider
+
+```ts
+interface DataProviderProps {}
+```
 
 ## More info
 

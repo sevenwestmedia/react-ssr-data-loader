@@ -29,7 +29,7 @@ Object {
 }
 `;
 
-exports[`server side render does not render on the server if clientLoadOnlySet 1`] = `
+exports[`server side render does not trigger data load on the server if clientLoadOnlySet 1`] = `
 Object {
   "events": Array [
     Object {
@@ -39,9 +39,20 @@ Object {
   ],
   "loadAllCompletedCalled": 0,
   "loadDataCount": 0,
-  "renderActions": undefined,
-  "renderCount": 0,
-  "renderProps": undefined,
+  "renderActions": Object {
+    "refresh": [Function],
+  },
+  "renderCount": 1,
+  "renderProps": Object {
+    "data": Object {
+      "hasData": false,
+    },
+    "lastAction": Object {
+      "success": true,
+      "type": "none",
+    },
+    "status": "Idle",
+  },
 }
 `;
 

@@ -2,6 +2,7 @@ import { ComponentWithArgsFixture } from './helpers/component-with-args-fixture'
 import Adapter from 'enzyme-adapter-react-16'
 import { configure } from 'enzyme'
 import { processEventLoop } from './helpers/event-loop-helpers'
+import { act } from 'react-dom/test-utils'
 
 configure({ adapter: new Adapter() })
 
@@ -10,11 +11,11 @@ describe('data-loader', () => {
         const args = { bar: 1, id: 'testKey', resourceType: 'testDataType' }
         const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, undefined, false)
 
-        await sut.testDataPromise.resolve({ result: 'Test' })
+        await act(() => sut.testDataPromise.resolve({ result: 'Test' }))
 
         expect(sut.passedParams).toEqual({ ...args, paramsCacheKey: '7a4496e0' })
         expect(sut.resources.generateCacheKey('testDataType', args)).toBe('7a4496e0')
-        const keys = Object.keys(sut.getState() || {})
+        const keys = Object.keys(sut.getLoaderState() || {})
         expect(keys).toContain('7a4496e0')
         sut.assertState()
     })
@@ -23,12 +24,16 @@ describe('data-loader', () => {
         const args = { bar: 1, id: 'testKey', resourceType: 'testDataType' }
         const sut = new ComponentWithArgsFixture(undefined, 'testKey', args, ['id'], false)
 
-        await sut.testDataPromise.resolve({ result: 'Test' })
+        await act(() => sut.testDataPromise.resolve({ result: 'Test' }))
 
         const state = { ...sut.currentState }
-        sut.root.setState({
-            bar: 2,
-        })
+        act(() =>
+            sut.setState({
+                ...sut.getLoaderState(),
+                bar: 2,
+            }),
+        )
+
         await processEventLoop()
         expect(state).toEqual(sut.currentState)
     })

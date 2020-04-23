@@ -37,7 +37,7 @@ Object {
     "nextPage": [Function],
     "refresh": [Function],
   },
-  "renderCount": 5,
+  "renderCount": 4,
   "renderParams": Object {
     "id": "testKey",
     "page": 2,
@@ -70,7 +70,7 @@ Object {
     "nextPage": [Function],
     "refresh": [Function],
   },
-  "renderCount": 5,
+  "renderCount": 4,
   "renderParams": Object {
     "id": "testKey",
     "page": 2,
