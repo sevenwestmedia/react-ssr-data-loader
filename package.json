@@ -16,7 +16,8 @@
         "test:watch": "jest --watch",
         "test:update-snapshots": "jest -u",
         "test:debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
-        "verify": "yarn build && yarn lint && yarn test"
+        "verify": "yarn build && yarn lint && yarn test",
+        "release": "yarn verify && changeset publish"
     },
     "jest": {
         "transform": {
