@@ -1,5 +1,5 @@
 export const resourceType = 'testDataType'
 
-export interface Data {
+export interface TestDataType {
     result: string
 }

@@ -5,7 +5,6 @@ import hashSum from 'hash-sum'
 
 // These are internal tests, if implementation changes they can be deleted
 
-// tslint:disable:no-empty
 describe('get data loader state for asynchronous data load', () => {
     const dataLoaderOneId = '1'
     const registeredResourceType = 'data'
@@ -18,7 +17,7 @@ describe('get data loader state for asynchronous data load', () => {
         promiseCompletionSource = []
         events = []
         loader = new DataLoaderStoreAndLoader(
-            event => {
+            (event) => {
                 events.push(event)
             },
             undefined,
@@ -275,7 +274,7 @@ describe('get data loader state for synchronous data load', () => {
         beforeEach(() => {
             events = []
             loader = new DataLoaderStoreAndLoader(
-                event => {
+                (event) => {
                     events.push(event)
                 },
                 undefined,
@@ -320,7 +319,7 @@ describe('get data loader state for synchronous data load', () => {
         beforeEach(() => {
             events = []
             loader = new DataLoaderStoreAndLoader(
-                event => {
+                (event) => {
                     events.push(event)
                 },
                 undefined,
@@ -363,5 +362,5 @@ describe('get data loader state for synchronous data load', () => {
 })
 
 function clearEventLoop() {
-    return new Promise(resolve => setTimeout(resolve, 1))
+    return new Promise((resolve) => setTimeout(resolve, 1))
 }

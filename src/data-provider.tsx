@@ -4,7 +4,7 @@ import { DataProviderEvents } from './events'
 import { DataLoaderContextComponent } from './data-loader-context'
 import { DataLoaderStoreAndLoader, DataLoaderState } from './data-loader-store-and-loader'
 
-export interface Props {
+export interface DataProviderProps {
     initialState?: DataLoaderState
     onEvent?: (event: DataProviderEvents) => void | Promise<any>
     isServerSideRender?: boolean
@@ -12,13 +12,13 @@ export interface Props {
     globalProps?: object
 }
 
-export const DataLoaderProvider: React.FC<Props> = props => {
+export const DataProvider: React.FC<DataProviderProps> = (props) => {
     const [dataLoader] = React.useState(() => {
         return new DataLoaderStoreAndLoader(
-            // tslint:disable-next-line:no-empty
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             props.onEvent || (() => {}),
             props.initialState,
-            params => {
+            (params) => {
                 const dataLoader = props.resources.getResourceLoader(params.resourceType)
                 if (!dataLoader) {
                     return Promise.reject(`No data loader present for ${params.resourceType}`)
@@ -42,4 +42,4 @@ export const DataLoaderProvider: React.FC<Props> = props => {
         </DataLoaderContextComponent.Provider>
     )
 }
-DataLoaderProvider.displayName = 'DataLoaderProvider'
+DataProvider.displayName = 'DataLoaderProvider'

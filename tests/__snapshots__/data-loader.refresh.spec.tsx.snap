@@ -120,7 +120,7 @@ Object {
   "renderActions": Object {
     "refresh": [Function],
   },
-  "renderCount": 4,
+  "renderCount": 3,
   "renderProps": Object {
     "data": Object {
       "dataFromServerSideRender": false,

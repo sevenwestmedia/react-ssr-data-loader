@@ -21,17 +21,16 @@ export const enum LoaderStatus {
     Fetching = 'Fetching',
 }
 
-export interface LoaderState<TData> {
+export interface LoaderState<ResourceDataType> {
     status: LoaderStatus
     lastAction: SuccessAction | FailedAction
-    data: Data<TData>
+    data: Data<ResourceDataType>
 }
 
-// @ TODO Should we drop dataFromServerSideRender? How do we model not fetching on client
-export type Data<TData> =
+export type Data<ResourceDataType> =
     | {
           hasData: true
-          result: TData
+          result: ResourceDataType
           dataFromServerSideRender: boolean
       }
     | { hasData: false }

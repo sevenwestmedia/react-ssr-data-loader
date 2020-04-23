@@ -1,28 +1,27 @@
 import React from 'react'
-import { Props, UserActions } from '../../src/data-loader'
-import { DataLoaderProvider } from '../../src/data-provider'
-import { DataLoaderResources } from '../../src/data-loader-resources'
-import { LoaderState } from '../../src/data-loader-state'
-import { Data, resourceType } from './test-data'
-
-// tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+
+import { UserActions } from '../../src/data-loader'
+import { DataProvider } from '../../src/data-provider'
+import { DataLoaderResources } from '../../src/data-loader-resources'
+import { LoaderState } from '../../src/data-loader-state'
 import { DataLoaderState } from '../../src/data-loader-store-and-loader'
+
+import { TestDataType, resourceType } from './test-data'
 
 export class DifferentKeysDataComponentFixture {
     loadAllCompletedCalled = 0
     loadDataCount1 = 0
     loadDataCount2 = 0
     renderCount = 0
-    testDataPromise: PromiseCompletionSource<Data>
-    testDataPromise2: PromiseCompletionSource<Data>
+    testDataPromise: PromiseCompletionSource<TestDataType>
+    testDataPromise2: PromiseCompletionSource<TestDataType>
     root: ReactWrapper<{ id: string }, any>
-    component: ReactWrapper<Props<Data, any, { id: string }> & { id: string }, any>
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
-    lastRenderProps!: LoaderState<Data>
-    lastRenderProps2!: LoaderState<Data>
+    lastRenderProps!: LoaderState<TestDataType>
+    lastRenderProps2!: LoaderState<TestDataType>
     lastRenderActions1!: UserActions<any>
     lastRenderActions2!: UserActions<any>
 
@@ -34,13 +33,13 @@ export class DifferentKeysDataComponentFixture {
         clientLoadOnly = false,
     ) {
         this.currentState = initialState
-        this.testDataPromise = new PromiseCompletionSource<Data>()
-        this.testDataPromise2 = new PromiseCompletionSource<Data>()
+        this.testDataPromise = new PromiseCompletionSource<TestDataType>()
+        this.testDataPromise2 = new PromiseCompletionSource<TestDataType>()
         this.resources = new DataLoaderResources()
 
-        const TestDataLoader = this.resources.registerResource<Data, { id: string }>(
+        const useDataLoader = this.resources.registerResource<TestDataType, { id: string }>(
             resourceType,
-            params => {
+            (params) => {
                 if (params.id === id) {
                     this.loadDataCount1++
                     return this.testDataPromise.promise
@@ -53,52 +52,45 @@ export class DifferentKeysDataComponentFixture {
             },
         )
 
-        const TestComponent: React.SFC<{ id: string; id2: string }> = testProp => (
-            <DataLoaderProvider
+        const ComponentWithData1: React.FC<{ id: string }> = ({ id }) => {
+            const { params, actions, ...props } = useDataLoader({ id }, { clientLoadOnly })
+            this.renderCount++
+            this.lastRenderProps = props
+            this.lastRenderActions1 = actions
+            return null
+        }
+        const ComponentWithData2: React.FC<{ id: string }> = ({ id }) => {
+            const { params, actions, ...props } = useDataLoader({ id }, { clientLoadOnly })
+            this.lastRenderProps2 = props
+            this.lastRenderActions2 = actions
+            return null
+        }
+
+        const TestComponent: React.SFC<{ id: string; id2: string }> = (testProp) => (
+            <div>
+                <ComponentWithData1 id={testProp.id} />
+                <ComponentWithData2 id={testProp.id2} />
+            </div>
+        )
+
+        this.root = mount(
+            <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
+                onEvent={(event) => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
                     } else if (event.type === 'state-changed') {
                         this.currentState = event.state
                     } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
                         console.info(event.data.error)
                     }
                 }}
             >
-                <div>
-                    <TestDataLoader
-                        id={testProp.id}
-                        clientLoadOnly={clientLoadOnly}
-                        // tslint:disable-next-line:jsx-no-lambda
-                        renderData={(props, actions) => {
-                            this.renderCount++
-                            this.lastRenderProps = props
-                            this.lastRenderActions1 = actions
-                            return null
-                        }}
-                    />
-                    <TestDataLoader
-                        id={testProp.id2}
-                        clientLoadOnly={clientLoadOnly}
-                        // tslint:disable-next-line:jsx-no-lambda
-                        renderData={(props, actions) => {
-                            this.lastRenderProps2 = props
-                            this.lastRenderActions2 = actions
-                            return null
-                        }}
-                    />
-                </div>
-            </DataLoaderProvider>
+                <TestComponent id={id} id2={id2} />
+            </DataProvider>,
         )
-
-        this.root = mount(<TestComponent id={id} id2={id2} />)
-
-        this.component = this.root.find(TestDataLoader)
     }
 
     refreshData1() {
@@ -121,12 +113,12 @@ export class DifferentKeysDataComponentFixture {
     }
 
     resetPromise() {
-        this.testDataPromise = new PromiseCompletionSource<Data>()
+        this.testDataPromise = new PromiseCompletionSource<TestDataType>()
     }
 
     unmount = async () => {
         this.root.unmount()
 
-        return new Promise(resolve => setTimeout(resolve))
+        return new Promise((resolve) => setTimeout(resolve))
     }
 }

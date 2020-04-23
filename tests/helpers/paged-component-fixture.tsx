@@ -1,20 +1,15 @@
 import React from 'react'
-import { Props, UserActions } from '../../src/data-loader'
-import { DataLoaderProvider } from '../../src/data-provider'
-import {
-    DataLoaderResources,
-    PagedData,
-    PageComponentProps,
-    PageState,
-} from '../../src/data-loader-resources'
-import { LoaderState } from '../../src/data-loader-state'
-
-// tslint:disable-next-line:no-implicit-dependencies
 import { mount, ReactWrapper } from 'enzyme'
 import { PromiseCompletionSource } from 'promise-completion-source'
+
+import { UserActions } from '../../src/data-loader'
+import { DataProvider } from '../../src/data-provider'
+import { DataLoaderResources } from '../../src/data-loader-resources'
+import { LoaderState } from '../../src/data-loader-state'
+
 import { DataLoaderState } from '../../src/data-loader-store-and-loader'
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DataResource {}
 
 export class PagedComponentFixture {
@@ -24,11 +19,6 @@ export class PagedComponentFixture {
     lastRenderProps!: LoaderState<DataResource>
     testDataPromise: PromiseCompletionSource<DataResource[]>
     root: ReactWrapper<{ id: string }, any>
-    component: ReactWrapper<
-        Props<PagedData<DataResource>, any, PageComponentProps & { id: string } & PageState> &
-            PageComponentProps & { id: string },
-        any
-    >
     resources: DataLoaderResources<any>
     currentState: DataLoaderState | undefined
     lastRenderActions!: UserActions<'nextPage' | 'refresh'>
@@ -43,50 +33,45 @@ export class PagedComponentFixture {
         this.currentState = initialState
         this.testDataPromise = new PromiseCompletionSource<DataResource[]>()
         this.resources = new DataLoaderResources()
-        const TestDataLoader = this.resources.registerPagedResource<DataResource, { id: string }>(
-            'testDataType',
-            () => {
-                this.loadDataCount++
-                return this.testDataPromise.promise
-            },
-        )
+        const usePagedDataLoader = this.resources.registerPagedResource<
+            DataResource,
+            { id: string }
+        >('testDataType', () => {
+            this.loadDataCount++
+            return this.testDataPromise.promise
+        })
 
-        const TestComponent: React.SFC<{ id: string }> = testComponentProps => (
-            <DataLoaderProvider
+        const TestComponent: React.SFC<{ id: string }> = (testComponentProps) => {
+            const { actions, params, ...props } = usePagedDataLoader(
+                { id: testComponentProps.id, paging: { pageSize: 10 } },
+                { clientLoadOnly },
+            )
+
+            this.renderCount++
+            this.lastRenderProps = props
+            this.lastRenderActions = actions
+            this.lastRenderParams = params
+            return null
+        }
+
+        this.root = mount(
+            <DataProvider
                 initialState={initialState}
                 isServerSideRender={isServerSideRender}
                 resources={this.resources}
-                // tslint:disable-next-line:jsx-no-lambda
-                onEvent={event => {
+                onEvent={(event) => {
                     if (event.type === 'data-load-completed') {
                         this.loadAllCompletedCalled++
                     } else if (event.type === 'state-changed') {
                         this.currentState = event.state
                     } else if (event.type === 'load-error') {
-                        // tslint:disable-next-line:no-console
                         console.info(event.data.error)
                     }
                 }}
             >
-                <TestDataLoader
-                    id={testComponentProps.id}
-                    paging={{ pageSize: 10 }}
-                    clientLoadOnly={clientLoadOnly}
-                    // tslint:disable-next-line:jsx-no-lambda
-                    renderData={(props, actions, params) => {
-                        this.renderCount++
-                        this.lastRenderProps = props
-                        this.lastRenderActions = actions
-                        this.lastRenderParams = params
-                        return null
-                    }}
-                />
-            </DataLoaderProvider>
+                <TestComponent id={id} />
+            </DataProvider>,
         )
-
-        this.root = mount(<TestComponent id={id} />)
-
-        this.component = this.root.find(TestDataLoader)
     }
 
     refreshData() {
@@ -117,6 +102,6 @@ export class PagedComponentFixture {
     unmount = async () => {
         this.root.unmount()
 
-        return new Promise(resolve => setTimeout(resolve))
+        return new Promise((resolve) => setTimeout(resolve))
     }
 }

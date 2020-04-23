@@ -1,12 +1,12 @@
 import React from 'react'
+import Adapter from 'enzyme-adapter-react-16'
+import { mount, configure } from 'enzyme'
+import { act } from 'react-dom/test-utils'
 import { ComponentFixture } from './helpers/component-fixture'
 import { SharedDataComponentFixture } from './helpers/shared-data-component-fixture'
 import { DifferentKeysDataComponentFixture } from './helpers/different-keys-data-component-fixture'
-import { DataLoaderProvider } from '../src/data-provider'
+import { DataProvider } from '../src/data-provider'
 import { DataLoaderResources } from '../src/index'
-// tslint:disable-next-line:no-implicit-dependencies
-import { mount, configure } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
 import { processEventLoop } from './helpers/event-loop-helpers'
 
 configure({ adapter: new Adapter() })
@@ -20,14 +20,16 @@ describe('data-loader', () => {
 
     it('can resolve data from multiple components', async () => {
         const sut = new SharedDataComponentFixture(undefined, 'testKey', false)
-        await sut.testDataPromise.resolve({ result: 'Test' })
+
+        await act(() => sut.testDataPromise.resolve({ result: 'Test' }))
 
         sut.assertState()
     })
 
     it('can load multiple dataloaders with different keys', async () => {
         const sut = new DifferentKeysDataComponentFixture(undefined, 'testKey', 'testKey2', false)
-        await sut.testDataPromise.resolve({ result: 'Test' })
+
+        await act(() => sut.testDataPromise.resolve({ result: 'Test' }))
 
         sut.assertState()
     })
@@ -35,10 +37,12 @@ describe('data-loader', () => {
     it('multiple components load data once when props change', async () => {
         const sut = new SharedDataComponentFixture(undefined, 'testKey', false)
 
-        await sut.testDataPromise.resolve({ result: 'Success!' })
-        sut.resetPromise()
-        sut.root.setProps({ id: 'newData' })
-        await sut.testDataPromise.resolve({ result: 'Success2!' })
+        await act(async () => {
+            await sut.testDataPromise.resolve({ result: 'Success!' })
+            sut.resetPromise()
+            sut.root.setProps({ id: 'newData' })
+            await sut.testDataPromise.resolve({ result: 'Success2!' })
+        })
 
         sut.assertState()
     })
@@ -46,16 +50,17 @@ describe('data-loader', () => {
     it('data is not unloaded until the last attached data-loader is unmounted', async () => {
         const sut = new SharedDataComponentFixture(undefined, 'testKey', false, false, true)
 
-        await sut.testDataPromise.resolve({ result: 'Success!' })
-        sut.root.unmount()
-        await processEventLoop()
+        await act(async () => {
+            await sut.testDataPromise.resolve({ result: 'Success!' })
+            sut.root.unmount()
+            await processEventLoop()
+        })
 
         sut.assertState()
     })
 
     it('handles onEvent throwing gracefully', async () => {
         const errors: string[] = []
-        // tslint:disable-next-line:no-console
         console.error = jest.fn((...err: any[]) => {
             errors.push(JSON.stringify(err))
         })
@@ -65,7 +70,10 @@ describe('data-loader', () => {
                 throw new Error('Boom')
             },
         })
-        await sut.testDataPromise.resolve({ result: 'Test' })
+
+        await act(async () => {
+            await sut.testDataPromise.resolve({ result: 'Test' })
+        })
 
         sut.assertState()
         expect(errors).toMatchSnapshot()
@@ -73,8 +81,11 @@ describe('data-loader', () => {
 
     it('ignores completion if unmounted first', async () => {
         const sut = new ComponentFixture(undefined, 'testKey', { isServerSideRender: false })
-        await sut.unmount()
-        await sut.testDataPromise.resolve({ result: 'Test' })
+
+        await act(async () => {
+            await sut.unmount()
+            await sut.testDataPromise.resolve({ result: 'Test' })
+        })
 
         sut.assertState()
     })
@@ -104,24 +115,26 @@ describe('data-loader', () => {
     it('resource can resolve synchronously', async () => {
         const resources = new DataLoaderResources()
 
-        const LoadTest = resources.registerResource<string, { id: string }>('test', () => 'Result!')
+        const useLoadData = resources.registerResource<string, { id: string }>(
+            'test',
+            () => 'Result!',
+        )
         let loadCount = 0
 
-        const wrapper = mount(
-            <DataLoaderProvider resources={resources}>
-                <LoadTest
-                    id="Test!"
-                    // tslint:disable-next-line:jsx-no-lambda
-                    renderData={renderProps => {
-                        loadCount++
-                        if (renderProps.data.hasData) {
-                            return <div>{renderProps.data.result}</div>
-                        }
+        const LoadTest: React.FC = () => {
+            const { data } = useLoadData({ id: 'Test!' })
+            loadCount++
 
-                        return <div>No data!</div>
-                    }}
-                />
-            </DataLoaderProvider>,
+            if (data.hasData) {
+                return <div>{data.result}</div>
+            }
+
+            return <div>No data!</div>
+        }
+        const wrapper = mount(
+            <DataProvider resources={resources}>
+                <LoadTest />
+            </DataProvider>,
         )
 
         expect(wrapper.html()).toMatchSnapshot()
@@ -133,29 +146,28 @@ describe('data-loader', () => {
     it('data loader handles synchronous throw', async () => {
         const resources = new DataLoaderResources()
 
-        const LoadTest = resources.registerResource<string, { id: string }>('test', () => {
+        const useLoadData = resources.registerResource<string, { id: string }>('test', () => {
             throw new Error('Synchronous fail')
         })
         let loadCount = 0
 
-        const wrapper = mount(
-            <DataLoaderProvider resources={resources}>
-                <LoadTest
-                    id="Test!"
-                    // tslint:disable-next-line:jsx-no-lambda
-                    renderData={renderProps => {
-                        loadCount++
-                        if (!renderProps.lastAction.success) {
-                            return <div>{renderProps.lastAction.error.message}</div>
-                        }
-                        if (renderProps.data.hasData) {
-                            return <div>{renderProps.data.result}</div>
-                        }
+        const LoadTest: React.FC = () => {
+            const { data, lastAction } = useLoadData({ id: 'Test!' })
+            loadCount++
+            if (!lastAction.success) {
+                return <div>{lastAction.error.message}</div>
+            }
+            if (data.hasData) {
+                return <div>{data.result}</div>
+            }
 
-                        return <div>No data!</div>
-                    }}
-                />
-            </DataLoaderProvider>,
+            return <div>No data!</div>
+        }
+
+        const wrapper = mount(
+            <DataProvider resources={resources}>
+                <LoadTest />
+            </DataProvider>,
         )
 
         expect(wrapper.html()).toMatchSnapshot()

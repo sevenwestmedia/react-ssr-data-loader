@@ -1,5 +1,9 @@
 {
-    "extends": ["wanews-base"],
+    "extends": ["wanews-base", "plugin:eslint-plugin-expect-type/recommended"],
+    "plugins": ["eslint-plugin-expect-type"],
+    "parserOptions": {
+        "project": "./tsconfig.json"
+    },
     "rules": {
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/explicit-member-accessibility": 0,

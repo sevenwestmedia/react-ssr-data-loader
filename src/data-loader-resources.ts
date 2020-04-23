@@ -1,15 +1,20 @@
-import { createTypedDataLoader, DataLoaderActions } from './data-loader'
+import { createUseRegisteredResourceHook, DataLoaderActions } from './data-loader'
 import { LoaderStatus } from './data-loader-state'
 import { ObjectHash } from './data-loader-store-and-loader'
 
-export type LoadResource<TData, TResourceParameters, TInternalState, TGlobalParameters> = (
-    params: {
-        resourceType: string
-        /** This is the key the data loader uses for looking up the data */
-        paramsCacheKey: string
-    } & TResourceParameters &
-        TInternalState &
-        TGlobalParameters,
+interface LoadResourceParams {
+    resourceType: string
+    /** This is the key the data loader uses for looking up the data */
+    paramsCacheKey: string
+}
+
+export type LoadResource<
+    TData,
+    TResourceParameters extends {},
+    TInternalState extends {},
+    TGlobalParameters extends {}
+> = (
+    params: LoadResourceParams & TResourceParameters & TInternalState & TGlobalParameters,
 ) => Promise<TData> | TData
 
 export interface RegisteredResource {
@@ -37,7 +42,7 @@ export interface PageState {
 }
 
 /** TGlobalParameters is provided through the data provider, and accessible in all data load function */
-export class DataLoaderResources<TGlobalParameters> {
+export class DataLoaderResources<TGlobalParameters extends {} = {}> {
     private resources: Record<keyof any, RegisteredResource> = {}
 
     constructor(
@@ -45,7 +50,10 @@ export class DataLoaderResources<TGlobalParameters> {
         private objectHash: ObjectHash = require('hash-sum'),
     ) {}
 
-    registerResource<TData, TResourceParameters>(
+    /**
+     * @returns data load hook
+     */
+    registerResource<TData, TResourceParameters extends {}>(
         resourceType: string,
         loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>,
         cacheKeyProperties?: Array<keyof TResourceParameters>,
@@ -54,7 +62,7 @@ export class DataLoaderResources<TGlobalParameters> {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<{}, TData> = {
+        const actions: DataLoaderActions<'refresh', {}, TData> = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,
@@ -63,18 +71,19 @@ export class DataLoaderResources<TGlobalParameters> {
                 }
             },
         }
-        const typedDataLoader = createTypedDataLoader<
+
+        const useRegisteredResource = createUseRegisteredResourceHook<
             TData,
             TResourceParameters,
             {},
-            typeof actions
+            'refresh'
         >(resourceType, {}, actions)
         this.resources[resourceType] = {
             loadResource,
             cacheKeyProperties,
         }
 
-        return typedDataLoader
+        return useRegisteredResource
     }
 
     /** Page numbers start at 1 */
@@ -92,7 +101,7 @@ export class DataLoaderResources<TGlobalParameters> {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<PageState, PagedData<TData>> = {
+        const actions: DataLoaderActions<'refresh' | 'nextPage', PageState, PagedData<TData>> = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,
@@ -113,18 +122,18 @@ export class DataLoaderResources<TGlobalParameters> {
             },
         }
 
-        const typedDataLoader = createTypedDataLoader<
+        const usePagedResource = createUseRegisteredResourceHook<
             PagedData<TData>,
             PageComponentProps & TResourceParameters,
             PageState,
-            typeof actions
+            'refresh' | 'nextPage'
         >(resourceType, { page: 1 }, actions)
         this.resources[resourceType] = {
             loadResource,
             cacheKeyProperties,
         }
 
-        return typedDataLoader
+        return usePagedResource
     }
 
     getResourceLoader(dataType: string): RegisteredResource {

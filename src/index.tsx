@@ -1,6 +1,6 @@
 export * from './data-loader-resources'
-export { RenderData, Props as DataLoaderProps, DataLoaderActions } from './data-loader'
-export { DataLoaderProvider as DataProvider, Props as DataProviderProps } from './data-provider'
+export { DataLoaderActions } from './data-loader'
+export { DataProvider, DataProviderProps } from './data-provider'
 export { DataLoaderResources } from './data-loader-resources'
 export { LoaderState, LoaderStatus } from './data-loader-state'
 export { DataProviderEvents } from './events'
