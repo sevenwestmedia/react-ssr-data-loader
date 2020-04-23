@@ -1,0 +1,8 @@
+{
+  "mode": "pre",
+  "tag": "next",
+  "initialVersions": {
+    "react-ssr-data-loader": "1.3.0"
+  },
+  "changesets": []
+}
