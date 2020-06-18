@@ -1,7 +1,6 @@
 export * from './data-loader-resources'
 export { DataLoaderActions } from './data-loader'
 export { DataProvider, DataProviderProps } from './data-provider'
-export { DataLoaderResources } from './data-loader-resources'
 export { LoaderState, LoaderStatus } from './data-loader-state'
 export { DataProviderEvents } from './events'
 export { DataLoaderState } from './data-loader-store-and-loader'

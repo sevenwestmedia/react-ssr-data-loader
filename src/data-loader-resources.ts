@@ -1,5 +1,5 @@
-import { createUseRegisteredResourceHook, DataLoaderActions } from './data-loader'
-import { LoaderStatus } from './data-loader-state'
+import { createUseRegisteredResourceHook, DataLoaderActions, UserActions } from './data-loader'
+import { LoaderStatus, LoaderState } from './data-loader-state'
 import { ObjectHash } from './data-loader-store-and-loader'
 
 interface LoadResourceParams {
@@ -10,9 +10,9 @@ interface LoadResourceParams {
 
 export type LoadResource<
     TData,
-    TResourceParameters extends {},
-    TInternalState extends {},
-    TGlobalParameters extends {}
+    TResourceParameters extends Record<string, unknown>,
+    TInternalState extends Record<string, unknown>,
+    TGlobalParameters extends Record<string, unknown>
 > = (
     params: LoadResourceParams & TResourceParameters & TInternalState & TGlobalParameters,
 ) => Promise<TData> | TData
@@ -42,7 +42,9 @@ export interface PageState {
 }
 
 /** TGlobalParameters is provided through the data provider, and accessible in all data load function */
-export class DataLoaderResources<TGlobalParameters extends {} = {}> {
+export class DataLoaderResources<
+    TGlobalParameters extends Record<string, unknown> = Record<string, unknown>
+> {
     private resources: Record<keyof any, RegisteredResource> = {}
 
     constructor(
@@ -53,16 +55,29 @@ export class DataLoaderResources<TGlobalParameters extends {} = {}> {
     /**
      * @returns data load hook
      */
-    registerResource<TData, TResourceParameters extends {}>(
+    registerResource<TData, TResourceParameters extends Record<string, unknown>>(
         resourceType: string,
-        loadResource: LoadResource<TData, TResourceParameters, {}, TGlobalParameters>,
+        loadResource: LoadResource<
+            TData,
+            TResourceParameters,
+            Record<string, unknown>,
+            TGlobalParameters
+        >,
         cacheKeyProperties?: Array<keyof TResourceParameters>,
-    ) {
+    ): (
+        dataLoadParams: TResourceParameters,
+        options?: {
+            clientLoadOnly?: boolean | undefined
+        },
+    ) => LoaderState<TData> & {
+        actions: UserActions<'refresh'>
+        params: TResourceParameters
+    } {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<'refresh', {}, TData> = {
+        const actions: DataLoaderActions<'refresh', Record<string, unknown>, TData> = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,
@@ -75,7 +90,7 @@ export class DataLoaderResources<TGlobalParameters extends {} = {}> {
         const useRegisteredResource = createUseRegisteredResourceHook<
             TData,
             TResourceParameters,
-            {},
+            Record<string, unknown>,
             'refresh'
         >(resourceType, {}, actions)
         this.resources[resourceType] = {
@@ -87,16 +102,24 @@ export class DataLoaderResources<TGlobalParameters extends {} = {}> {
     }
 
     /** Page numbers start at 1 */
-    registerPagedResource<TData, TResourceParameters>(
+    registerPagedResource<TData, TResourceParameters extends Record<string, unknown>>(
         resourceType: string,
         loadResource: LoadResource<
             TData,
             TResourceParameters & PageComponentProps,
-            PageState,
+            PageState & Record<string, unknown>,
             TGlobalParameters
         >,
         cacheKeyProperties?: Array<keyof TResourceParameters & string>,
-    ) {
+    ): (
+        dataLoadParams: PageComponentProps & TResourceParameters,
+        options?: {
+            clientLoadOnly?: boolean | undefined
+        },
+    ) => LoaderState<PagedData<TData>> & {
+        actions: UserActions<'refresh'>
+        params: TResourceParameters
+    } {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
@@ -140,7 +163,7 @@ export class DataLoaderResources<TGlobalParameters extends {} = {}> {
         return this.resources[dataType]
     }
 
-    generateCacheKey(resourceType: string, dataLoadParams: object): string {
+    generateCacheKey(resourceType: string, dataLoadParams: Record<string, unknown>): string {
         const { cacheKeyProperties } = this.resources[resourceType]
         const cacheObj = { ...dataLoadParams, resourceType }
 
