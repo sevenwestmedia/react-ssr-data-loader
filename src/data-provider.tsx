@@ -9,7 +9,7 @@ export interface DataProviderProps {
     onEvent?: (event: DataProviderEvents) => void | Promise<any>
     isServerSideRender?: boolean
     resources: DataLoaderResources<any>
-    globalProps?: object
+    globalProps?: Record<string, unknown>
 }
 
 export const DataProvider: React.FC<DataProviderProps> = (props) => {

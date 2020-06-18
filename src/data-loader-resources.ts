@@ -117,14 +117,18 @@ export class DataLoaderResources<
             clientLoadOnly?: boolean | undefined
         },
     ) => LoaderState<PagedData<TData>> & {
-        actions: UserActions<'refresh'>
+        actions: UserActions<'nextPage' | 'refresh'>
         params: TResourceParameters
     } {
         if (this.resources[resourceType]) {
             throw new Error(`The resource type ${resourceType} has already been registered`)
         }
 
-        const actions: DataLoaderActions<'refresh' | 'nextPage', PageState, PagedData<TData>> = {
+        const actions: DataLoaderActions<
+            'refresh' | 'nextPage',
+            PageState & Record<string, unknown>,
+            PagedData<TData>
+        > = {
             refresh(internalState) {
                 return {
                     newInternalState: internalState,
@@ -148,7 +152,7 @@ export class DataLoaderResources<
         const usePagedResource = createUseRegisteredResourceHook<
             PagedData<TData>,
             PageComponentProps & TResourceParameters,
-            PageState,
+            PageState & Record<string, unknown>,
             'refresh' | 'nextPage'
         >(resourceType, { page: 1 }, actions)
         this.resources[resourceType] = {

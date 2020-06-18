@@ -23,7 +23,7 @@ export interface LoadParams {
 }
 
 /** Takes an object and produces a consistent hash */
-export type ObjectHash = (obj: object) => string
+export type ObjectHash = (obj: Record<string, unknown>) => string
 
 export class DataLoaderStoreAndLoader {
     private requiresUpdateOnMount: string[] = []
@@ -56,10 +56,13 @@ export class DataLoaderStoreAndLoader {
                 paramsCacheKey: string
             },
         ) => Promise<any> | any,
-        private createParamsHash: (resourceType: string, dataLoadParams: object) => string,
+        private createParamsHash: (
+            resourceType: string,
+            dataLoadParams: Record<string, unknown>,
+        ) => string,
         public isServerSideRender: boolean,
     ) {
-        this.onEvent = event => {
+        this.onEvent = (event) => {
             try {
                 return onEvent(event)
             } catch (err) {
@@ -81,7 +84,7 @@ export class DataLoaderStoreAndLoader {
     attach(
         componentInstanceId: string,
         resourceType: string,
-        dataLoadParams: object,
+        dataLoadParams: Record<string, unknown>,
         update: () => void,
     ): void {
         const paramsObjectHash = this.createParamsHash(resourceType, dataLoadParams)
@@ -104,7 +107,11 @@ export class DataLoaderStoreAndLoader {
     }
 
     // Returns true when data needs to be unloaded from redux
-    detach(componentInstanceId: string, resourceType: string, dataLoadParams: object) {
+    detach(
+        componentInstanceId: string,
+        resourceType: string,
+        dataLoadParams: Record<string, unknown>,
+    ): void {
         const paramsObjectHash = this.createParamsHash(resourceType, dataLoadParams)
         this.cleanupDataLoader(paramsObjectHash, componentInstanceId)
         delete this.registeredDataLoaders[componentInstanceId]
@@ -114,10 +121,10 @@ export class DataLoaderStoreAndLoader {
     getDataLoaderState(
         componentInstanceId: string,
         resourceType: string,
-        dataLoadParams: object,
+        dataLoadParams: Record<string, unknown>,
         keepData = false,
         forceRefresh = false,
-    ) {
+    ): LoaderState<any> {
         // Initial render (before mount) and SSR will not be registered, we can safely fall back to
         // undefined in both these instances
         const previousRenderParamsObjectHash = this.registeredDataLoaders[componentInstanceId]
@@ -214,9 +221,9 @@ export class DataLoaderStoreAndLoader {
     ) {
         this.currentWorkCount++
         work.then(
-            result => ({ success: true as true, result }),
-            err => ({ success: false as false, err }),
-        ).then(result => {
+            (result) => ({ success: true as const, result }),
+            (err) => ({ success: false as const, err }),
+        ).then((result) => {
             const currentState = this.dataStore[paramsObjectHash]
             const currentStateVersion = this.paramHashVersion[paramsObjectHash]
             const versionMismatch = currentState && currentStateVersion !== beginLoadVersion
@@ -252,7 +259,7 @@ export class DataLoaderStoreAndLoader {
                     })
                 }
 
-                dataLoadersForHash.forEach(dataLoader => {
+                dataLoadersForHash.forEach((dataLoader) => {
                     const dataLoaderInfo = this.registeredDataLoaders[dataLoader]
                     // If data loaders are not mounted yet, can't call update..
                     // TODO when it registers, if the state has changed, need to call update

@@ -1,6 +1,6 @@
 import { LoadParams } from './data-loader-store-and-loader'
 
-export function getError(metadata: LoadParams, err: any, fallbackMsg?: string): Error {
+export function getError(metadata: LoadParams, err: unknown, fallbackMsg?: string): Error {
     if (err instanceof Error) {
         ;(err as any).dataLoadContext = `${metadata.resourceType}`
 
@@ -12,7 +12,7 @@ export function getError(metadata: LoadParams, err: any, fallbackMsg?: string): 
         return error
     }
 
-    const fallbackEror = new Error((err || fallbackMsg).toString())
+    const fallbackEror = new Error((err ? (err as any).toString() : fallbackMsg).toString())
     ;(fallbackEror as any).dataLoadContext = `${metadata.resourceType}`
     return fallbackEror
 }

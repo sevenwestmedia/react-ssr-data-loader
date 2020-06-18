@@ -18,6 +18,6 @@ export function ensureContext(
     return context
 }
 
-export function ssrNeedsData(state: LoaderState<any> | undefined) {
+export function ssrNeedsData(state: LoaderState<any> | undefined): boolean {
     return !state || (!state.data.hasData && state.lastAction.success)
 }
