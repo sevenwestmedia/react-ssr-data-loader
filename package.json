@@ -39,8 +39,8 @@
     },
     "peerDependencies": {
         "react": "^16.8.0",
-        "tslib": "^1.10.0",
-        "typescript-log": "^1.1.1"
+        "tslib": "^2.0.0",
+        "typescript-log": "^2.0.0"
     },
     "devDependencies": {
         "@changesets/cli": "^2.9.1",
