@@ -1,5 +1,11 @@
 # react-ssr-data-loader
 
+## 2.0.0-next.2
+
+### Patch Changes
+
+-   8e5f9c4: Fixed peerDependency versions
+
 ## 2.0.0-next.1
 
 ### Patch Changes
