@@ -23,7 +23,7 @@ export interface LoadParams {
 }
 
 /** Takes an object and produces a consistent hash */
-export type ObjectHash = (obj: Record<string, unknown>) => string
+export type ObjectHash = (obj: {}) => string
 
 export class DataLoaderStoreAndLoader {
     private requiresUpdateOnMount: string[] = []
@@ -56,10 +56,7 @@ export class DataLoaderStoreAndLoader {
                 paramsCacheKey: string
             },
         ) => Promise<any> | any,
-        private createParamsHash: (
-            resourceType: string,
-            dataLoadParams: Record<string, unknown>,
-        ) => string,
+        private createParamsHash: (resourceType: string, dataLoadParams: {}) => string,
         public isServerSideRender: boolean,
     ) {
         this.onEvent = (event) => {
@@ -84,7 +81,7 @@ export class DataLoaderStoreAndLoader {
     attach(
         componentInstanceId: string,
         resourceType: string,
-        dataLoadParams: Record<string, unknown>,
+        dataLoadParams: {},
         update: () => void,
     ): void {
         const paramsObjectHash = this.createParamsHash(resourceType, dataLoadParams)
@@ -107,11 +104,7 @@ export class DataLoaderStoreAndLoader {
     }
 
     // Returns true when data needs to be unloaded from redux
-    detach(
-        componentInstanceId: string,
-        resourceType: string,
-        dataLoadParams: Record<string, unknown>,
-    ): void {
+    detach(componentInstanceId: string, resourceType: string, dataLoadParams: {}): void {
         const paramsObjectHash = this.createParamsHash(resourceType, dataLoadParams)
         this.cleanupDataLoader(paramsObjectHash, componentInstanceId)
         delete this.registeredDataLoaders[componentInstanceId]
@@ -121,7 +114,7 @@ export class DataLoaderStoreAndLoader {
     getDataLoaderState(
         componentInstanceId: string,
         resourceType: string,
-        dataLoadParams: Record<string, unknown>,
+        dataLoadParams: {},
         keepData = false,
         forceRefresh = false,
     ): LoaderState<any> {

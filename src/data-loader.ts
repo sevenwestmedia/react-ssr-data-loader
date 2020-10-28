@@ -10,11 +10,7 @@ export type DataLoaderAction<TInternalState, TData> = (
     loaderState: LoaderState<TData>,
 ) => ActionResult<TInternalState> | null
 
-export type DataLoaderActions<
-    Actions extends string,
-    InternalState extends Record<string, unknown>,
-    Data
-> = {
+export type DataLoaderActions<Actions extends string, InternalState extends {}, Data> = {
     [actionName in Actions]: DataLoaderAction<InternalState, Data>
 }
 
@@ -24,8 +20,8 @@ export type UserActions<TActions extends string | number | symbol> = {
 
 export function createUseRegisteredResourceHook<
     ResourceData,
-    ResourceLoadParams extends Record<string, unknown>,
-    TInternalState extends Record<string, unknown>,
+    ResourceLoadParams extends {},
+    TInternalState extends {},
     Actions extends string
 >(
     resourceType: string,
