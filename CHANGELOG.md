@@ -1,5 +1,11 @@
 # react-ssr-data-loader
 
+## 2.0.0-next.3
+
+### Patch Changes
+
+-   ac0db16: Upgrade dependencies
+
 ## 2.0.0-next.2
 
 ### Patch Changes
