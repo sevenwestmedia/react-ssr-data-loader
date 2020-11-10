@@ -97,7 +97,10 @@ export class DataLoaderStoreAndLoader {
         const requiresUpdateIndex = this.requiresUpdateOnMount.indexOf(componentInstanceId)
         if (requiresUpdateIndex !== -1) {
             this.requiresUpdateOnMount.splice(requiresUpdateIndex, 1)
-            if (this.dataStore[paramsObjectHash].status !== LoaderStatus.Fetching) {
+            if (
+                this.dataStore[paramsObjectHash] &&
+                this.dataStore[paramsObjectHash].status !== LoaderStatus.Fetching
+            ) {
                 update()
             }
         }
