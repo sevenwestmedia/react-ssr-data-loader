@@ -1,5 +1,11 @@
 # react-ssr-data-loader
 
+## 2.0.0-next.4
+
+### Patch Changes
+
+-   6b228ea: Fixed possible error when a data loader is unmounted while a new data loader is still mounting which has the same data loader params
+
 ## 2.0.0-next.3
 
 ### Patch Changes
